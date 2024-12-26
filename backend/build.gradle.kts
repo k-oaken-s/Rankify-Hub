@@ -2,6 +2,7 @@ plugins {
     application
     id("org.jetbrains.kotlin.jvm") version "1.9.25"
     id("org.jetbrains.kotlin.plugin.spring") version "1.9.25"
+    id("org.jetbrains.kotlin.plugin.jpa") version "1.9.25"
     id("org.springframework.boot") version "3.3.5"
     id("io.spring.dependency-management") version "1.1.6"
     id("com.diffplug.spotless") version "6.22.0"
@@ -32,8 +33,13 @@ dependencies {
     implementation("org.postgresql:postgresql:42.7.4")
     runtimeOnly("com.h2database:h2:2.3.232")
 
+    // hibernate en
+    implementation("org.jetbrains.kotlin:kotlin-noarg")
+    implementation("org.jetbrains.kotlin:kotlin-allopen")
+
     // Flyway
     implementation("org.flywaydb:flyway-core:11.1.0")
+    implementation("org.flywaydb:flyway-database-postgresql")
 
     // Test dependencies
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
@@ -58,6 +64,12 @@ java {
 
 kotlin {
     jvmToolchain(21)
+}
+
+allOpen {
+    annotation("jakarta.persistence.Entity")
+    annotation("jakarta.persistence.MappedSuperclass")
+    annotation("jakarta.persistence.Embeddable")
 }
 
 repositories {
