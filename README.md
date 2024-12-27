@@ -19,8 +19,6 @@
 ### infra
 
 - Docker
-- Terraform
-- AWS
 
 ### CI/CD
 

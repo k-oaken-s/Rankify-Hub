@@ -1,0 +1,19 @@
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# Node.js / Frontend
+node_modules/
+npm-debug.log*
+yarn-error.log*
+.next/
+out/
+
+# Docker
+*.log
+
+# Secrets and sensitive files
+.secrets

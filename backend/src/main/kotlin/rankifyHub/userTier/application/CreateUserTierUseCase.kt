@@ -3,10 +3,12 @@ package rankifyHub.userTier.application
 import java.util.*
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.multipart.MultipartFile
+import rankifyHub.shared.domain.repository.FileStorageRepository
 import rankifyHub.userTier.domain.model.UserTier
 import rankifyHub.userTier.domain.model.UserTierFactory
-import rankifyHub.userTier.domain.model.UserTierItemData
-import rankifyHub.userTier.domain.model.UserTierLevelData
+import rankifyHub.userTier.domain.model.UserTierLevel
+import rankifyHub.userTier.domain.model.UserTierLevelItem
 import rankifyHub.userTier.domain.repository.UserTierRepository
 import rankifyHub.userTier.domain.vo.AnonymousId
 import rankifyHub.userTier.domain.vo.OrderIndex
@@ -16,41 +18,58 @@ import rankifyHub.userTier.presentation.dto.CreateUserTierRequest
 @Service
 class CreateUserTierUseCase(
   private val userTierRepository: UserTierRepository,
-  private val userTierFactory: UserTierFactory
+  private val userTierFactory: UserTierFactory,
+  private val fileStorageRepository: FileStorageRepository
 ) {
 
   @Transactional
-  fun create(request: CreateUserTierRequest): UserTier {
+  fun create(request: CreateUserTierRequest, imageFile: MultipartFile?): UserTier {
     val anonymousId = AnonymousId(request.anonymousId)
-    val categoryId = String(request.categoryId.toByteArray(Charsets.UTF_8), Charsets.UTF_8)
+    val categoryId = UUID.fromString(request.categoryId)
     val name = UserTierName(request.name)
     val isPublic = request.isPublic
 
+    val imagePath =
+      imageFile?.bytes?.let {
+        val uniqueId = "${anonymousId.value}-${System.currentTimeMillis()}"
+        fileStorageRepository.saveFile("user-tier-images", uniqueId, it, "jpg")
+      }
+
+    // levelsを組み立て
     val levels =
       request.levels.map { levelRequest ->
-        val levelName = UserTierName(levelRequest.name)
-        val levelOrderIndex = OrderIndex(levelRequest.orderIndex)
-
-        val items =
-          levelRequest.items.map { itemRequest ->
-            UserTierItemData(
+        val level =
+          UserTierLevel.create(
+            userTierId = UUID.randomUUID(), // 仮
+            name = levelRequest.name,
+            orderIndex = OrderIndex(levelRequest.orderIndex),
+            imagePath = null
+          )
+        levelRequest.items.forEach { itemRequest ->
+          val item =
+            UserTierLevelItem.create(
+              userTierLevelId = level.id,
+              userTierId = UUID.randomUUID(), // 仮
               itemId = UUID.fromString(itemRequest.itemId),
               orderIndex = OrderIndex(itemRequest.orderIndex)
             )
-          }
-
-        UserTierLevelData(name = levelName, orderIndex = levelOrderIndex, items = items)
+          level.addItem(item)
+        }
+        level
       }
 
+    // ドメイン側ファクトリで生成
     val userTier =
       userTierFactory.create(
         anonymousId = anonymousId,
         categoryId = categoryId,
         name = name,
         isPublic = isPublic,
-        levels = levels
+        levels = levels,
+        imagePath = imagePath
       )
 
+    // jOOQベースのリポジトリで保存
     return userTierRepository.save(userTier)
   }
 }

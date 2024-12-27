@@ -1,1 +1,2 @@
-ALTER TABLE category ADD COLUMN image MEDIUMBLOB AFTER description;
+ALTER TABLE category
+    ADD COLUMN image BYTEA;

@@ -1,11 +1,12 @@
 package rankifyHub.userTier.presentation.dto
 
+import java.util.*
 import rankifyHub.userTier.domain.model.UserTier
 import rankifyHub.userTier.domain.model.UserTierLevel
 import rankifyHub.userTier.domain.model.UserTierLevelItem
 
 data class UserTierDetailResponse(
-  val id: String,
+  val id: UUID,
   val anonymousId: String,
   val categoryId: String,
   val name: String,
@@ -16,7 +17,7 @@ data class UserTierDetailResponse(
   companion object {
     fun fromEntity(userTier: UserTier): UserTierDetailResponse {
       return UserTierDetailResponse(
-        id = userTier.id.toString(),
+        id = userTier.id,
         anonymousId = userTier.anonymousId.value,
         categoryId = userTier.categoryId.toString(),
         name = userTier.name.value,
@@ -29,7 +30,7 @@ data class UserTierDetailResponse(
 }
 
 data class UserTierLevelResponse(
-  val id: String,
+  val id: UUID,
   val name: String,
   val order: Int,
   val items: List<UserTierItemResponse>
@@ -37,7 +38,7 @@ data class UserTierLevelResponse(
   companion object {
     fun fromEntity(userTierLevel: UserTierLevel): UserTierLevelResponse {
       return UserTierLevelResponse(
-        id = userTierLevel.id.toString(),
+        id = userTierLevel.id,
         name = userTierLevel.name,
         order = userTierLevel.orderIndex.value,
         items = userTierLevel.items.map { UserTierItemResponse.fromEntity(it) }
@@ -46,7 +47,7 @@ data class UserTierLevelResponse(
   }
 }
 
-data class UserTierItemResponse(val itemId: String, val order: Int) {
+data class UserTierItemResponse(val itemId: UUID, val order: Int) {
   companion object {
     fun fromEntity(userTierItem: UserTierLevelItem): UserTierItemResponse {
       return UserTierItemResponse(itemId = userTierItem.id, order = userTierItem.orderIndex.value)

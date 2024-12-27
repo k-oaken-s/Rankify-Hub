@@ -1,14 +1,15 @@
 # Kotlin/Java specific
+*.class
 *.jar
 *.war
 *.ear
+*.iml
+build/
+bin/
+out/
 
 #gradle
 .gradle/
-
-# Gradle wrapper
-!gradle/wrapper/
-!gradle/wrapper/gradle-wrapper.properties
 !gradle/wrapper/gradle-wrapper.jar
 
 # OS generated files
@@ -17,14 +18,12 @@ Thumbs.db
 
 # IntelliJ IDEA
 .idea/
+*.iws
+*.ipr
+*.iml
 
 # VS Code
 .vscode/
-
-# Node.js / Frontend
-node_modules/
-npm-debug.log*
-yarn-error.log*
 
 # Docker
 *.log

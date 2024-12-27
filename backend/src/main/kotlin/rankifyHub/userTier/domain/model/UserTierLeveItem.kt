@@ -1,35 +1,67 @@
 package rankifyHub.userTier.domain.model
 
-import jakarta.persistence.*
 import java.time.Instant
 import java.util.*
 import rankifyHub.userTier.domain.vo.OrderIndex
 
-@Entity
-@Table(
-  name = "user_tier_level_item",
-  uniqueConstraints = [UniqueConstraint(columnNames = ["user_tier_level_id", "order_index"])]
-)
-open class UserTierLevelItem(
-  @Id val id: String = UUID.randomUUID().toString(),
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_tier_level_id", nullable = false)
-  var userTierLevel: UserTierLevel? = null,
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_tier_id", nullable = false)
-  val userTier: UserTier? = null,
-  @Column(name = "item_id", nullable = false) val itemId: String,
-  @Embedded
-  @AttributeOverrides(
-    AttributeOverride(name = "value", column = Column(name = "order_index", nullable = false))
-  )
-  var orderIndex: OrderIndex = OrderIndex(1),
-  @Column(name = "created_at", nullable = false) val createdAt: Instant = Instant.now(),
-  @Column(name = "updated_at", nullable = false) val updatedAt: Instant = Instant.now()
+class UserTierLevelItem(
+  val id: UUID = UUID.randomUUID(),
+  var userTierLevelId: UUID,
+  var userTierId: UUID,
+  var itemId: UUID,
+  var orderIndex: OrderIndex,
+  var imagePath: String? = null,
+  val createdAt: Instant = Instant.now(),
+  var updatedAt: Instant = Instant.now()
 ) {
-  constructor() : this(itemId = "")
+  fun updateImagePath(newImagePath: String?) {
+    this.imagePath = newImagePath
+    this.updatedAt = Instant.now()
+  }
 
   fun updateOrder(newOrder: OrderIndex) {
     this.orderIndex = newOrder
+    this.updatedAt = Instant.now()
+  }
+
+  companion object {
+    fun create(
+      userTierLevelId: UUID,
+      userTierId: UUID,
+      itemId: UUID,
+      orderIndex: OrderIndex,
+      imagePath: String? = null
+    ): UserTierLevelItem {
+      return UserTierLevelItem(
+        id = UUID.randomUUID(),
+        userTierLevelId = userTierLevelId,
+        userTierId = userTierId,
+        itemId = itemId,
+        orderIndex = orderIndex,
+        imagePath = imagePath
+      )
+    }
+
+    fun reconstruct(
+      id: UUID,
+      userTierLevelId: UUID,
+      userTierId: UUID,
+      itemId: UUID,
+      orderIndex: OrderIndex,
+      imagePath: String?,
+      createdAt: Instant,
+      updatedAt: Instant
+    ): UserTierLevelItem {
+      return UserTierLevelItem(
+        id,
+        userTierLevelId,
+        userTierId,
+        itemId,
+        orderIndex,
+        imagePath,
+        createdAt,
+        updatedAt
+      )
+    }
   }
 }

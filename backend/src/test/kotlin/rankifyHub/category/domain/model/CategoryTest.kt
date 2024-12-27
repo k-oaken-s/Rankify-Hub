@@ -2,80 +2,68 @@ package rankifyHub.category.domain.model
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.collections.shouldContainExactly
-import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import java.util.*
 
 class CategoryTest :
   StringSpec({
-
-    // カテゴリーの作成テスト
     "カテゴリーが正しく作成されること" {
-      // 準備
-      val name = "テストカテゴリー"
-      val description = "これはテストカテゴリーです"
-      val image = "画像データ".toByteArray()
+      val name = "Test Category"
+      val description = "Test Description"
+      val imagePath = "images/test-category.jpg"
 
-      // 実行
-      val category = Category.create(name, description, image)
+      val category = Category.create(name, description, imagePath)
 
-      // 検証
       category.name shouldBe name
       category.description shouldBe description
-      category.image shouldBe image
-      category.items shouldHaveSize 0 // 初期状態ではアイテムが空であること
+      category.imagePath shouldBe imagePath
     }
 
-    // カテゴリーへのアイテム追加テスト
     "カテゴリーにアイテムを追加できること" {
-      // 準備
-      val category = Category.create("テストカテゴリー", null, null)
+      val category = Category.create("Test Category", "Test Description", null)
+      val itemName = "Test Item"
+      val imagePath = "images/test-item.jpg"
 
-      // 実行
-      val item = category.addItem("テストアイテム", null, null)
+      val item =
+        category.addItem(
+          name = itemName,
+          imagePath = imagePath,
+          description = "Test Item Description"
+        )
 
-      // 検証
-      category.items shouldHaveSize 1
-      category.items shouldContainExactly listOf(item) // 正しいアイテムが追加されていること
-      category.items[0].name shouldBe "テストアイテム"
+      item.name shouldBe itemName
+      item.imagePath shouldBe imagePath
+      item.category shouldBe category
+      category.items shouldBe listOf(item)
     }
 
-    // カテゴリー内のアイテム更新テスト
     "カテゴリー内のアイテムを更新できること" {
-      // 準備
-      val category = Category.create("テストカテゴリー", null, null)
-      val item = category.addItem("古いアイテム", "古い画像".toByteArray(), "古い説明")
+      val category = Category.create("Test Category", "Test Description", null)
+      val item =
+        category.addItem(name = "Old Item", imagePath = null, description = "Old Description")
 
-      // 実行
       val updatedItem =
         category.updateItem(
           itemId = item.id,
-          name = "更新済みアイテム",
-          image = "新しい画像".toByteArray(),
+          name = "Updated Item",
+          imagePath = "images/updated-item.jpg",
           keepCurrentImage = false,
-          description = "新しい説明"
+          description = "Updated Description"
         )
 
-      // 検証
-      updatedItem.name shouldBe "更新済みアイテム"
-      updatedItem.image shouldBe "新しい画像".toByteArray()
-      updatedItem.description shouldBe "新しい説明"
-      category.items shouldHaveSize 1 // アイテム数は1のままであること
-      category.items[0] shouldBe updatedItem // 更新されたアイテムが正しく反映されていること
+      updatedItem.name shouldBe "Updated Item"
+      updatedItem.imagePath shouldBe "images/updated-item.jpg"
+      updatedItem.description shouldBe "Updated Description"
     }
 
-    // 存在しないアイテムの更新時に例外がスローされるテスト
     "存在しないアイテムを更新しようとすると例外がスローされること" {
-      // 準備
       val category = Category.create("テストカテゴリー", null, null)
 
-      // 実行・検証
       shouldThrow<IllegalArgumentException> {
           category.updateItem(
-            itemId = UUID.randomUUID().toString(), // 存在しないID
+            itemId = UUID.randomUUID(),
             name = "更新済みアイテム",
-            image = null,
+            imagePath = null,
             keepCurrentImage = true,
             description = null
           )
@@ -83,25 +71,21 @@ class CategoryTest :
         .message shouldBe "Item not found"
     }
 
-    // アイテム更新時に既存の画像を保持するテスト
     "アイテム更新時にkeepCurrentImage=trueの場合、既存の画像が保持されること" {
-      // 準備
       val category = Category.create("テストカテゴリー", null, null)
-      val item = category.addItem("アイテム名", "初期画像".toByteArray(), "説明")
+      val item = category.addItem("アイテム名", "初期画像のパス", "説明")
 
-      // 実行
       val updatedItem =
         category.updateItem(
           itemId = item.id,
           name = "更新済みアイテム",
-          image = null, // 新しい画像を指定しない
+          imagePath = null,
           keepCurrentImage = true,
           description = "更新済み説明"
         )
 
-      // 検証
       updatedItem.name shouldBe "更新済みアイテム"
-      updatedItem.image shouldBe "初期画像".toByteArray() // 既存の画像が保持されていること
+      updatedItem.imagePath shouldBe "初期画像のパス"
       updatedItem.description shouldBe "更新済み説明"
     }
   })

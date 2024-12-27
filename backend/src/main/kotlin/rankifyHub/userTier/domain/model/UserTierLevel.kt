@@ -1,56 +1,91 @@
 package rankifyHub.userTier.domain.model
 
-import jakarta.persistence.*
 import java.time.Instant
 import java.util.*
 import rankifyHub.userTier.domain.vo.OrderIndex
 
-@Entity
-@Table(
-  name = "user_tier_level",
-  uniqueConstraints = [UniqueConstraint(columnNames = ["user_tier_id", "order_index"])]
-)
-open class UserTierLevel(
-  @Id val id: String = UUID.randomUUID().toString(),
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_tier_id", nullable = false)
-  var userTier: UserTier? = null,
-  @Column(name = "name", nullable = false) val name: String = "",
-  @Embedded
-  @AttributeOverrides(
-    AttributeOverride(name = "value", column = Column(name = "order_index", nullable = false))
-  )
+class UserTierLevel(
+  val id: UUID = UUID.randomUUID(),
+  var userTierId: UUID, // UserTierとの紐付け (双方向は要検討)
+  val name: String,
   var orderIndex: OrderIndex = OrderIndex(1),
-  @Column(name = "created_at", nullable = false) val createdAt: Instant = Instant.now(),
-  @Column(name = "updated_at", nullable = false) val updatedAt: Instant = Instant.now(),
-  @OneToMany(
-    mappedBy = "userTierLevel",
-    cascade = [CascadeType.ALL],
-    orphanRemoval = true,
-    fetch = FetchType.LAZY
-  )
-  val items: MutableList<UserTierLevelItem> = mutableListOf()
+  var imagePath: String? = null,
+  val createdAt: Instant = Instant.now(),
+  var updatedAt: Instant = Instant.now(),
+  private val _items: MutableList<UserTierLevelItem> = mutableListOf()
 ) {
-  constructor() : this(id = UUID.randomUUID().toString())
+
+  val items: List<UserTierLevelItem>
+    get() = _items.toList()
 
   fun addItem(item: UserTierLevelItem) {
-    val nextOrder = items.maxOfOrNull { it.orderIndex.value }?.plus(1) ?: 1
+    val nextOrder = _items.maxOfOrNull { it.orderIndex.value }?.plus(1) ?: 1
     item.orderIndex = OrderIndex(nextOrder)
-    item.userTierLevel = this
-    items.add(item)
+    _items.add(item)
+    refreshUpdatedAt()
   }
 
   fun removeItem(item: UserTierLevelItem) {
-    items.remove(item)
+    _items.remove(item)
     reorderItems()
+    refreshUpdatedAt()
   }
 
   private fun reorderItems() {
-    items.sortBy { it.orderIndex.value }
-    items.forEachIndexed { index, item -> item.updateOrder(OrderIndex(index + 1)) }
+    _items.sortBy { it.orderIndex.value }
+    _items.forEachIndexed { index, it -> it.updateOrder(OrderIndex(index + 1)) }
   }
 
   fun updateOrder(newOrder: OrderIndex) {
     this.orderIndex = newOrder
+    refreshUpdatedAt()
+  }
+
+  fun updateImagePath(newImagePath: String?) {
+    this.imagePath = newImagePath
+    refreshUpdatedAt()
+  }
+
+  private fun refreshUpdatedAt() {
+    this.updatedAt = Instant.now()
+  }
+
+  companion object {
+    fun create(
+      userTierId: UUID,
+      name: String,
+      orderIndex: OrderIndex,
+      imagePath: String?
+    ): UserTierLevel {
+      return UserTierLevel(
+        id = UUID.randomUUID(),
+        userTierId = userTierId,
+        name = name,
+        orderIndex = orderIndex,
+        imagePath = imagePath
+      )
+    }
+
+    fun reconstruct(
+      id: UUID,
+      userTierId: UUID,
+      name: String,
+      orderIndex: OrderIndex,
+      imagePath: String?,
+      createdAt: Instant,
+      updatedAt: Instant,
+      items: List<UserTierLevelItem>
+    ): UserTierLevel {
+      return UserTierLevel(
+        id = id,
+        userTierId = userTierId,
+        name = name,
+        orderIndex = orderIndex,
+        imagePath = imagePath,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+        _items = items.toMutableList()
+      )
+    }
   }
 }

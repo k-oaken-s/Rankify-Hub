@@ -6,5 +6,5 @@ import rankifyHub.userTier.domain.model.UserTier
 data class UserTierWithCategoryDto(
   val userTier: UserTier,
   val categoryName: String,
-  val categoryImage: ByteArray?
+  val categoryImagePath: String? // S3などのパスを保持
 )

@@ -1,1 +1,4 @@
-ALTER TABLE item CHANGE COLUMN image_url image MEDIUMBLOB;
+ALTER TABLE item RENAME COLUMN image_url TO image;
+ALTER TABLE item
+ALTER COLUMN image TYPE bytea
+    USING image::bytea;
