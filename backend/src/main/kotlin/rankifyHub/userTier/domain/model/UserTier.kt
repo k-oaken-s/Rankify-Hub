@@ -17,6 +17,7 @@ import rankifyHub.userTier.domain.vo.UserTierName
  * @property name Tierの名前
  * @property isPublic Tierの公開設定
  * @property accessUrl アクセスURL（Tierの一意な公開用識別子）
+ * @property imagePath S3に保存された画像へのパス（任意）
  * @property createdAt 作成日時
  * @property updatedAt 更新日時
  */
@@ -38,6 +39,8 @@ open class UserTier(
   @Embedded
   @AttributeOverride(name = "value", column = Column(name = "access_url", nullable = false))
   val accessUrl: AccessUrl,
+  @Column(name = "image_path", nullable = true) // 新規追加
+  var imagePath: String? = null,
   @Column(name = "created_at", nullable = false, updatable = false)
   val createdAt: Instant = Instant.now(),
   @Column(name = "updated_at", nullable = false) var updatedAt: Instant = Instant.now(),
@@ -50,7 +53,7 @@ open class UserTier(
   private var levels: MutableList<UserTierLevel> = mutableListOf(),
 ) {
   // Hibernate用のデフォルトコンストラクタ
-  protected constructor() :
+  constructor() :
     this(
       UUID.randomUUID(),
       AnonymousId(),
@@ -58,6 +61,7 @@ open class UserTier(
       UserTierName(),
       false,
       AccessUrl(),
+      null, // imagePathの初期値
       Instant.now(),
       Instant.now(),
       mutableListOf()
@@ -86,5 +90,15 @@ open class UserTier(
 
   private fun updateTimestamp() {
     updatedAt = Instant.now()
+  }
+
+  /**
+   * 画像パスを更新します。
+   *
+   * @param newImagePath 新しい画像パス
+   */
+  fun updateImagePath(newImagePath: String?) {
+    this.imagePath = newImagePath
+    updateTimestamp()
   }
 }

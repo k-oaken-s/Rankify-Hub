@@ -14,7 +14,6 @@ import rankifyHub.userTier.domain.vo.UserTierName
 
 class UserTierLevelTest :
   StringSpec({
-    // UserTierLevelにアイテムを追加するテスト
     "アイテムを追加できることを確認" {
       val userTierLevel =
         UserTierLevel(
@@ -24,7 +23,7 @@ class UserTierLevelTest :
           orderIndex = OrderIndex(1),
           createdAt = Instant.now(),
           updatedAt = Instant.now(),
-          _items = mutableListOf() // 空のリストを初期化
+          _items = mutableListOf()
         )
       val userTier =
         UserTier(
@@ -47,13 +46,12 @@ class UserTierLevelTest :
 
       userTierLevel.addItem(item)
 
-      userTierLevel.items shouldHaveSize 1 // アイテムが1件追加されていること
-      userTierLevel.items shouldContain item // アイテムがリストに含まれていること
-      item.orderIndex.value shouldBe 1 // アイテムの順序が正しいこと
-      item.userTierLevel shouldBe userTierLevel // 親のUserTierLevelが正しく設定されていること
+      userTierLevel.items shouldHaveSize 1
+      userTierLevel.items shouldContain item
+      item.orderIndex.value shouldBe 1
+      item.userTierLevel shouldBe userTierLevel
     }
 
-    // UserTierLevelからアイテムを削除するテスト
     "アイテムを削除できることを確認" {
       val userTierLevel =
         UserTierLevel(
@@ -63,7 +61,7 @@ class UserTierLevelTest :
           orderIndex = OrderIndex(1),
           createdAt = Instant.now(),
           updatedAt = Instant.now(),
-          _items = mutableListOf() // 空のリストを初期化
+          _items = mutableListOf()
         )
       val item =
         UserTierLevelItem(
@@ -78,10 +76,9 @@ class UserTierLevelTest :
       userTierLevel.addItem(item)
       userTierLevel.removeItem(item)
 
-      userTierLevel.items shouldHaveSize 0 // アイテムが削除されていること
+      userTierLevel.items shouldHaveSize 0
     }
 
-    // UserTierLevel内のアイテムを並べ替えるテスト
     "アイテムの順序を並べ替えられることを確認" {
       val userTierLevel =
         UserTierLevel(
@@ -91,7 +88,7 @@ class UserTierLevelTest :
           orderIndex = OrderIndex(1),
           createdAt = Instant.now(),
           updatedAt = Instant.now(),
-          _items = mutableListOf() // 空のリストを初期化
+          _items = mutableListOf()
         )
 
       val item1 =
@@ -116,11 +113,11 @@ class UserTierLevelTest :
       userTierLevel.addItem(item1)
       userTierLevel.addItem(item2)
 
-      userTierLevel.items[0].orderIndex.value shouldBe 1 // 最初のアイテムの順序が1
-      userTierLevel.items[1].orderIndex.value shouldBe 2 // 2番目のアイテムの順序が2
+      userTierLevel.items[0].orderIndex.value shouldBe 1
+      userTierLevel.items[1].orderIndex.value shouldBe 2
 
       userTierLevel.removeItem(item1)
 
-      userTierLevel.items[0].orderIndex.value shouldBe 1 // 残ったアイテムの順序が更新されること
+      userTierLevel.items[0].orderIndex.value shouldBe 1
     }
   })

@@ -10,7 +10,6 @@ import rankifyHub.userTier.domain.vo.OrderIndex
 class UserTierLevelItemTest :
   StringSpec({
     "順序を更新できることを確認" {
-      // テスト用のデータを準備
       val userTierLevel = mockk<UserTierLevel>(relaxed = true)
       val userTier = mockk<UserTier>(relaxed = true)
       val itemId = UUID.randomUUID()
@@ -18,7 +17,6 @@ class UserTierLevelItemTest :
       val createdAt = Instant.now()
       val updatedAt = Instant.now()
 
-      // UserTierLevelItemを作成
       val item =
         UserTierLevelItem(
           userTierLevel = userTierLevel,
@@ -29,10 +27,8 @@ class UserTierLevelItemTest :
           updatedAt = updatedAt
         )
 
-      // 順序を更新
       item.updateOrder(OrderIndex(2))
 
-      // 検証
-      item.orderIndex.value shouldBe 2 // 順序が2に更新されていること
+      item.orderIndex.value shouldBe 2
     }
   })

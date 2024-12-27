@@ -19,6 +19,8 @@ class UserTierLevel(
   @Embedded
   @AttributeOverride(name = "value", column = Column(name = "order_index", nullable = false))
   var orderIndex: OrderIndex = OrderIndex(1),
+  @Column(name = "image_path", nullable = true) // 画像パスを追加
+  var imagePath: String? = null,
   @Column(name = "created_at", nullable = false, updatable = false)
   val createdAt: Instant = Instant.now(),
   @Column(name = "updated_at", nullable = false) var updatedAt: Instant = Instant.now(),
@@ -40,12 +42,14 @@ class UserTierLevel(
     item.orderIndex = OrderIndex(nextOrder)
     item.userTierLevel = this
     _items.add(item)
+    refreshUpdatedAt()
   }
 
   /** アイテムを削除する */
   fun removeItem(item: UserTierLevelItem) {
     _items.remove(item)
     reorderItems()
+    refreshUpdatedAt()
   }
 
   /** アイテムの順序を再整理する */
@@ -57,6 +61,13 @@ class UserTierLevel(
   /** 並び順を更新する */
   fun updateOrder(newOrder: OrderIndex) {
     this.orderIndex = newOrder
+    refreshUpdatedAt()
+  }
+
+  /** 画像パスを更新する */
+  fun updateImagePath(newImagePath: String?) {
+    this.imagePath = newImagePath
+    refreshUpdatedAt()
   }
 
   /** 更新日時をリフレッシュする */

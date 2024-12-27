@@ -1,97 +1,73 @@
 package rankifyHub.category.domain.model
 
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 
 class ItemTest :
-  DescribeSpec({
-    describe("Item エンティティ") {
+  StringSpec({
+    "名前と画像パスを指定して新しいアイテムを作成できること" {
+      val name = "サンプルアイテム"
+      val imagePath = "images/sample-item.jpg"
+      val category = Category.create("カテゴリー名", null, null)
 
-      // アイテム作成メソッドのテスト
-      context("create メソッド") {
-        it("名前と画像データを指定して新しいアイテムを作成できること") {
-          // 準備
-          val name = "サンプルアイテム"
-          val image = ByteArray(10) { it.toByte() } // サンプルバイナリデータ
-          val category = Category.create("カテゴリー名", null, null)
+      val item = Item.create(name, imagePath, category, "サンプル説明")
 
-          // 実行
-          val item = Item.create(name, image, category)
+      item.shouldBeInstanceOf<Item>()
+      item.name shouldBe name
+      item.imagePath shouldBe imagePath
+      item.category shouldBe category
+      item.description shouldBe "サンプル説明"
+      item.id shouldNotBe null
+    }
 
-          // 検証
-          item.shouldBeInstanceOf<Item>()
-          item.name shouldBe name
-          item.image shouldBe image
-          item.category shouldBe category
-          item.id shouldNotBe null // IDが生成されていること
-        }
+    "画像パスがnullでも新しいアイテムを作成できること" {
+      val name = "画像なしアイテム"
+      val category = Category.create("カテゴリー名", null, null)
 
-        it("画像がnullでも新しいアイテムを作成できること") {
-          // 準備
-          val name = "画像なしアイテム"
-          val category = Category.create("カテゴリー名", null, null)
+      val item = Item.create(name, null, category, null)
 
-          // 実行
-          val item = Item.create(name, null, category)
+      item.name shouldBe name
+      item.imagePath shouldBe null
+      item.category shouldBe category
+      item.description shouldBe null
+    }
 
-          // 検証
-          item.name shouldBe name
-          item.image shouldBe null
-          item.category shouldBe category
-        }
-      }
+    "アイテムの名前と画像パスを更新できること" {
+      val originalName = "元のアイテム"
+      val originalImagePath = "images/original-item.jpg"
+      val category = Category.create("カテゴリー名", null, null)
+      val item = Item.create(originalName, originalImagePath, category, "元の説明")
 
-      // アイテム更新メソッドのテスト
-      context("update メソッド") {
-        it("アイテムの名前と画像を更新できること") {
-          // 準備
-          val originalName = "元のアイテム"
-          val originalImage = ByteArray(5) { it.toByte() }
-          val category = Category.create("カテゴリー名", null, null)
-          val item = Item.create(originalName, originalImage, category)
+      val updatedName = "更新後のアイテム"
+      val updatedImagePath = "images/updated-item.jpg"
 
-          val updatedName = "更新後のアイテム"
-          val updatedImage = ByteArray(10) { it.toByte() }
+      val updatedItem = item.update(updatedName, updatedImagePath, "更新後の説明")
 
-          // 実行
-          val updatedItem = item.update(updatedName, updatedImage, "更新後の説明")
+      updatedItem.id shouldBe item.id
+      updatedItem.name shouldBe updatedName
+      updatedItem.imagePath shouldBe updatedImagePath
+      updatedItem.description shouldBe "更新後の説明"
+    }
 
-          // 検証
-          updatedItem.id shouldBe item.id // IDは変更されないこと
-          updatedItem.name shouldBe updatedName
-          updatedItem.image shouldBe updatedImage
-          updatedItem.description shouldBe "更新後の説明"
-        }
+    "画像パスをnullに更新できること" {
+      val originalName = "元のアイテム"
+      val originalImagePath = "images/original-item.jpg"
+      val category = Category.create("カテゴリー名", null, null)
+      val item = Item.create(originalName, originalImagePath, category, "元の説明")
 
-        it("画像をnullに更新できること") {
-          // 準備
-          val originalName = "元のアイテム"
-          val originalImage = ByteArray(5) { it.toByte() }
-          val category = Category.create("カテゴリー名", null, null)
-          val item = Item.create(originalName, originalImage, category)
+      val updatedItem = item.update(originalName, null, "説明を変更")
 
-          // 実行
-          val updatedItem = item.update(originalName, null, "説明を変更")
+      updatedItem.name shouldBe originalName
+      updatedItem.imagePath shouldBe null
+      updatedItem.description shouldBe "説明を変更"
+    }
 
-          // 検証
-          updatedItem.name shouldBe originalName
-          updatedItem.image shouldBe null // 画像が削除されていること
-          updatedItem.description shouldBe "説明を変更"
-        }
-      }
+    "IDと名前のデフォルト値が設定されていること" {
+      val item = Item.create("", null, Category(), null)
 
-      // デフォルト値のテスト
-      context("デフォルト値") {
-        it("IDと名前のデフォルト値が設定されていること") {
-          // 実行
-          val item = Item.create("", null, Category())
-
-          // 検証
-          item.id shouldNotBe null // デフォルトのIDが生成されていること
-          item.name shouldBe "" // 名前のデフォルト値が空文字列であること
-        }
-      }
+      item.id shouldNotBe null
+      item.name shouldBe ""
     }
   })

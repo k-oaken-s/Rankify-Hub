@@ -1,12 +1,12 @@
 package rankifyHub.userTier.presentation.presenter
 
 import org.springframework.stereotype.Component
-import rankifyHub.shared.infrustructure.PublicFileStorageRepository
+import rankifyHub.shared.domain.repository.FileStorageRepository
 import rankifyHub.userTier.presentation.dto.UserTierResponse
 import rankifyHub.userTier.presentation.dto.UserTierWithCategoryDto
 
 @Component
-class UserTierPresenter(private val publicFileStorageRepository: PublicFileStorageRepository) {
+class UserTierPresenter(private val fileStorageRepository: FileStorageRepository) {
 
   /**
    * UserTierWithCategoryDtoをUserTierResponseに変換します。
@@ -16,16 +16,7 @@ class UserTierPresenter(private val publicFileStorageRepository: PublicFileStora
    */
   fun toResponse(dto: UserTierWithCategoryDto): UserTierResponse {
     val categoryImageUrl =
-      dto.categoryImage?.let { imageBytes ->
-        publicFileStorageRepository.saveFile(
-          "images/categories",
-          dto.userTier.categoryId.toString(),
-          imageBytes,
-          "jpg"
-        )
-      }
-        ?: ""
-
+      dto.categoryImagePath?.let { fileStorageRepository.generateUrl(it) } ?: ""
     return UserTierResponse(
       accessUrl = dto.userTier.accessUrl.value,
       createdAt = dto.userTier.createdAt,

@@ -6,6 +6,7 @@ import java.util.concurrent.Executors
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.context.request.async.DeferredResult
+import org.springframework.web.multipart.MultipartFile
 import rankifyHub.userTier.application.CreateUserTierUseCase
 import rankifyHub.userTier.application.GetLatestUserTiersUseCase
 import rankifyHub.userTier.presentation.dto.CreateUserTierRequest
@@ -22,43 +23,30 @@ class UserTierController(
 ) {
 
   @PostMapping
-  fun create(@RequestBody request: CreateUserTierRequest): ResponseEntity<UserTierDetailResponse> {
-    val userTier = createUserTierUseCase.create(request)
+  fun create(
+    @RequestPart("request") request: CreateUserTierRequest,
+    @RequestPart("image", required = false) imageFile: MultipartFile?
+  ): ResponseEntity<UserTierDetailResponse> {
+    // CreateUserTierUseCase にリクエストとファイルを渡す
+    val userTier = createUserTierUseCase.create(request, imageFile)
     return ResponseEntity.ok(UserTierDetailResponse.fromEntity(userTier))
   }
 
-  /**
-   * 公開されているUserTierを取得します。
-   *
-   * @return 公開されているUserTierのリスト
-   */
   @GetMapping("/public")
   fun getPublicUserTiers(): List<UserTierResponse> {
     val userTiersWithCategory = getLatestUserTiersUseCase.getPublicUserTiers()
     return userTiersWithCategory.map { presenter.toResponse(it) }
   }
 
-  /**
-   * 指定された件数の最新のUserTierを取得します。
-   *
-   * @param limit 取得する件数
-   * @return 最新のUserTierリスト
-   */
   @GetMapping("/latest")
   fun getLatestUserTiers(@RequestParam limit: Int): List<UserTierResponse> {
     val userTiersWithCategory = getLatestUserTiersUseCase.getLatestUserTiers(limit)
     return userTiersWithCategory.map { presenter.toResponse(it) }
   }
 
-  /**
-   * 指定された時刻以降に作成されたUserTierをロングポーリングで取得します。
-   *
-   * @param since 開始時刻（ミリ秒）
-   * @return 指定時刻以降のUserTierリスト
-   */
   @GetMapping("/since")
   fun getUserTiersSince(@RequestParam since: Long): DeferredResult<List<UserTierResponse>> {
-    val deferredResult = DeferredResult<List<UserTierResponse>>(30000L) // タイムアウト30秒
+    val deferredResult = DeferredResult<List<UserTierResponse>>(30000L)
     val executor = Executors.newSingleThreadExecutor()
 
     CompletableFuture.runAsync(
