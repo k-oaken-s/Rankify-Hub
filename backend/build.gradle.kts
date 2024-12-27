@@ -54,6 +54,7 @@ dependencies {
     implementation(platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.1.0"))
     implementation(platform("software.amazon.awssdk:bom:2.26.7"))
     implementation("io.awspring.cloud:spring-cloud-aws-starter-parameter-store")
+    implementation("software.amazon.awssdk:s3")
 }
 
 java {
