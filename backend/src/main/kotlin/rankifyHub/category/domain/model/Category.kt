@@ -1,32 +1,18 @@
 package rankifyHub.category.domain.model
 
-import jakarta.persistence.*
 import java.util.*
 
-/** カテゴリーエンティティ。 */
-@Entity
-@Table(name = "category")
-open class Category(
-  @Id
-  @GeneratedValue
-  @Column(columnDefinition = "UUID", updatable = false, nullable = false)
-  val id: UUID = UUID.randomUUID(),
-  @Column(nullable = false) val name: String = "",
-  val description: String? = null,
-
-  /** 画像のバイナリを保持していた代わりに、 「オブジェクトストレージ上のキー or URL」を文字列として保持。 */
-  val imagePath: String? = null,
-  @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
-  @JoinColumn(name = "category_id")
+class Category
+private constructor(
+  val id: UUID,
+  val name: String,
+  val description: String?,
+  val imagePath: String?,
   private val _items: MutableList<Item> = mutableListOf()
 ) {
 
   val items: List<Item>
     get() = _items.toList()
-
-  override fun toString(): String {
-    return "Category(id=$id, name='$name', description=$description)"
-  }
 
   companion object {
     fun create(name: String, description: String?, imagePath: String?): Category {
@@ -37,11 +23,20 @@ open class Category(
         imagePath = imagePath
       )
     }
+
+    fun reconstruct(
+      id: UUID,
+      name: String,
+      description: String?,
+      imagePath: String?,
+      items: List<Item> = emptyList()
+    ): Category {
+      return Category(id, name, description, imagePath, items.toMutableList())
+    }
   }
 
   fun addItem(name: String, imagePath: String?, description: String?): Item {
-    val item =
-      Item.create(name = name, imagePath = imagePath, category = this, description = description)
+    val item = Item.create(name, imagePath, description)
     _items.add(item)
     return item
   }
@@ -53,15 +48,15 @@ open class Category(
     keepCurrentImage: Boolean,
     description: String?
   ): Item {
-    val item = _items.find { it.id == itemId } ?: throw IllegalArgumentException("Item not found")
+    val targetIndex = _items.indexOfFirst { it.id == itemId }
+    if (targetIndex == -1) throw IllegalArgumentException("Item not found")
 
-    val updatedImagePath = if (keepCurrentImage) item.imagePath else imagePath
+    val current = _items[targetIndex]
+    val updatedImagePath = if (keepCurrentImage) current.imagePath else imagePath
 
-    val updatedItem =
-      item.update(name = name, imagePath = updatedImagePath, description = description)
-
-    _items.removeIf { it.id == itemId }
-    _items.add(updatedItem)
-    return updatedItem
+    val updated =
+      current.update(name = name, imagePath = updatedImagePath, description = description)
+    _items[targetIndex] = updated
+    return updated
   }
 }

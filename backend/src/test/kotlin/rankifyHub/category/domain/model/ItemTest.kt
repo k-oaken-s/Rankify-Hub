@@ -10,35 +10,30 @@ class ItemTest :
     "名前と画像パスを指定して新しいアイテムを作成できること" {
       val name = "サンプルアイテム"
       val imagePath = "images/sample-item.jpg"
-      val category = Category.create("カテゴリー名", null, null)
 
-      val item = Item.create(name, imagePath, category, "サンプル説明")
+      val item = Item.create(name, imagePath, "サンプル説明")
 
       item.shouldBeInstanceOf<Item>()
       item.name shouldBe name
       item.imagePath shouldBe imagePath
-      item.category shouldBe category
       item.description shouldBe "サンプル説明"
       item.id shouldNotBe null
     }
 
     "画像パスがnullでも新しいアイテムを作成できること" {
       val name = "画像なしアイテム"
-      val category = Category.create("カテゴリー名", null, null)
 
-      val item = Item.create(name, null, category, null)
+      val item = Item.create(name, null, null)
 
       item.name shouldBe name
       item.imagePath shouldBe null
-      item.category shouldBe category
       item.description shouldBe null
     }
 
     "アイテムの名前と画像パスを更新できること" {
       val originalName = "元のアイテム"
       val originalImagePath = "images/original-item.jpg"
-      val category = Category.create("カテゴリー名", null, null)
-      val item = Item.create(originalName, originalImagePath, category, "元の説明")
+      val item = Item.create(originalName, originalImagePath, "元の説明")
 
       val updatedName = "更新後のアイテム"
       val updatedImagePath = "images/updated-item.jpg"
@@ -54,8 +49,7 @@ class ItemTest :
     "画像パスをnullに更新できること" {
       val originalName = "元のアイテム"
       val originalImagePath = "images/original-item.jpg"
-      val category = Category.create("カテゴリー名", null, null)
-      val item = Item.create(originalName, originalImagePath, category, "元の説明")
+      val item = Item.create(originalName, originalImagePath, "元の説明")
 
       val updatedItem = item.update(originalName, null, "説明を変更")
 
@@ -65,7 +59,7 @@ class ItemTest :
     }
 
     "IDと名前のデフォルト値が設定されていること" {
-      val item = Item.create("", null, Category(), null)
+      val item = Item.create("", null, null)
 
       item.id shouldNotBe null
       item.name shouldBe ""

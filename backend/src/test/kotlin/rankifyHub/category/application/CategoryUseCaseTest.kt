@@ -63,7 +63,7 @@ class CategoryUseCaseTest :
       val categoryId = UUID.randomUUID()
       val itemId = UUID.randomUUID()
       val category = mockk<Category>(relaxed = true)
-      val updatedItem = Item.create("Updated Item", "imagePath", category, "")
+      val updatedItem = Item.create("Updated Item", "imagePath", description = "")
 
       every { categoryRepository.findById(categoryId) } returns Optional.of(category)
       every {

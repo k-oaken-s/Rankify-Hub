@@ -10,7 +10,6 @@ import rankifyHub.userTier.domain.model.UserTierFactory
 import rankifyHub.userTier.domain.model.UserTierLevel
 import rankifyHub.userTier.domain.model.UserTierLevelItem
 import rankifyHub.userTier.domain.repository.UserTierRepository
-import rankifyHub.userTier.domain.vo.AccessUrl
 import rankifyHub.userTier.domain.vo.AnonymousId
 import rankifyHub.userTier.domain.vo.OrderIndex
 import rankifyHub.userTier.domain.vo.UserTierName
@@ -36,40 +35,41 @@ class CreateUserTierUseCase(
         fileStorageRepository.saveFile("user-tier-images", uniqueId, it, "jpg")
       }
 
-    // UserTier を先に作成・保存して ID を付与
+    // levelsを組み立て
+    val levels =
+      request.levels.map { levelRequest ->
+        val level =
+          UserTierLevel.create(
+            userTierId = UUID.randomUUID(), // 仮
+            name = levelRequest.name,
+            orderIndex = OrderIndex(levelRequest.orderIndex),
+            imagePath = null
+          )
+        levelRequest.items.forEach { itemRequest ->
+          val item =
+            UserTierLevelItem.create(
+              userTierLevelId = level.id,
+              userTierId = UUID.randomUUID(), // 仮
+              itemId = UUID.fromString(itemRequest.itemId),
+              orderIndex = OrderIndex(itemRequest.orderIndex)
+            )
+          level.addItem(item)
+        }
+        level
+      }
+
+    // ドメイン側ファクトリで生成
     val userTier =
-      UserTier(
+      userTierFactory.create(
         anonymousId = anonymousId,
         categoryId = categoryId,
         name = name,
         isPublic = isPublic,
-        accessUrl = AccessUrl(UUID.randomUUID().toString()),
+        levels = levels,
         imagePath = imagePath
       )
-    userTierRepository.save(userTier)
 
-    // レベルデータとアイテムを作成
-    request.levels.forEach { levelRequest ->
-      val level =
-        UserTierLevel(
-          userTier = userTier,
-          name = levelRequest.name,
-          orderIndex = OrderIndex(levelRequest.orderIndex)
-        )
-      levelRequest.items.forEach { itemRequest ->
-        val item =
-          UserTierLevelItem(
-            userTierLevel = level,
-            userTier = userTier,
-            itemId = UUID.fromString(itemRequest.itemId),
-            orderIndex = OrderIndex(itemRequest.orderIndex)
-          )
-        level.addItem(item)
-      }
-      userTier.addLevel(level)
-    }
-
-    // UserTier を再度保存してレベルとアイテムを永続化
+    // jOOQベースのリポジトリで保存
     return userTierRepository.save(userTier)
   }
 }
