@@ -1,20 +1,19 @@
 plugins {
     application
     id("org.jetbrains.kotlin.jvm") version "1.9.25"
-    id("org.jetbrains.kotlin.plugin.spring") version "1.9.25"
-    // ↓ JPA/Hibernate 用プラグインなら削除してOK
-    // id("org.jetbrains.kotlin.plugin.jpa") version "1.9.25"
-
     id("org.springframework.boot") version "3.3.5"
     id("io.spring.dependency-management") version "1.1.6"
     id("com.diffplug.spotless") version "6.22.0"
     id("org.flywaydb.flyway") version "10.10.0"
-    // ↓ JPA/Hibernate 用プラグインなら削除してOK
-    // kotlin("plugin.allopen") version "2.1.0"
+    id("nu.studer.jooq") version "8.2"
+}
+
+repositories {
+    mavenCentral()
 }
 
 dependencies {
-    // Spring Boot関連
+    // Spring Boot 関連
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-devtools")
@@ -37,13 +36,13 @@ dependencies {
 
     // jOOQ
     implementation("org.springframework.boot:spring-boot-starter-jooq")
-     implementation("org.jooq:jooq:3.18.6")
-     implementation("org.jooq:jooq-meta:3.18.6")
-     implementation("org.jooq:jooq-meta-extensions:3.18.6")
+    implementation("org.jooq:jooq:3.19.16")
+    implementation("org.jooq:jooq-meta:3.19.16")
+    implementation("org.jooq:jooq-codegen:3.19.16")
+    jooqGenerator("org.postgresql:postgresql:42.7.4")
 
     // Flyway
     implementation("org.flywaydb:flyway-core:11.1.0")
-    implementation("org.flywaydb:flyway-database-postgresql")
 
     // テスト関連
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
@@ -61,20 +60,45 @@ dependencies {
     implementation("software.amazon.awssdk:s3")
 }
 
-// ★ Hibernate (noarg/allopen) 用なら削除してOK
-// java {
-//     toolchain {
-//         languageVersion = JavaLanguageVersion.of(21)
-//     }
-// }
-
-// ★ Kotlin の JVM Toolchain 設定
 kotlin {
     jvmToolchain(21)
 }
 
-repositories {
-    mavenCentral()
+sourceSets.main {
+    java.srcDir("build/generated-sources/jooq")
+}
+
+jooq {
+    version.set("3.19.16")
+    configurations {
+        create("main") {
+            generateSchemaSourceOnCompilation.set(false)
+            jooqConfiguration.apply {
+                jdbc.apply {
+                    driver = "org.postgresql.Driver"
+                    url = "jdbc:postgresql://localhost:5432/my_database"
+                    user = "user"
+                    password = "password"
+                }
+                generator.apply {
+                    name = "org.jooq.codegen.KotlinGenerator"
+                    database.apply {
+                        name = "org.jooq.meta.postgres.PostgresDatabase"
+                        inputSchema = "public"
+                        includes = ".*"
+                    }
+                    target.apply {
+                        packageName = "rankifyHub.jooq.generated"
+                        directory = "build/generated-sources/jooq"
+                    }
+                }
+            }
+        }
+    }
+}
+
+tasks.named("compileKotlin") {
+    dependsOn("generateJooq")
 }
 
 tasks.test {
