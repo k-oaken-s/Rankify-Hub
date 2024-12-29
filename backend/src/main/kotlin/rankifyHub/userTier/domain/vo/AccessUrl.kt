@@ -1,14 +1,12 @@
 package rankifyHub.userTier.domain.vo
 
-import jakarta.persistence.Embeddable
-import java.util.UUID
+import java.util.*
 
 /**
  * アクセスURL
  *
  * @property value アクセスURLの値
  */
-@Embeddable
 data class AccessUrl(val value: String = "") {
   init {
     require(value.length <= 255) { "AccessUrl must be 255 characters or less" }
