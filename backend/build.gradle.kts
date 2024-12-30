@@ -1,20 +1,28 @@
+import nu.studer.gradle.jooq.JooqEdition
+import org.jooq.meta.jaxb.ForcedType
+import org.jooq.meta.jaxb.Logging
+import org.jooq.meta.jaxb.Property
+
 plugins {
     application
     id("org.jetbrains.kotlin.jvm") version "1.9.25"
-    id("org.jetbrains.kotlin.plugin.spring") version "1.9.25"
-    // ↓ JPA/Hibernate 用プラグインなら削除してOK
-    // id("org.jetbrains.kotlin.plugin.jpa") version "1.9.25"
-
     id("org.springframework.boot") version "3.3.5"
     id("io.spring.dependency-management") version "1.1.6"
     id("com.diffplug.spotless") version "6.22.0"
-    id("org.flywaydb.flyway") version "10.10.0"
-    // ↓ JPA/Hibernate 用プラグインなら削除してOK
-    // kotlin("plugin.allopen") version "2.1.0"
+    id("org.flywaydb.flyway") version "11.1.0"
+    id("nu.studer.jooq") version "9.0"
+}
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    create("flywayMigration")
 }
 
 dependencies {
-    // Spring Boot関連
+    // Spring Boot 関連
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-devtools")
@@ -33,17 +41,17 @@ dependencies {
 
     // Database
     implementation("org.postgresql:postgresql:42.7.4")
-    runtimeOnly("com.h2database:h2:2.3.232")
 
     // jOOQ
     implementation("org.springframework.boot:spring-boot-starter-jooq")
-     implementation("org.jooq:jooq:3.18.6")
-     implementation("org.jooq:jooq-meta:3.18.6")
-     implementation("org.jooq:jooq-meta-extensions:3.18.6")
+    implementation("org.jooq:jooq:3.19.16")
+    implementation("org.jooq:jooq-meta:3.19.16")
+    implementation("org.jooq:jooq-codegen:3.19.16")
+    jooqGenerator("com.h2database:h2:2.1.214")
 
     // Flyway
     implementation("org.flywaydb:flyway-core:11.1.0")
-    implementation("org.flywaydb:flyway-database-postgresql")
+    add("flywayMigration", "com.h2database:h2:2.1.214")
 
     // テスト関連
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
@@ -61,20 +69,8 @@ dependencies {
     implementation("software.amazon.awssdk:s3")
 }
 
-// ★ Hibernate (noarg/allopen) 用なら削除してOK
-// java {
-//     toolchain {
-//         languageVersion = JavaLanguageVersion.of(21)
-//     }
-// }
-
-// ★ Kotlin の JVM Toolchain 設定
 kotlin {
     jvmToolchain(21)
-}
-
-repositories {
-    mavenCentral()
 }
 
 tasks.test {
@@ -90,4 +86,76 @@ spotless {
 
 application {
     mainClass.set("rankifyHub.RankifyHubApplicationKt")
+}
+
+flyway {
+    configurations = arrayOf("flywayMigration")
+    url = "jdbc:h2:~/my_database;AUTO_SERVER=TRUE" // あなたのデータベースのURL
+    user = "sa" // あなたのデータベースのユーザー名
+    password = "" // あなたのデータベースのパスワード
+}
+
+jooq {
+    version.set("3.19.15")
+    edition.set(JooqEdition.OSS)
+
+    configurations {
+        create("main") {
+            jooqConfiguration.apply {
+                logging = Logging.WARN
+                jdbc.apply {
+                    driver = "org.h2.Driver"
+                    url = "jdbc:h2:~/my_database;AUTO_SERVER=TRUE"
+                    user = "sa"
+                    password = ""
+                    properties = listOf(
+                        Property().apply {
+                            key = "PAGE_SIZE"
+                            value = "2048"
+                        }
+                    )
+                }
+                generator.apply {
+                    name = "org.jooq.codegen.DefaultGenerator"
+                    database.apply {
+                        name = "org.jooq.meta.h2.H2Database"
+                        inputSchema = "PUBLIC"
+                        forcedTypes = listOf(
+                            ForcedType().apply {
+                                name = "varchar"
+                                includeExpression = ".*"
+                                includeTypes = "JSONB?"
+                            },
+                            ForcedType().apply {
+                                name = "varchar"
+                                includeExpression = ".*"
+                                includeTypes = "INET"
+                            }
+                        )
+                    }
+                    generate.apply {
+                        isDeprecated = false
+                        isRecords = false
+                        isImmutablePojos = false
+                        isFluentSetters = false
+                    }
+                    target.apply {
+                        packageName = "rankifyHub"
+                        directory = "build/generated-src/jooq/main"
+                    }
+                    strategy.name = "org.jooq.codegen.DefaultGeneratorStrategy"
+                }
+            }
+        }
+    }
+}
+
+tasks.named("generateJooq") {
+    dependsOn(tasks.named("flywayMigrate"))
+
+    inputs.files(fileTree("src/main/resources/db/migration"))
+        .withPropertyName("migrations")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+
+    outputs.upToDateWhen { false }
 }

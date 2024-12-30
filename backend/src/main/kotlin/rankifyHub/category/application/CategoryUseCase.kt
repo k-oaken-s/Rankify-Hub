@@ -1,9 +1,9 @@
 package rankifyHub.category.application
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import jakarta.transaction.Transactional
 import java.util.*
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import rankifyHub.category.domain.model.Category
 import rankifyHub.category.domain.model.Item
