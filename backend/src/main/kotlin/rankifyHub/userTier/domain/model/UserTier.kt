@@ -15,7 +15,6 @@ class UserTier(
   val name: UserTierName,
   val isPublic: Boolean = false,
   val accessUrl: AccessUrl,
-  var imagePath: String? = null, // S3に保存された画像パス
   val createdAt: Instant = Instant.now(),
   var updatedAt: Instant = Instant.now(),
   private val levels: MutableList<UserTierLevel> = mutableListOf(),
@@ -43,11 +42,6 @@ class UserTier(
     levels.forEachIndexed { index, lvl -> lvl.updateOrder(OrderIndex(index + 1)) }
   }
 
-  fun updateImagePath(newImagePath: String?) {
-    this.imagePath = newImagePath
-    refreshUpdatedAt()
-  }
-
   private fun refreshUpdatedAt() {
     this.updatedAt = Instant.now()
   }
@@ -60,7 +54,6 @@ class UserTier(
       categoryId: UUID,
       name: UserTierName,
       isPublic: Boolean,
-      imagePath: String?
     ): UserTier {
       return UserTier(
         id = UUID.randomUUID(),
@@ -69,7 +62,6 @@ class UserTier(
         name = name,
         isPublic = isPublic,
         accessUrl = AccessUrl(UUID.randomUUID().toString()),
-        imagePath = imagePath
       )
     }
 
@@ -81,7 +73,6 @@ class UserTier(
       name: UserTierName,
       isPublic: Boolean,
       accessUrl: AccessUrl,
-      imagePath: String?,
       createdAt: Instant,
       updatedAt: Instant,
       levels: List<UserTierLevel>
@@ -93,7 +84,6 @@ class UserTier(
         name = name,
         isPublic = isPublic,
         accessUrl = accessUrl,
-        imagePath = imagePath,
         createdAt = createdAt,
         updatedAt = updatedAt,
         levels = levels.toMutableList()

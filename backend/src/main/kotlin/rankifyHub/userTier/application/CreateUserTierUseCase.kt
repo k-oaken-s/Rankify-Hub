@@ -1,6 +1,5 @@
 package rankifyHub.userTier.application
 
-import java.util.*
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
@@ -14,16 +13,17 @@ import rankifyHub.userTier.domain.vo.AnonymousId
 import rankifyHub.userTier.domain.vo.OrderIndex
 import rankifyHub.userTier.domain.vo.UserTierName
 import rankifyHub.userTier.presentation.dto.CreateUserTierRequest
+import java.util.*
 
 @Service
-class CreateUserTierUseCase(
+open class CreateUserTierUseCase(
   private val userTierRepository: UserTierRepository,
   private val userTierFactory: UserTierFactory,
   private val fileStorageRepository: FileStorageRepository
 ) {
 
   @Transactional
-  fun create(request: CreateUserTierRequest, imageFile: MultipartFile?): UserTier {
+  open fun create(request: CreateUserTierRequest, imageFile: MultipartFile?): UserTier {
     val anonymousId = AnonymousId(request.anonymousId)
     val categoryId = UUID.fromString(request.categoryId)
     val name = UserTierName(request.name)
@@ -65,8 +65,7 @@ class CreateUserTierUseCase(
         categoryId = categoryId,
         name = name,
         isPublic = isPublic,
-        levels = levels,
-        imagePath = imagePath
+        levels = levels
       )
 
     // jOOQベースのリポジトリで保存

@@ -13,16 +13,14 @@ class UserTierFactory {
     categoryId: UUID,
     name: UserTierName,
     isPublic: Boolean,
-    levels: List<UserTierLevel>,
-    imagePath: String?
+    levels: List<UserTierLevel>
   ): UserTier {
     val userTier =
       UserTier.create(
         anonymousId = anonymousId,
         categoryId = categoryId,
         name = name,
-        isPublic = isPublic,
-        imagePath = imagePath
+        isPublic = isPublic
       )
 
     // UserTierLevel の userTierId をセットし、items も紐付け
