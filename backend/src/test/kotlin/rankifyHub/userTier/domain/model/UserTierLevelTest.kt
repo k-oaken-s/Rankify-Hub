@@ -4,13 +4,9 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
-import io.mockk.mockk
+import rankifyHub.userTier.domain.vo.OrderIndex
 import java.time.Instant
 import java.util.*
-import rankifyHub.userTier.domain.vo.AccessUrl
-import rankifyHub.userTier.domain.vo.AnonymousId
-import rankifyHub.userTier.domain.vo.OrderIndex
-import rankifyHub.userTier.domain.vo.UserTierName
 
 class UserTierLevelTest :
   StringSpec({
@@ -18,55 +14,50 @@ class UserTierLevelTest :
       val userTierLevel =
         UserTierLevel(
           id = UUID.randomUUID(),
+          userTierId = UUID.randomUUID(), // userTier ではなく userTierId を使用
           name = "Test Level",
-          userTier = mockk(relaxed = true),
           orderIndex = OrderIndex(1),
           createdAt = Instant.now(),
-          updatedAt = Instant.now(),
-          _items = mutableListOf()
-        )
-      val userTier =
-        UserTier(
-          anonymousId = AnonymousId("test"),
-          categoryId = UUID.randomUUID(),
-          name = UserTierName("Test UserTier"),
-          isPublic = true,
-          accessUrl = AccessUrl("test-url")
+          updatedAt = Instant.now()
         )
 
       val item =
         UserTierLevelItem(
-          userTierLevel = userTierLevel,
-          userTier = userTier,
+          id = UUID.randomUUID(),
+          userTierLevelId = userTierLevel.id,
+          userTierId = userTierLevel.userTierId,
           itemId = UUID.randomUUID(),
           orderIndex = OrderIndex(1),
           createdAt = Instant.now(),
           updatedAt = Instant.now()
         )
 
+      // アイテムを追加
       userTierLevel.addItem(item)
 
       userTierLevel.items shouldHaveSize 1
       userTierLevel.items shouldContain item
       item.orderIndex.value shouldBe 1
-      item.userTierLevel shouldBe userTierLevel
+      item.userTierLevelId shouldBe userTierLevel.id
+      item.userTierId shouldBe userTierLevel.userTierId
     }
 
     "アイテムを削除できることを確認" {
       val userTierLevel =
         UserTierLevel(
           id = UUID.randomUUID(),
+          userTierId = UUID.randomUUID(),
           name = "Test Level",
-          userTier = mockk(relaxed = true),
           orderIndex = OrderIndex(1),
           createdAt = Instant.now(),
-          updatedAt = Instant.now(),
-          _items = mutableListOf()
+          updatedAt = Instant.now()
         )
+
       val item =
         UserTierLevelItem(
-          userTierLevel = userTierLevel,
-          userTier = mockk(relaxed = true),
+          id = UUID.randomUUID(),
+          userTierLevelId = userTierLevel.id,
+          userTierId = userTierLevel.userTierId,
           itemId = UUID.randomUUID(),
           orderIndex = OrderIndex(1),
           createdAt = Instant.now(),
@@ -83,18 +74,18 @@ class UserTierLevelTest :
       val userTierLevel =
         UserTierLevel(
           id = UUID.randomUUID(),
+          userTierId = UUID.randomUUID(),
           name = "Test Level",
-          userTier = mockk(relaxed = true),
           orderIndex = OrderIndex(1),
           createdAt = Instant.now(),
-          updatedAt = Instant.now(),
-          _items = mutableListOf()
+          updatedAt = Instant.now()
         )
 
       val item1 =
         UserTierLevelItem(
-          userTierLevel = userTierLevel,
-          userTier = mockk(relaxed = true),
+          id = UUID.randomUUID(),
+          userTierLevelId = userTierLevel.id,
+          userTierId = userTierLevel.userTierId,
           itemId = UUID.randomUUID(),
           orderIndex = OrderIndex(1),
           createdAt = Instant.now(),
@@ -102,8 +93,9 @@ class UserTierLevelTest :
         )
       val item2 =
         UserTierLevelItem(
-          userTierLevel = userTierLevel,
-          userTier = mockk(relaxed = true),
+          id = UUID.randomUUID(),
+          userTierLevelId = userTierLevel.id,
+          userTierId = userTierLevel.userTierId,
           itemId = UUID.randomUUID(),
           orderIndex = OrderIndex(2),
           createdAt = Instant.now(),

@@ -33,7 +33,6 @@ class CategoryTest :
 
       item.name shouldBe itemName
       item.imagePath shouldBe imagePath
-      item.category shouldBe category
       category.items shouldBe listOf(item)
     }
 

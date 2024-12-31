@@ -1,5 +1,6 @@
 package rankifyHub.userTier.application
 
+import java.util.*
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
@@ -13,7 +14,6 @@ import rankifyHub.userTier.domain.vo.AnonymousId
 import rankifyHub.userTier.domain.vo.OrderIndex
 import rankifyHub.userTier.domain.vo.UserTierName
 import rankifyHub.userTier.presentation.dto.CreateUserTierRequest
-import java.util.*
 
 @Service
 open class CreateUserTierUseCase(
