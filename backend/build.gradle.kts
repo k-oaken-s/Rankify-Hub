@@ -120,18 +120,18 @@ jooq {
                     database.apply {
                         name = "org.jooq.meta.h2.H2Database"
                         inputSchema = "PUBLIC"
-                        forcedTypes = listOf(
-                            ForcedType().apply {
-                                name = "varchar"
-                                includeExpression = ".*"
-                                includeTypes = "JSONB?"
-                            },
-                            ForcedType().apply {
-                                name = "varchar"
-                                includeExpression = ".*"
-                                includeTypes = "INET"
-                            }
-                        )
+//                        forcedTypes = listOf(
+//                            ForcedType().apply {
+//                                name = "varchar"
+//                                includeExpression = ".*"
+//                                includeTypes = "JSONB?"
+//                            },
+//                            ForcedType().apply {
+//                                name = "varchar"
+//                                includeExpression = ".*"
+//                                includeTypes = "INET"
+//                            }
+//                        )
                     }
                     generate.apply {
                         isDeprecated = false
