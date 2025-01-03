@@ -21,10 +21,10 @@ class CategoryRepository(private val dsl: DSLContext) : CategoryRepository {
         .on(CATEGORY.ID.eq(ITEM.CATEGORY_ID))
         .fetchGroups(CATEGORY.ID)
 
-    return records.map { (categoryId, groupRecords) ->
+    return records.map { (_, groupRecords) ->
       val categoryRecord = groupRecords.first().into(CATEGORY)
       val itemRecords =
-        groupRecords.mapNotNull { rec -> rec.into(ITEM)?.takeIf { it[ITEM.ID] != null } }
+        groupRecords.mapNotNull { rec -> rec.into(ITEM).takeIf { it[ITEM.ID] != null } }
 
       Category.reconstruct(
         id = categoryRecord[CATEGORY.ID]!!,

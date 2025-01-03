@@ -3,7 +3,6 @@ package rankifyHub.common.security
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
@@ -17,8 +16,7 @@ import org.springframework.web.filter.CorsFilter
  * アプリケーションのセキュリティ設定を管理します。 主に認証、認可、CORS、CSRF などの設定を行います。
  */
 @Configuration
-@EnableWebSecurity
-class SecurityConfig {
+open class SecurityConfig {
 
   /**
    * パスワードエンコーダーの Bean を生成
@@ -28,7 +26,7 @@ class SecurityConfig {
    * @return PasswordEncoder のインスタンス
    */
   @Bean
-  fun passwordEncoder(): PasswordEncoder {
+  open fun passwordEncoder(): PasswordEncoder {
     return BCryptPasswordEncoder()
   }
 
@@ -41,7 +39,7 @@ class SecurityConfig {
    * @return SecurityFilterChain のインスタンス
    */
   @Bean
-  fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
+  open fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
     http
       .cors { it.configurationSource(corsConfigurationSource()) } // CORS設定を適用
       .csrf { it.disable() } // CSRFを無効化
@@ -59,7 +57,7 @@ class SecurityConfig {
    * @return CORS 設定のソース
    */
   @Bean
-  fun corsConfigurationSource(): UrlBasedCorsConfigurationSource {
+  open fun corsConfigurationSource(): UrlBasedCorsConfigurationSource {
     val source = UrlBasedCorsConfigurationSource()
     val config = CorsConfiguration()
 
@@ -81,7 +79,7 @@ class SecurityConfig {
    * @return CORS フィルター
    */
   @Bean
-  fun corsFilter(): CorsFilter {
+  open fun corsFilter(): CorsFilter {
     return CorsFilter(corsConfigurationSource())
   }
 }

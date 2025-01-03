@@ -1,6 +1,5 @@
 package rankifyHub.userTier.application
 
-import java.util.*
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
@@ -14,6 +13,7 @@ import rankifyHub.userTier.domain.vo.AnonymousId
 import rankifyHub.userTier.domain.vo.OrderIndex
 import rankifyHub.userTier.domain.vo.UserTierName
 import rankifyHub.userTier.presentation.dto.CreateUserTierRequest
+import java.util.*
 
 @Service
 open class CreateUserTierUseCase(
@@ -29,11 +29,11 @@ open class CreateUserTierUseCase(
     val name = UserTierName(request.name)
     val isPublic = request.isPublic
 
-    val imagePath =
-      imageFile?.bytes?.let {
-        val uniqueId = "${anonymousId.value}-${System.currentTimeMillis()}"
-        fileStorageRepository.saveFile("user-tier-images", uniqueId, it, "jpg")
-      }
+    //    val imagePath =
+    //      imageFile?.bytes?.let {
+    //        val uniqueId = "${anonymousId.value}-${System.currentTimeMillis()}"
+    //        fileStorageRepository.saveFile("user-tier-images", uniqueId, it, "jpg")
+    //      }
 
     // levelsを組み立て
     val levels =

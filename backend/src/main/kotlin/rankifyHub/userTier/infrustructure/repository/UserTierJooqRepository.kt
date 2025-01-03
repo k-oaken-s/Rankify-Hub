@@ -1,18 +1,18 @@
 package rankifyHub.userTier.infrastructure.repository
 
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneOffset
 import org.jooq.DSLContext
 import org.springframework.stereotype.Repository
-import rankifyHub.tables.UserTier as JUserTier
-import rankifyHub.tables.UserTierLevel as JUserTierLevel
-import rankifyHub.tables.UserTierLevelItem as JUserTierLevelItem
 import rankifyHub.userTier.domain.model.UserTier
 import rankifyHub.userTier.domain.repository.UserTierRepository
 import rankifyHub.userTier.domain.vo.AccessUrl
 import rankifyHub.userTier.domain.vo.AnonymousId
 import rankifyHub.userTier.domain.vo.UserTierName
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import rankifyHub.tables.UserTier as JUserTier
+import rankifyHub.tables.UserTierLevel as JUserTierLevel
+import rankifyHub.tables.UserTierLevelItem as JUserTierLevelItem
 
 @Repository
 class UserTierJooqRepository(private val dsl: DSLContext) : UserTierRepository {
@@ -29,12 +29,12 @@ class UserTierJooqRepository(private val dsl: DSLContext) : UserTierRepository {
       .set(JUserTier.USER_TIER.ACCESS_URL, userTier.accessUrl.value)
       .set(
         JUserTier.USER_TIER.CREATED_AT,
-        userTier.createdAt?.let { LocalDateTime.ofInstant(it, ZoneOffset.UTC) }
+        userTier.createdAt.let { LocalDateTime.ofInstant(it, ZoneOffset.UTC) }
           ?: LocalDateTime.now()
       )
       .set(
         JUserTier.USER_TIER.UPDATED_AT,
-        userTier.updatedAt?.let { LocalDateTime.ofInstant(it, ZoneOffset.UTC) }
+        userTier.updatedAt.let { LocalDateTime.ofInstant(it, ZoneOffset.UTC) }
           ?: LocalDateTime.now()
       )
       .onDuplicateKeyUpdate()
@@ -65,13 +65,11 @@ class UserTierJooqRepository(private val dsl: DSLContext) : UserTierRepository {
         .set(JUserTierLevel.USER_TIER_LEVEL.ORDER_INDEX, level.orderIndex.value)
         .set(
           JUserTierLevel.USER_TIER_LEVEL.CREATED_AT,
-          level.createdAt?.let { LocalDateTime.ofInstant(it, ZoneOffset.UTC) }
-            ?: LocalDateTime.now()
+          level.createdAt.let { LocalDateTime.ofInstant(it, ZoneOffset.UTC) } ?: LocalDateTime.now()
         )
         .set(
           JUserTierLevel.USER_TIER_LEVEL.UPDATED_AT,
-          level.updatedAt?.let { LocalDateTime.ofInstant(it, ZoneOffset.UTC) }
-            ?: LocalDateTime.now()
+          level.updatedAt.let { LocalDateTime.ofInstant(it, ZoneOffset.UTC) } ?: LocalDateTime.now()
         )
         .execute()
 
@@ -85,12 +83,12 @@ class UserTierJooqRepository(private val dsl: DSLContext) : UserTierRepository {
           .set(JUserTierLevelItem.USER_TIER_LEVEL_ITEM.ORDER_INDEX, item.orderIndex.value)
           .set(
             JUserTierLevelItem.USER_TIER_LEVEL_ITEM.CREATED_AT,
-            item.createdAt?.let { LocalDateTime.ofInstant(it, ZoneOffset.UTC) }
+            item.createdAt.let { LocalDateTime.ofInstant(it, ZoneOffset.UTC) }
               ?: LocalDateTime.now()
           )
           .set(
             JUserTierLevelItem.USER_TIER_LEVEL_ITEM.UPDATED_AT,
-            item.updatedAt?.let { LocalDateTime.ofInstant(it, ZoneOffset.UTC) }
+            item.updatedAt.let { LocalDateTime.ofInstant(it, ZoneOffset.UTC) }
               ?: LocalDateTime.now()
           )
           .execute()

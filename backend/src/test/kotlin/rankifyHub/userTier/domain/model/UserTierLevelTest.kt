@@ -4,9 +4,9 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
-import rankifyHub.userTier.domain.vo.OrderIndex
 import java.time.Instant
 import java.util.*
+import rankifyHub.userTier.domain.vo.OrderIndex
 
 class UserTierLevelTest :
   StringSpec({
