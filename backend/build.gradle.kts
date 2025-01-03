@@ -1,5 +1,5 @@
+
 import nu.studer.gradle.jooq.JooqEdition
-import org.jooq.meta.jaxb.ForcedType
 import org.jooq.meta.jaxb.Logging
 import org.jooq.meta.jaxb.Property
 
@@ -47,11 +47,11 @@ dependencies {
     implementation("org.jooq:jooq:3.19.16")
     implementation("org.jooq:jooq-meta:3.19.16")
     implementation("org.jooq:jooq-codegen:3.19.16")
-    jooqGenerator("com.h2database:h2:2.1.214")
+    jooqGenerator("com.h2database:h2:2.3.232")
 
     // Flyway
     implementation("org.flywaydb:flyway-core:11.1.0")
-    add("flywayMigration", "com.h2database:h2:2.1.214")
+    add("flywayMigration", "com.h2database:h2:2.3.232")
 
     // テスト関連
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
@@ -96,7 +96,7 @@ flyway {
 }
 
 jooq {
-    version.set("3.19.15")
+    version.set("3.19.16")
     edition.set(JooqEdition.OSS)
 
     configurations {
