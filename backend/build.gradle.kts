@@ -1,7 +1,13 @@
-
 import nu.studer.gradle.jooq.JooqEdition
 import org.jooq.meta.jaxb.Logging
 import org.jooq.meta.jaxb.Property
+
+buildscript {
+    dependencies {
+        // Flyway for PostgreSQL (バージョンは必要に応じて調整)
+        classpath("org.flywaydb:flyway-database-postgresql:10.22.0")
+    }
+}
 
 plugins {
     application
@@ -39,18 +45,23 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-impl:0.11.5")
     implementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
 
-    // Database
+    // PostgreSQL (アプリ起動時用)
     implementation("org.postgresql:postgresql:42.7.4")
 
-    // jOOQ
+    // jOOQ 関連
     implementation("org.springframework.boot:spring-boot-starter-jooq")
     implementation("org.jooq:jooq:3.19.16")
     implementation("org.jooq:jooq-meta:3.19.16")
     implementation("org.jooq:jooq-codegen:3.19.16")
-    jooqGenerator("com.h2database:h2:2.3.232")
+    implementation("org.jooq:jooq-postgres-extensions:3.19.16")
+
+    // ★ jOOQのコード生成時に使うPostgreSQLドライバ
+    jooqGenerator("org.postgresql:postgresql:42.7.4")
 
     // Flyway
-    implementation("org.flywaydb:flyway-core:11.1.0")
+    implementation("org.flywaydb:flyway-core:10.22.0")
+
+    // H2
     add("flywayMigration", "com.h2database:h2:2.3.232")
 
     // テスト関連
@@ -88,13 +99,15 @@ application {
     mainClass.set("rankifyHub.RankifyHubApplicationKt")
 }
 
+// Flyway設定
 flyway {
     configurations = arrayOf("flywayMigration")
-    url = "jdbc:h2:~/my_database;AUTO_SERVER=TRUE" // あなたのデータベースのURL
-    user = "sa" // あなたのデータベースのユーザー名
-    password = "" // あなたのデータベースのパスワード
+    url = "jdbc:h2:~/my_database;AUTO_SERVER=TRUE"
+    user = "sa"
+    password = ""
 }
 
+val dbUrl = System.getenv("JOOQ_DB_URL") ?: "jdbc:postgresql://localhost:5432/my_database"
 jooq {
     version.set("3.19.16")
     edition.set(JooqEdition.OSS)
@@ -104,10 +117,10 @@ jooq {
             jooqConfiguration.apply {
                 logging = Logging.WARN
                 jdbc.apply {
-                    driver = "org.h2.Driver"
-                    url = "jdbc:h2:~/my_database;AUTO_SERVER=TRUE"
-                    user = "sa"
-                    password = ""
+                    driver = "org.postgresql.Driver"
+                    url = dbUrl
+                    user = "user"
+                    password = "password"
                     properties = listOf(
                         Property().apply {
                             key = "PAGE_SIZE"
@@ -118,20 +131,8 @@ jooq {
                 generator.apply {
                     name = "org.jooq.codegen.DefaultGenerator"
                     database.apply {
-                        name = "org.jooq.meta.h2.H2Database"
-                        inputSchema = "PUBLIC"
-//                        forcedTypes = listOf(
-//                            ForcedType().apply {
-//                                name = "varchar"
-//                                includeExpression = ".*"
-//                                includeTypes = "JSONB?"
-//                            },
-//                            ForcedType().apply {
-//                                name = "varchar"
-//                                includeExpression = ".*"
-//                                includeTypes = "INET"
-//                            }
-//                        )
+                        name = "org.jooq.meta.postgres.PostgresDatabase"
+                        inputSchema = "public"
                     }
                     generate.apply {
                         isDeprecated = false
@@ -150,6 +151,7 @@ jooq {
     }
 }
 
+// jOOQコード生成タスク
 tasks.named("generateJooq") {
     dependsOn(tasks.named("flywayMigrate"))
 
@@ -157,5 +159,15 @@ tasks.named("generateJooq") {
         .withPropertyName("migrations")
         .withPathSensitivity(PathSensitivity.RELATIVE)
 
+    // 常に実行したい場合は false
     outputs.upToDateWhen { false }
+}
+
+// jOOQ バージョンを強制統一
+configurations.all {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "org.jooq") {
+            useVersion("3.19.16")
+        }
+    }
 }

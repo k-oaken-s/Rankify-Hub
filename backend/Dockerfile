@@ -22,7 +22,7 @@ COPY ./build.gradle.kts ./build.gradle.kts
 COPY ./settings.gradle.kts ./settings.gradle.kts
 
 RUN chmod +x ./gradlew
-RUN ./gradlew dependencies --no-daemon --parallel
+RUN ./gradlew dependencies --no-daemon
 
 # アプリケーションコードを最後にコピー
 COPY . .
