@@ -5,7 +5,7 @@ import org.jooq.meta.jaxb.Property
 buildscript {
     dependencies {
         // Flyway for PostgreSQL (バージョンは必要に応じて調整)
-        classpath("org.flywaydb:flyway-database-postgresql:10.22.0")
+//        classpath("org.flywaydb:flyway-database-postgresql:10.22.0")
     }
 }
 
@@ -56,10 +56,12 @@ dependencies {
     implementation("org.jooq:jooq-postgres-extensions:3.19.16")
 
     // ★ jOOQのコード生成時に使うPostgreSQLドライバ
-    jooqGenerator("org.postgresql:postgresql:42.7.4")
+//    jooqGenerator("org.postgresql:postgresql:42.7.4")
+    jooqGenerator("com.h2database:h2:2.3.232")
+
 
     // Flyway
-    implementation("org.flywaydb:flyway-core:10.22.0")
+    implementation("org.flywaydb:flyway-core:11.1.0")
 
     // H2
     add("flywayMigration", "com.h2database:h2:2.3.232")
@@ -99,15 +101,15 @@ application {
     mainClass.set("rankifyHub.RankifyHubApplicationKt")
 }
 
+val dbUrl = System.getenv("JOOQ_DB_URL") ?: "jdbc:postgresql://localhost:5432/my_database"
 // Flyway設定
 flyway {
     configurations = arrayOf("flywayMigration")
-    url = "jdbc:h2:~/my_database;AUTO_SERVER=TRUE"
+    url = "jdbc:h2:/tmp/my_database;AUTO_SERVER=TRUE"
     user = "sa"
     password = ""
 }
 
-val dbUrl = System.getenv("JOOQ_DB_URL") ?: "jdbc:postgresql://localhost:5432/my_database"
 jooq {
     version.set("3.19.16")
     edition.set(JooqEdition.OSS)
@@ -117,10 +119,14 @@ jooq {
             jooqConfiguration.apply {
                 logging = Logging.WARN
                 jdbc.apply {
-                    driver = "org.postgresql.Driver"
-                    url = dbUrl
-                    user = "user"
-                    password = "password"
+//                    driver = "org.postgresql.Driver"
+//                    url = dbUrl
+//                    user = "user"
+//                    password = "password"
+                    driver = "org.h2.Driver"
+                    url = "jdbc:h2:/tmp/my_database;AUTO_SERVER=TRUE"
+                    user = "sa"
+                    password = ""
                     properties = listOf(
                         Property().apply {
                             key = "PAGE_SIZE"
@@ -131,8 +137,9 @@ jooq {
                 generator.apply {
                     name = "org.jooq.codegen.DefaultGenerator"
                     database.apply {
-                        name = "org.jooq.meta.postgres.PostgresDatabase"
-                        inputSchema = "public"
+//                        name = "org.jooq.meta.postgres.PostgresDatabase"
+                        name = "org.jooq.meta.h2.H2Database"
+                        inputSchema = "PUBLIC"
                     }
                     generate.apply {
                         isDeprecated = false
@@ -168,6 +175,10 @@ configurations.all {
     resolutionStrategy.eachDependency {
         if (requested.group == "org.jooq") {
             useVersion("3.19.16")
+        }
+        if (requested.group == "org.flywaydb" && requested.name == "flyway-core") {
+            useVersion("11.1.0")
+            because("We want to override the Flyway version to 11.1.0")
         }
     }
 }
