@@ -29,11 +29,11 @@ open class CreateUserTierUseCase(
     val name = UserTierName(request.name)
     val isPublic = request.isPublic
 
-    val imagePath =
-      imageFile?.bytes?.let {
-        val uniqueId = "${anonymousId.value}-${System.currentTimeMillis()}"
-        fileStorageRepository.saveFile("user-tier-images", uniqueId, it, "jpg")
-      }
+    //    val imagePath =
+    //      imageFile?.bytes?.let {
+    //        val uniqueId = "${anonymousId.value}-${System.currentTimeMillis()}"
+    //        fileStorageRepository.saveFile("user-tier-images", uniqueId, it, "jpg")
+    //      }
 
     // levelsを組み立て
     val levels =

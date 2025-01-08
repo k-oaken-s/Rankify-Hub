@@ -1,6 +1,6 @@
 services:
     db:
-        image: postgres:17
+        image: postgres:14.0
         environment:
             POSTGRES_USER: user
             POSTGRES_PASSWORD: password
@@ -31,6 +31,7 @@ services:
             - SPRING_DATASOURCE_PASSWORD=password
             - SPRING_DEVTOOLS_RESTART_ENABLED=true
             - SPRING_DEVTOOLS_RESTART_TRIGGER_FILE=.reload
+            - JOOQ_DB_URL=jdbc:postgresql://db:5432/my_database
         depends_on:
             db:
                 condition: service_healthy

@@ -1,5 +1,4 @@
 import nu.studer.gradle.jooq.JooqEdition
-import org.jooq.meta.jaxb.ForcedType
 import org.jooq.meta.jaxb.Logging
 import org.jooq.meta.jaxb.Property
 
@@ -11,6 +10,7 @@ plugins {
     id("com.diffplug.spotless") version "6.22.0"
     id("org.flywaydb.flyway") version "11.1.0"
     id("nu.studer.jooq") version "9.0"
+    id("org.jetbrains.kotlin.plugin.spring") version "1.9.25"
 }
 
 repositories {
@@ -39,19 +39,24 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-impl:0.11.5")
     implementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
 
-    // Database
+    // PostgreSQL
     implementation("org.postgresql:postgresql:42.7.4")
 
-    // jOOQ
+    // jOOQ 関連
     implementation("org.springframework.boot:spring-boot-starter-jooq")
     implementation("org.jooq:jooq:3.19.16")
     implementation("org.jooq:jooq-meta:3.19.16")
     implementation("org.jooq:jooq-codegen:3.19.16")
-    jooqGenerator("com.h2database:h2:2.1.214")
+    implementation("org.jooq:jooq-postgres-extensions:3.19.16")
+
+    // H2
+    jooqGenerator("com.h2database:h2:2.3.232")
 
     // Flyway
-    implementation("org.flywaydb:flyway-core:11.1.0")
-    add("flywayMigration", "com.h2database:h2:2.1.214")
+    implementation("org.flywaydb:flyway-database-postgresql:10.20.1")
+
+    // H2
+    add("flywayMigration", "com.h2database:h2:2.3.232")
 
     // テスト関連
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
@@ -88,15 +93,17 @@ application {
     mainClass.set("rankifyHub.RankifyHubApplicationKt")
 }
 
+val dbUrl = System.getenv("JOOQ_DB_URL") ?: "jdbc:postgresql://localhost:5432/my_database"
+// Flyway設定
 flyway {
     configurations = arrayOf("flywayMigration")
-    url = "jdbc:h2:~/my_database;AUTO_SERVER=TRUE" // あなたのデータベースのURL
-    user = "sa" // あなたのデータベースのユーザー名
-    password = "" // あなたのデータベースのパスワード
+    url = "jdbc:h2:/tmp/my_database;AUTO_SERVER=TRUE"
+    user = "sa"
+    password = ""
 }
 
 jooq {
-    version.set("3.19.15")
+    version.set("3.19.16")
     edition.set(JooqEdition.OSS)
 
     configurations {
@@ -105,7 +112,7 @@ jooq {
                 logging = Logging.WARN
                 jdbc.apply {
                     driver = "org.h2.Driver"
-                    url = "jdbc:h2:~/my_database;AUTO_SERVER=TRUE"
+                    url = "jdbc:h2:/tmp/my_database;AUTO_SERVER=TRUE"
                     user = "sa"
                     password = ""
                     properties = listOf(
@@ -120,18 +127,6 @@ jooq {
                     database.apply {
                         name = "org.jooq.meta.h2.H2Database"
                         inputSchema = "PUBLIC"
-                        forcedTypes = listOf(
-                            ForcedType().apply {
-                                name = "varchar"
-                                includeExpression = ".*"
-                                includeTypes = "JSONB?"
-                            },
-                            ForcedType().apply {
-                                name = "varchar"
-                                includeExpression = ".*"
-                                includeTypes = "INET"
-                            }
-                        )
                     }
                     generate.apply {
                         isDeprecated = false
@@ -150,6 +145,7 @@ jooq {
     }
 }
 
+// jOOQコード生成タスク
 tasks.named("generateJooq") {
     dependsOn(tasks.named("flywayMigrate"))
 
@@ -157,5 +153,15 @@ tasks.named("generateJooq") {
         .withPropertyName("migrations")
         .withPathSensitivity(PathSensitivity.RELATIVE)
 
+    // 常に実行したい場合は false
     outputs.upToDateWhen { false }
 }
+
+// jOOQ バージョンを強制統一
+//configurations.all {
+//    resolutionStrategy.eachDependency {
+//        if (requested.group == "org.jooq") {
+//            useVersion("3.19.16")
+//        }
+//    }
+//}
