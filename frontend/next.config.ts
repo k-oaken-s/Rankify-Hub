@@ -33,6 +33,18 @@ const nextConfig: NextConfig = {
                 port: '8080',
                 pathname: '/images/**',
             },
+            {
+                protocol: 'http',
+                hostname: 'localhost',
+                port: '9000',
+                pathname: '/my-bucket/images/**',
+            },
+            {
+                protocol: 'http',
+                hostname: 'minio',
+                port: '9000',
+                pathname: '/my-bucket/images/**',
+            }
         ],
     },
 };
