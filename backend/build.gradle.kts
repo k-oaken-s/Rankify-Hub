@@ -2,13 +2,6 @@ import nu.studer.gradle.jooq.JooqEdition
 import org.jooq.meta.jaxb.Logging
 import org.jooq.meta.jaxb.Property
 
-buildscript {
-    dependencies {
-        // Flyway for PostgreSQL (バージョンは必要に応じて調整)
-//        classpath("org.flywaydb:flyway-database-postgresql:10.22.0")
-    }
-}
-
 plugins {
     application
     id("org.jetbrains.kotlin.jvm") version "1.9.25"
@@ -17,6 +10,7 @@ plugins {
     id("com.diffplug.spotless") version "6.22.0"
     id("org.flywaydb.flyway") version "11.1.0"
     id("nu.studer.jooq") version "9.0"
+    id("org.jetbrains.kotlin.plugin.spring") version "1.9.25"
 }
 
 repositories {
@@ -45,7 +39,7 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-impl:0.11.5")
     implementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
 
-    // PostgreSQL (アプリ起動時用)
+    // PostgreSQL
     implementation("org.postgresql:postgresql:42.7.4")
 
     // jOOQ 関連
@@ -55,13 +49,11 @@ dependencies {
     implementation("org.jooq:jooq-codegen:3.19.16")
     implementation("org.jooq:jooq-postgres-extensions:3.19.16")
 
-    // ★ jOOQのコード生成時に使うPostgreSQLドライバ
-//    jooqGenerator("org.postgresql:postgresql:42.7.4")
+    // H2
     jooqGenerator("com.h2database:h2:2.3.232")
 
-
     // Flyway
-    implementation("org.flywaydb:flyway-core:11.1.0")
+    implementation("org.flywaydb:flyway-database-postgresql:10.20.1")
 
     // H2
     add("flywayMigration", "com.h2database:h2:2.3.232")
@@ -119,10 +111,6 @@ jooq {
             jooqConfiguration.apply {
                 logging = Logging.WARN
                 jdbc.apply {
-//                    driver = "org.postgresql.Driver"
-//                    url = dbUrl
-//                    user = "user"
-//                    password = "password"
                     driver = "org.h2.Driver"
                     url = "jdbc:h2:/tmp/my_database;AUTO_SERVER=TRUE"
                     user = "sa"
@@ -137,7 +125,6 @@ jooq {
                 generator.apply {
                     name = "org.jooq.codegen.DefaultGenerator"
                     database.apply {
-//                        name = "org.jooq.meta.postgres.PostgresDatabase"
                         name = "org.jooq.meta.h2.H2Database"
                         inputSchema = "PUBLIC"
                     }
@@ -171,14 +158,10 @@ tasks.named("generateJooq") {
 }
 
 // jOOQ バージョンを強制統一
-configurations.all {
-    resolutionStrategy.eachDependency {
-        if (requested.group == "org.jooq") {
-            useVersion("3.19.16")
-        }
-        if (requested.group == "org.flywaydb" && requested.name == "flyway-core") {
-            useVersion("11.1.0")
-            because("We want to override the Flyway version to 11.1.0")
-        }
-    }
-}
+//configurations.all {
+//    resolutionStrategy.eachDependency {
+//        if (requested.group == "org.jooq") {
+//            useVersion("3.19.16")
+//        }
+//    }
+//}
