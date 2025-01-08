@@ -49,6 +49,7 @@ services:
         environment:
             - NODE_ENV=development
             - NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
+            - FILE_STORAGE_URL=http://localhost:9000
         networks:
             - app-network
         volumes:
@@ -79,11 +80,31 @@ services:
             - MINIO_ACCESS_KEY=minioadmin
             - MINIO_SECRET_KEY=minioadmin
         ports:
-            - "9000:9000"       # S3 API
-            - "9001:9001"       # MinIO console
+            - "9000:9000"
+            - "9001:9001"
         command: server /data --console-address ":9001"
         volumes:
             - ./minio_data:/data
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+            interval: 5s
+            timeout: 5s
+            retries: 3
+        networks:
+            - app-network
+
+    createbuckets:
+        image: minio/mc
+        depends_on:
+            minio:
+                condition: service_healthy
+        entrypoint: >
+            /bin/sh -c "
+            /usr/bin/mc alias set myminio http://minio:9000 minioadmin minioadmin;
+            /usr/bin/mc mb myminio/my-bucket;
+            /usr/bin/mc anonymous set public myminio/my-bucket;
+            exit 0;
+            "
 
 networks:
     app-network:

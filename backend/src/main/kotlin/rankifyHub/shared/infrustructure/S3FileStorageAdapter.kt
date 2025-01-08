@@ -1,6 +1,5 @@
 package rankifyHub.shared.infrustructure
 
-import java.net.URI
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import rankifyHub.shared.domain.repository.FileStorageRepository
@@ -11,6 +10,7 @@ import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
+import java.net.URI
 
 @Component
 class S3FileStorageAdapter(
@@ -27,6 +27,7 @@ class S3FileStorageAdapter(
       S3Client.builder()
         .region(Region.of(region))
         .credentialsProvider(StaticCredentialsProvider.create(creds))
+        .serviceConfiguration { it.pathStyleAccessEnabled(true) }
 
     if (!endpointOverride.isNullOrEmpty()) {
       builder.endpointOverride(URI.create(endpointOverride))
@@ -56,9 +57,9 @@ class S3FileStorageAdapter(
 
   override fun generateUrl(objectKey: String): String {
     return if (!endpointOverride.isNullOrEmpty()) {
-      "${endpointOverride.trimEnd('/')}/$bucketName/$objectKey"
+      "http://localhost:9000/$bucketName/$objectKey"
     } else {
-      "https://$bucketName.s3.$region.amazonaws.com/$objectKey"
+      "https://s3.$region.amazonaws.com/$bucketName/$objectKey"
     }
   }
 
