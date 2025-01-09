@@ -20,6 +20,8 @@ import DraggableItem from "./DraggableItem";
 import {getImageUrl} from "@/utils/getImageUrl";
 import Tier from "@/app/categories/[id]/TierCreationScreen/Tier";
 import ImageWrapper from "@/components/ImageWrapper";
+import {getApiBaseUrl} from "@/utils/getApiBaseUrl";
+import axios from "axios";
 
 const {Text, Title} = Typography;
 
@@ -221,32 +223,31 @@ const TierCreationScreen: React.FC<TierCreationScreenProps> = ({
                 })),
             }));
 
-            const response = await fetch(`/user-tiers`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    anonymousId,
-                    categoryId,
-                    name: tierName, // 入力されたTier全体の名前
-                    isPublic,
-                    levels,
-                }),
+            const response = await axios.post(`${getApiBaseUrl()}/user-tiers`, {
+                anonymousId,
+                categoryId,
+                name: tierName,
+                isPublic,
+                levels,
             });
 
-            if (!response.ok) {
-                throw new Error("Tierの生成に失敗しました");
-            }
-
-            const data = await response.json();
+            const data = response.data;
             setGeneratedUrl(data.accessUrl);
 
             navigator.clipboard.writeText(data.accessUrl);
             message.success("URLが生成されクリップボードにコピーされました");
-        } catch (error) {
-            console.error("エラー:", error);
-            message.error("URLの生成に失敗しました");
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error)) {
+                if (error.response) {
+                    message.error(`URLの生成に失敗しました (ステータス: ${error.response.status})`);
+                } else {
+                    message.error("サーバーからのレスポンスがありません");
+                }
+            } else if (error instanceof Error) {
+                message.error(`エラー: ${error.message}`);
+            } else {
+                message.error("不明なエラーが発生しました");
+            }
         } finally {
             setIsGenerating(false);
         }
