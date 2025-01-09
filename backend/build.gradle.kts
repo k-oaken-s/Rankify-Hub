@@ -22,7 +22,7 @@ configurations {
 }
 
 dependencies {
-    // Spring Boot 関連
+    // Spring Boot
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-devtools")
@@ -42,7 +42,7 @@ dependencies {
     // PostgreSQL
     implementation("org.postgresql:postgresql:42.7.4")
 
-    // jOOQ 関連
+    // jOOQ
     implementation("org.springframework.boot:spring-boot-starter-jooq")
     implementation("org.jooq:jooq:3.19.16")
     implementation("org.jooq:jooq-meta:3.19.16")
@@ -58,7 +58,7 @@ dependencies {
     // H2
     add("flywayMigration", "com.h2database:h2:2.3.232")
 
-    // テスト関連
+    // テスト
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }
@@ -93,15 +93,14 @@ application {
     mainClass.set("rankifyHub.RankifyHubApplicationKt")
 }
 
-val dbUrl = System.getenv("JOOQ_DB_URL") ?: "jdbc:postgresql://localhost:5432/my_database"
-// Flyway設定
+// jOOQ用設定
 flyway {
     configurations = arrayOf("flywayMigration")
     url = "jdbc:h2:/tmp/my_database;AUTO_SERVER=TRUE"
     user = "sa"
     password = ""
 }
-
+val dbUrl = System.getenv("JOOQ_DB_URL") ?: "jdbc:postgresql://localhost:5432/my_database"
 jooq {
     version.set("3.19.16")
     edition.set(JooqEdition.OSS)
@@ -144,24 +143,10 @@ jooq {
         }
     }
 }
-
-// jOOQコード生成タスク
 tasks.named("generateJooq") {
     dependsOn(tasks.named("flywayMigrate"))
-
     inputs.files(fileTree("src/main/resources/db/migration"))
         .withPropertyName("migrations")
         .withPathSensitivity(PathSensitivity.RELATIVE)
-
-    // 常に実行したい場合は false
     outputs.upToDateWhen { false }
 }
-
-// jOOQ バージョンを強制統一
-//configurations.all {
-//    resolutionStrategy.eachDependency {
-//        if (requested.group == "org.jooq") {
-//            useVersion("3.19.16")
-//        }
-//    }
-//}
