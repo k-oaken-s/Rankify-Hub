@@ -57,7 +57,7 @@ class S3FileStorageAdapter(
 
   override fun generateUrl(objectKey: String): String {
     return if (!endpointOverride.isNullOrEmpty()) {
-      "http://localhost:9000/$bucketName/$objectKey"
+      "http://minio:9000/$bucketName/$objectKey"
     } else {
       "https://s3.$region.amazonaws.com/$bucketName/$objectKey"
     }
