@@ -15,14 +15,12 @@ class UserTierPresenter(private val fileStorageRepository: FileStorageRepository
    * @return クライアントに返却するレスポンスDTO
    */
   fun toResponse(dto: UserTierWithCategoryDto): UserTierResponse {
-    val categoryImageUrl =
-      dto.categoryImagePath?.let { fileStorageRepository.generateUrl(it) } ?: ""
     return UserTierResponse(
       accessUrl = dto.userTier.accessUrl.value,
       createdAt = dto.userTier.createdAt,
       name = dto.userTier.name.value,
       categoryName = dto.categoryName,
-      categoryImageUrl = categoryImageUrl
+      categoryImageUrl = dto.categoryImagePath ?: ""
     )
   }
 }

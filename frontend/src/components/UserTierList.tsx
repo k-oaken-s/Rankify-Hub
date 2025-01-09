@@ -4,6 +4,7 @@ import React from 'react';
 import {Tier as TierType} from '@/types/Tier';
 import Link from 'next/link';
 import ImageWrapper from "@/components/ImageWrapper";
+import {getImageUrl} from "@/utils/getImageUrl";
 
 interface UserTierListProps {
     tiers: TierType[];
@@ -20,7 +21,7 @@ const UserTierList: React.FC<UserTierListProps> = ({tiers}) => {
                     <Link href={tier.accessUrl}>
                         <div>
                             <ImageWrapper
-                                src={tier.categoryImageUrl}
+                                src={getImageUrl(tier.categoryImageUrl)}
                                 alt={`${tier.categoryName}の画像`}
                                 className="w-full h-40 object-cover rounded-md mb-4"
                                 width={400}

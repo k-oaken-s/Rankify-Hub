@@ -1,18 +1,17 @@
 package rankifyHub.userTier.presentation.controller
 
-import java.time.Instant
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.Executors
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.context.request.async.DeferredResult
-import org.springframework.web.multipart.MultipartFile
 import rankifyHub.userTier.application.CreateUserTierUseCase
 import rankifyHub.userTier.application.GetLatestUserTiersUseCase
 import rankifyHub.userTier.presentation.dto.CreateUserTierRequest
 import rankifyHub.userTier.presentation.dto.UserTierDetailResponse
 import rankifyHub.userTier.presentation.dto.UserTierResponse
 import rankifyHub.userTier.presentation.presenter.UserTierPresenter
+import java.time.Instant
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Executors
 
 @RestController
 @RequestMapping("/user-tiers")
@@ -24,11 +23,9 @@ class UserTierController(
 
   @PostMapping
   fun create(
-    @RequestPart("request") request: CreateUserTierRequest,
-    @RequestPart("image", required = false) imageFile: MultipartFile?
+    @RequestBody request: CreateUserTierRequest
   ): ResponseEntity<UserTierDetailResponse> {
-    // CreateUserTierUseCase にリクエストとファイルを渡す
-    val userTier = createUserTierUseCase.create(request, imageFile)
+    val userTier = createUserTierUseCase.create(request)
     return ResponseEntity.ok(UserTierDetailResponse.fromEntity(userTier))
   }
 
