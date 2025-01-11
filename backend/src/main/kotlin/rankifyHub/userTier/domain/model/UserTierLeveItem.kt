@@ -10,14 +10,9 @@ class UserTierLevelItem(
   var userTierId: UUID,
   var itemId: UUID,
   var orderIndex: OrderIndex,
-  var imagePath: String? = null,
   val createdAt: Instant = Instant.now(),
   var updatedAt: Instant = Instant.now()
 ) {
-  fun updateImagePath(newImagePath: String?) {
-    this.imagePath = newImagePath
-    this.updatedAt = Instant.now()
-  }
 
   fun updateOrder(newOrder: OrderIndex) {
     this.orderIndex = newOrder
@@ -30,7 +25,6 @@ class UserTierLevelItem(
       userTierId: UUID,
       itemId: UUID,
       orderIndex: OrderIndex,
-      imagePath: String? = null
     ): UserTierLevelItem {
       return UserTierLevelItem(
         id = UUID.randomUUID(),
@@ -38,7 +32,6 @@ class UserTierLevelItem(
         userTierId = userTierId,
         itemId = itemId,
         orderIndex = orderIndex,
-        imagePath = imagePath
       )
     }
 
@@ -48,7 +41,6 @@ class UserTierLevelItem(
       userTierId: UUID,
       itemId: UUID,
       orderIndex: OrderIndex,
-      imagePath: String?,
       createdAt: Instant,
       updatedAt: Instant
     ): UserTierLevelItem {
@@ -58,7 +50,6 @@ class UserTierLevelItem(
         userTierId,
         itemId,
         orderIndex,
-        imagePath,
         createdAt,
         updatedAt
       )

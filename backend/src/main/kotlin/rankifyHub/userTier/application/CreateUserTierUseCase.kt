@@ -1,5 +1,6 @@
 package rankifyHub.userTier.application
 
+import java.util.*
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import rankifyHub.shared.domain.repository.FileStorageRepository
@@ -12,7 +13,6 @@ import rankifyHub.userTier.domain.vo.AnonymousId
 import rankifyHub.userTier.domain.vo.OrderIndex
 import rankifyHub.userTier.domain.vo.UserTierName
 import rankifyHub.userTier.presentation.dto.CreateUserTierRequest
-import java.util.*
 
 @Service
 class CreateUserTierUseCase(
@@ -35,7 +35,6 @@ class CreateUserTierUseCase(
             userTierId = UUID.randomUUID(), // 仮
             name = levelRequest.name,
             orderIndex = OrderIndex(levelRequest.orderIndex),
-            imagePath = null
           )
         levelRequest.items.forEach { itemRequest ->
           val item =
