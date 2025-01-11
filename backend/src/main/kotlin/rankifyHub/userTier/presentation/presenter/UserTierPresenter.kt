@@ -16,6 +16,7 @@ class UserTierPresenter(private val fileStorageRepository: FileStorageRepository
    */
   fun toResponse(dto: UserTierWithCategoryDto): UserTierResponse {
     return UserTierResponse(
+      id = dto.userTier.id.toString(),
       accessUrl = dto.userTier.accessUrl.value,
       createdAt = dto.userTier.createdAt,
       name = dto.userTier.name.value,
