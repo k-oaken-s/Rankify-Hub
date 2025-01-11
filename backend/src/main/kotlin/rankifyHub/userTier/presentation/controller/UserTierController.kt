@@ -5,11 +5,13 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.context.request.async.DeferredResult
 import rankifyHub.userTier.application.CreateUserTierUseCase
 import rankifyHub.userTier.application.GetLatestUserTiersUseCase
+import rankifyHub.userTier.application.GetUserTierUseCase
 import rankifyHub.userTier.presentation.dto.CreateUserTierRequest
 import rankifyHub.userTier.presentation.dto.UserTierDetailResponse
 import rankifyHub.userTier.presentation.dto.UserTierResponse
 import rankifyHub.userTier.presentation.presenter.UserTierPresenter
 import java.time.Instant
+import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
 
@@ -17,16 +19,22 @@ import java.util.concurrent.Executors
 @RequestMapping("/user-tiers")
 class UserTierController(
   private val createUserTierUseCase: CreateUserTierUseCase,
+  private val getUserTierUseCase: GetUserTierUseCase,
   private val getLatestUserTiersUseCase: GetLatestUserTiersUseCase,
   private val presenter: UserTierPresenter
 ) {
 
   @PostMapping
-  fun create(
-    @RequestBody request: CreateUserTierRequest
-  ): ResponseEntity<UserTierDetailResponse> {
+  fun create(@RequestBody request: CreateUserTierRequest): ResponseEntity<UserTierDetailResponse> {
     val userTier = createUserTierUseCase.create(request)
     return ResponseEntity.ok(UserTierDetailResponse.fromEntity(userTier))
+  }
+
+  @GetMapping("/{userTierId}")
+  fun getUserTierById(@PathVariable userTierId: UUID): ResponseEntity<UserTierDetailResponse> {
+    val userTier = getUserTierUseCase.getUserTierById(userTierId)
+    val response = UserTierDetailResponse.fromEntity(userTier)
+    return ResponseEntity.ok(response)
   }
 
   @GetMapping("/public")

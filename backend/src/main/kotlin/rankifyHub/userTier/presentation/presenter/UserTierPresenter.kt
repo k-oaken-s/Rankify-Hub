@@ -21,7 +21,8 @@ class UserTierPresenter(private val fileStorageRepository: FileStorageRepository
       createdAt = dto.userTier.createdAt,
       name = dto.userTier.name.value,
       categoryName = dto.categoryName,
-      categoryImageUrl = dto.categoryImagePath ?: ""
+      categoryImageUrl = dto.categoryImagePath ?: "",
+      categoryId = dto.userTier.categoryId.toString()
     )
   }
 }

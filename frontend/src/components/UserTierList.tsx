@@ -18,7 +18,7 @@ const UserTierList: React.FC<UserTierListProps> = ({tiers}) => {
                     key={tier.accessUrl}
                     className="bg-white rounded-xl shadow-md p-4 hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1 cursor-pointer"
                 >
-                    <Link href={tier.accessUrl}>
+                    <Link href={`/categories/${tier.categoryId}/tiers/${tier.accessUrl}`}>
                         <div>
                             <ImageWrapper
                                 src={getImageUrl(tier.categoryImageUrl)}
