@@ -18,6 +18,8 @@ services:
     backend:
         build:
             context: ./backend
+            args:
+                ENVIRONMENT: ${ENVIRONMENT:-dev}
             dockerfile: Dockerfile
         volumes:
             - ./backend:/app
@@ -25,6 +27,8 @@ services:
             - ${HOME}/.m2:/root/.m2
         ports:
             - "8080:8080"
+            # 開発環境の場合のみデバッグポートをマッピング
+            - "127.0.0.1:5005:5005"
         environment:
             - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/my_database
             - SPRING_DATASOURCE_USERNAME=user
@@ -32,6 +36,7 @@ services:
             - SPRING_DEVTOOLS_RESTART_ENABLED=true
             - SPRING_DEVTOOLS_RESTART_TRIGGER_FILE=.reload
             - JOOQ_DB_URL=jdbc:postgresql://db:5432/my_database
+            - ENVIRONMENT=${ENVIRONMENT:-dev}
         depends_on:
             db:
                 condition: service_healthy
