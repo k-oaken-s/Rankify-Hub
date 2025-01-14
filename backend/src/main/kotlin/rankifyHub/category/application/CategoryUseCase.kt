@@ -19,7 +19,7 @@ class CategoryUseCase(
   fun getAllCategories(): List<Category> = categoryRepository.findAll()
 
   fun getCategoryWithItems(id: UUID): Category =
-    categoryRepository.findById(id).orElseThrow { IllegalArgumentException("Category not found") }
+    categoryRepository.findById(id) ?: throw IllegalArgumentException("Category not found")
 
   fun addCategory(addCategoryDto: AddCategoryDto, fileBytes: ByteArray?): Category {
     val imagePath =
@@ -42,9 +42,8 @@ class CategoryUseCase(
   @Transactional
   fun addItemToCategory(categoryId: UUID, itemJson: String, fileBytes: ByteArray?): Item {
     val category =
-      categoryRepository.findById(categoryId).orElseThrow {
-        IllegalArgumentException("Category not found")
-      }
+      categoryRepository.findById(categoryId)
+        ?: throw IllegalArgumentException("Category not found")
 
     val jsonNode = ObjectMapper().readTree(itemJson)
     val itemName = jsonNode.get("name").asText()
@@ -75,9 +74,9 @@ class CategoryUseCase(
     keepCurrentImage: Boolean
   ): Item {
     val category =
-      categoryRepository.findById(categoryId).orElseThrow {
-        IllegalArgumentException("Category not found")
-      }
+      categoryRepository.findById(categoryId)
+        ?: throw IllegalArgumentException("Category not found")
+
     val jsonNode = ObjectMapper().readTree(itemJson)
     val itemName = jsonNode.get("name").asText()
     val description = jsonNode.path("description").asText(null)

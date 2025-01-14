@@ -35,7 +35,7 @@ class CategoryUseCaseTest :
     "指定されたIDのカテゴリを取得できること" {
       val categoryId = UUID.randomUUID()
       val category = Category.create("Category1", "Description1", null)
-      every { categoryRepository.findById(categoryId) } returns Optional.of(category)
+      every { categoryRepository.findById(categoryId) } returns category
 
       val result = categoryUseCase.getCategoryWithItems(categoryId)
 
@@ -65,7 +65,7 @@ class CategoryUseCaseTest :
       val category = mockk<Category>(relaxed = true)
       val updatedItem = Item.create("Updated Item", "imagePath", description = "")
 
-      every { categoryRepository.findById(categoryId) } returns Optional.of(category)
+      every { categoryRepository.findById(categoryId) } returns category
       every {
         category.updateItem(
           itemId = itemId,
@@ -93,7 +93,7 @@ class CategoryUseCaseTest :
     "カテゴリが見つからない場合に例外をスローすること" {
       val categoryId = UUID.randomUUID()
       val itemId = UUID.randomUUID()
-      every { categoryRepository.findById(categoryId) } returns Optional.empty()
+      every { categoryRepository.findById(categoryId) } returns null
 
       val exception =
         shouldThrow<IllegalArgumentException> {
