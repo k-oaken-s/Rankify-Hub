@@ -1,5 +1,9 @@
 package rankifyHub.userTier.presentation.controller
 
+import java.time.Instant
+import java.util.*
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Executors
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.context.request.async.DeferredResult
@@ -10,10 +14,6 @@ import rankifyHub.userTier.presentation.dto.CreateUserTierRequest
 import rankifyHub.userTier.presentation.dto.UserTierDetailResponse
 import rankifyHub.userTier.presentation.dto.UserTierResponse
 import rankifyHub.userTier.presentation.presenter.UserTierPresenter
-import java.time.Instant
-import java.util.*
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.Executors
 
 @RestController
 @RequestMapping("/user-tiers")
@@ -25,16 +25,20 @@ class UserTierController(
 ) {
 
   @PostMapping
-  fun create(@RequestBody request: CreateUserTierRequest): ResponseEntity<UserTierDetailResponse> {
+  fun create(@RequestBody request: CreateUserTierRequest): ResponseEntity<String?> {
     val userTier = createUserTierUseCase.create(request)
-    return ResponseEntity.ok(UserTierDetailResponse.fromEntity(userTier))
+    return ResponseEntity.ok(userTier.id.toString())
   }
 
   @GetMapping("/{userTierId}")
   fun getUserTierById(@PathVariable userTierId: UUID): ResponseEntity<UserTierDetailResponse> {
-    val userTier = getUserTierUseCase.getUserTierById(userTierId)
-    val response = UserTierDetailResponse.fromEntity(userTier)
-    return ResponseEntity.ok(response)
+    val userTierWithCategory = getUserTierUseCase.getUserTierById(userTierId)
+    return ResponseEntity.ok(
+      UserTierDetailResponse.fromEntity(
+        userTierWithCategory.userTier,
+        userTierWithCategory.category
+      )
+    )
   }
 
   @GetMapping("/public")

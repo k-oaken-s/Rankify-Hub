@@ -1,5 +1,3 @@
-// components/UserTierList.tsx
-
 import React from 'react';
 import {Tier as TierType} from '@/types/Tier';
 import Link from 'next/link';
@@ -18,7 +16,7 @@ const UserTierList: React.FC<UserTierListProps> = ({tiers}) => {
                     key={tier.accessUrl}
                     className="bg-white rounded-xl shadow-md p-4 hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1 cursor-pointer"
                 >
-                    <Link href={`/categories/${tier.categoryId}/tiers/${tier.accessUrl}`}>
+                    <Link href={`/categories/${tier.categoryId}/tiers/${tier.id}`}>
                         <div>
                             <ImageWrapper
                                 src={getImageUrl(tier.categoryImageUrl)}
