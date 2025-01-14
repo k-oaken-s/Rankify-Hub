@@ -3,6 +3,7 @@ package rankifyHub.userTier.infrustructure.repository
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
+import java.util.*
 import org.jooq.DSLContext
 import org.springframework.stereotype.Repository
 import rankifyHub.tables.UserTier as JUserTier
@@ -95,6 +96,93 @@ class UserTierJooqRepository(private val dsl: DSLContext) : UserTierRepository {
       }
     }
     return userTier
+  }
+
+  override fun findById(userTierId: UUID): UserTier? {
+    // 1. user_tier テーブルから対象の1件を取得
+    val userTierRecord =
+      dsl.selectFrom(JUserTier.USER_TIER).where(JUserTier.USER_TIER.ID.eq(userTierId)).fetchOne()
+        ?: return null
+
+    // 2. user_tier_level テーブルから UserTier に紐づくレベル一覧を取得
+    val levelRecords =
+      dsl
+        .selectFrom(JUserTierLevel.USER_TIER_LEVEL)
+        .where(JUserTierLevel.USER_TIER_LEVEL.USER_TIER_ID.eq(userTierId))
+        .orderBy(JUserTierLevel.USER_TIER_LEVEL.ORDER_INDEX.asc()) // 必要に応じて並び替え
+        .fetch()
+
+    // 3. 各レベルに対して user_tier_level_item テーブルからアイテム一覧を取得
+    val levels =
+      levelRecords.map { levelRec ->
+        val levelId = levelRec[JUserTierLevel.USER_TIER_LEVEL.ID]
+
+        // レベルに紐づくアイテムを取得
+        val itemRecords =
+          dsl
+            .selectFrom(JUserTierLevelItem.USER_TIER_LEVEL_ITEM)
+            .where(JUserTierLevelItem.USER_TIER_LEVEL_ITEM.USER_TIER_LEVEL_ID.eq(levelId))
+            .orderBy(JUserTierLevelItem.USER_TIER_LEVEL_ITEM.ORDER_INDEX.asc())
+            .fetch()
+
+        // ドメインオブジェクト: UserTierLevelItem を再構築
+        val levelItems =
+          itemRecords.map { itemRec ->
+            // 実際のドメインクラス設計に合わせて再構築
+            // 下記は例としてのイメージ
+            rankifyHub.userTier.domain.model.UserTierLevelItem.reconstruct(
+              id = itemRec[JUserTierLevelItem.USER_TIER_LEVEL_ITEM.ID],
+              userTierLevelId = levelId,
+              userTierId = userTierId,
+              itemId = itemRec[JUserTierLevelItem.USER_TIER_LEVEL_ITEM.ITEM_ID],
+              orderIndex =
+                rankifyHub.userTier.domain.vo.OrderIndex(
+                  itemRec[JUserTierLevelItem.USER_TIER_LEVEL_ITEM.ORDER_INDEX]
+                ),
+              createdAt =
+                itemRec[JUserTierLevelItem.USER_TIER_LEVEL_ITEM.CREATED_AT]?.toInstant(
+                  ZoneOffset.UTC
+                )
+                  ?: Instant.now(),
+              updatedAt =
+                itemRec[JUserTierLevelItem.USER_TIER_LEVEL_ITEM.UPDATED_AT]?.toInstant(
+                  ZoneOffset.UTC
+                )
+                  ?: Instant.now()
+            )
+          }
+
+        // ドメインオブジェクト: UserTierLevel を再構築
+        rankifyHub.userTier.domain.model.UserTierLevel.reconstruct(
+          id = levelId,
+          userTierId = userTierId, // 必要なら保持
+          name = levelRec[JUserTierLevel.USER_TIER_LEVEL.NAME],
+          orderIndex =
+            rankifyHub.userTier.domain.vo.OrderIndex(
+              levelRec[JUserTierLevel.USER_TIER_LEVEL.ORDER_INDEX]
+            ),
+          createdAt = levelRec[JUserTierLevel.USER_TIER_LEVEL.CREATED_AT]?.toInstant(ZoneOffset.UTC)
+              ?: Instant.now(),
+          updatedAt = levelRec[JUserTierLevel.USER_TIER_LEVEL.UPDATED_AT]?.toInstant(ZoneOffset.UTC)
+              ?: Instant.now(),
+          items = levelItems
+        )
+      }
+
+    // 4. userTierRecord から UserTier を再構築し、上記で取得した levels をセット
+    return UserTier.reconstruct(
+      id = userTierRecord[JUserTier.USER_TIER.ID],
+      anonymousId = AnonymousId(userTierRecord[JUserTier.USER_TIER.ANONYMOUS_ID]),
+      categoryId = userTierRecord[JUserTier.USER_TIER.CATEGORY_ID],
+      name = UserTierName(userTierRecord[JUserTier.USER_TIER.NAME]),
+      isPublic = userTierRecord[JUserTier.USER_TIER.IS_PUBLIC],
+      accessUrl = AccessUrl(userTierRecord[JUserTier.USER_TIER.ACCESS_URL]),
+      createdAt = userTierRecord[JUserTier.USER_TIER.CREATED_AT]?.toInstant(ZoneOffset.UTC)
+          ?: Instant.now(),
+      updatedAt = userTierRecord[JUserTier.USER_TIER.UPDATED_AT]?.toInstant(ZoneOffset.UTC)
+          ?: Instant.now(),
+      levels = levels
+    )
   }
 
   override fun findByIsPublicTrueOrderByCreatedAtDesc(): List<UserTier> {

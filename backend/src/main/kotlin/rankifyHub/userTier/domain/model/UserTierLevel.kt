@@ -9,7 +9,6 @@ class UserTierLevel(
   var userTierId: UUID, // UserTierとの紐付け (双方向は要検討)
   val name: String,
   var orderIndex: OrderIndex = OrderIndex(1),
-  var imagePath: String? = null,
   val createdAt: Instant = Instant.now(),
   var updatedAt: Instant = Instant.now(),
   private val _items: MutableList<UserTierLevelItem> = mutableListOf()
@@ -41,11 +40,6 @@ class UserTierLevel(
     refreshUpdatedAt()
   }
 
-  fun updateImagePath(newImagePath: String?) {
-    this.imagePath = newImagePath
-    refreshUpdatedAt()
-  }
-
   private fun refreshUpdatedAt() {
     this.updatedAt = Instant.now()
   }
@@ -55,14 +49,12 @@ class UserTierLevel(
       userTierId: UUID,
       name: String,
       orderIndex: OrderIndex,
-      imagePath: String?
     ): UserTierLevel {
       return UserTierLevel(
         id = UUID.randomUUID(),
         userTierId = userTierId,
         name = name,
         orderIndex = orderIndex,
-        imagePath = imagePath
       )
     }
 
@@ -71,7 +63,6 @@ class UserTierLevel(
       userTierId: UUID,
       name: String,
       orderIndex: OrderIndex,
-      imagePath: String?,
       createdAt: Instant,
       updatedAt: Instant,
       items: List<UserTierLevelItem>
@@ -81,7 +72,6 @@ class UserTierLevel(
         userTierId = userTierId,
         name = name,
         orderIndex = orderIndex,
-        imagePath = imagePath,
         createdAt = createdAt,
         updatedAt = updatedAt,
         _items = items.toMutableList()

@@ -1,14 +1,15 @@
 package rankifyHub.userTier.presentation.controller
 
 import java.time.Instant
+import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.context.request.async.DeferredResult
-import org.springframework.web.multipart.MultipartFile
 import rankifyHub.userTier.application.CreateUserTierUseCase
 import rankifyHub.userTier.application.GetLatestUserTiersUseCase
+import rankifyHub.userTier.application.GetUserTierUseCase
 import rankifyHub.userTier.presentation.dto.CreateUserTierRequest
 import rankifyHub.userTier.presentation.dto.UserTierDetailResponse
 import rankifyHub.userTier.presentation.dto.UserTierResponse
@@ -18,18 +19,26 @@ import rankifyHub.userTier.presentation.presenter.UserTierPresenter
 @RequestMapping("/user-tiers")
 class UserTierController(
   private val createUserTierUseCase: CreateUserTierUseCase,
+  private val getUserTierUseCase: GetUserTierUseCase,
   private val getLatestUserTiersUseCase: GetLatestUserTiersUseCase,
   private val presenter: UserTierPresenter
 ) {
 
   @PostMapping
-  fun create(
-    @RequestPart("request") request: CreateUserTierRequest,
-    @RequestPart("image", required = false) imageFile: MultipartFile?
-  ): ResponseEntity<UserTierDetailResponse> {
-    // CreateUserTierUseCase にリクエストとファイルを渡す
-    val userTier = createUserTierUseCase.create(request, imageFile)
-    return ResponseEntity.ok(UserTierDetailResponse.fromEntity(userTier))
+  fun create(@RequestBody request: CreateUserTierRequest): ResponseEntity<String?> {
+    val userTier = createUserTierUseCase.create(request)
+    return ResponseEntity.ok(userTier.id.toString())
+  }
+
+  @GetMapping("/{userTierId}")
+  fun getUserTierById(@PathVariable userTierId: UUID): ResponseEntity<UserTierDetailResponse> {
+    val userTierWithCategory = getUserTierUseCase.getUserTierById(userTierId)
+    return ResponseEntity.ok(
+      UserTierDetailResponse.fromEntity(
+        userTierWithCategory.userTier,
+        userTierWithCategory.category
+      )
+    )
   }
 
   @GetMapping("/public")

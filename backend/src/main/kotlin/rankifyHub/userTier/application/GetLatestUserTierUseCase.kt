@@ -3,8 +3,8 @@ package rankifyHub.userTier.application
 import java.time.Instant
 import org.springframework.stereotype.Service
 import rankifyHub.category.domain.repository.CategoryRepository
+import rankifyHub.userTier.application.dto.UserTierWithCategory
 import rankifyHub.userTier.domain.repository.UserTierRepository
-import rankifyHub.userTier.presentation.dto.UserTierWithCategoryDto
 
 @Service
 class GetLatestUserTiersUseCase(
@@ -12,45 +12,27 @@ class GetLatestUserTiersUseCase(
   private val categoryRepository: CategoryRepository
 ) {
 
-  fun getPublicUserTiers(): List<UserTierWithCategoryDto> {
+  fun getPublicUserTiers(): List<UserTierWithCategory> {
     val userTiers = userTierRepository.findByIsPublicTrueOrderByCreatedAtDesc()
     return userTiers.mapNotNull { userTier ->
-      val category = categoryRepository.findById(userTier.categoryId).orElse(null)
-      category?.let {
-        UserTierWithCategoryDto(
-          userTier = userTier,
-          categoryName = it.name,
-          categoryImagePath = it.imagePath // 画像パスを使用
-        )
-      }
+      val category = categoryRepository.findById(userTier.categoryId)
+      category?.let { UserTierWithCategory(userTier = userTier, category = it) }
     }
   }
 
-  fun getLatestUserTiers(limit: Int): List<UserTierWithCategoryDto> {
+  fun getLatestUserTiers(limit: Int): List<UserTierWithCategory> {
     val userTiers = userTierRepository.findLatest(limit)
     return userTiers.mapNotNull { userTier ->
-      val category = categoryRepository.findById(userTier.categoryId).orElse(null)
-      category?.let {
-        UserTierWithCategoryDto(
-          userTier = userTier,
-          categoryName = it.name,
-          categoryImagePath = it.imagePath // 画像パスを使用
-        )
-      }
+      val category = categoryRepository.findById(userTier.categoryId)
+      category?.let { UserTierWithCategory(userTier = userTier, category = it) }
     }
   }
 
-  fun getUserTiersSince(timestamp: Instant): List<UserTierWithCategoryDto> {
+  fun getUserTiersSince(timestamp: Instant): List<UserTierWithCategory> {
     val userTiers = userTierRepository.findSince(timestamp)
     return userTiers.mapNotNull { userTier ->
-      val category = categoryRepository.findById(userTier.categoryId).orElse(null)
-      category?.let {
-        UserTierWithCategoryDto(
-          userTier = userTier,
-          categoryName = it.name,
-          categoryImagePath = it.imagePath // 画像パスを使用
-        )
-      }
+      val category = categoryRepository.findById(userTier.categoryId)
+      category?.let { UserTierWithCategory(userTier = userTier, category = it) }
     }
   }
 }

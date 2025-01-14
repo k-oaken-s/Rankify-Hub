@@ -1,6 +1,6 @@
 'use client';
 
-import TierCreationScreen from '@/app/categories/[id]/TierCreationScreen/TierCreationScreen';
+import TierCreationScreen from '@/app/categories/[categoryId]/TierCreationScreen/TierCreationScreen';
 import {Category} from '@/types/Category';
 import {Item} from '@/types/Item';
 import {getApiBaseUrl} from '@/utils/getApiBaseUrl';
@@ -9,7 +9,7 @@ import {useEffect, useState} from 'react';
 
 const HomePage = () => {
     const params = useParams();
-    const categoryId = Array.isArray(params?.id) ? params.id[0] : params?.id;
+    const categoryId = Array.isArray(params?.categoryId) ? params.categoryId[0] : params?.categoryId;
     const [items, setItems] = useState<Item[]>([]);
     const [loading, setLoading] = useState(true);
     const [categoryName, setCategoryName] = useState<string>('');

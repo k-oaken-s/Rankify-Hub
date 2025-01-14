@@ -6,4 +6,6 @@ export interface Tier {
     name: string;
     categoryName: string;
     categoryImageUrl: string;
+    id: string;
+    categoryId: string;
 }

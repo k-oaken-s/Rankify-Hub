@@ -27,6 +27,7 @@ class S3FileStorageAdapter(
       S3Client.builder()
         .region(Region.of(region))
         .credentialsProvider(StaticCredentialsProvider.create(creds))
+        .serviceConfiguration { it.pathStyleAccessEnabled(true) }
 
     if (!endpointOverride.isNullOrEmpty()) {
       builder.endpointOverride(URI.create(endpointOverride))
@@ -56,9 +57,9 @@ class S3FileStorageAdapter(
 
   override fun generateUrl(objectKey: String): String {
     return if (!endpointOverride.isNullOrEmpty()) {
-      "${endpointOverride.trimEnd('/')}/$bucketName/$objectKey"
+      "http://minio:9000/$bucketName/$objectKey"
     } else {
-      "https://$bucketName.s3.$region.amazonaws.com/$objectKey"
+      "https://s3.$region.amazonaws.com/$bucketName/$objectKey"
     }
   }
 

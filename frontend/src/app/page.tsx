@@ -2,82 +2,107 @@
 
 import UserCategoryList from '@/components/UserCategoryList';
 import UserTierList from '@/components/UserTierList';
-import {Category as CategoryType} from '@/types/Category';
-import {Tier as TierType} from '@/types/Tier';
-import {getApiBaseUrl} from '@/utils/getApiBaseUrl';
+import { Category as CategoryType } from '@/types/Category';
+import { Tier as TierType } from '@/types/Tier';
+import { getApiBaseUrl } from '@/utils/getApiBaseUrl';
 import axios from 'axios';
-import {useEffect, useState} from 'react';
+import { useEffect, useRef, useState } from 'react';
 import 'tailwindcss/tailwind.css';
 
 const TopPage = () => {
     const [categories, setCategories] = useState<CategoryType[]>([]);
     const [tiers, setTiers] = useState<TierType[]>([]);
-    const [lastUpdated, setLastUpdated] = useState<number>(Date.now());
+    const lastPolledTimeRef = useRef<number>(Date.now());
 
     useEffect(() => {
-        // カテゴリの取得（最近追加された順にN件）
-        axios
-            .get<CategoryType[]>(`${getApiBaseUrl()}/categories?limit=10&sort=createdAt_desc`)
-            .then((res) => setCategories(res.data))
-            .catch((err) => console.error("Failed to fetch categories:", err));
+        const fetchInitialData = async () => {
+            try {
+                const [categoriesRes, tiersRes] = await Promise.all([
+                    axios.get<CategoryType[]>(`${getApiBaseUrl()}/categories?limit=10&sort=createdAt_desc`),
+                    axios.get<TierType[]>(`${getApiBaseUrl()}/user-tiers/latest?limit=10`)
+                ]);
 
-        // Tierの取得（新着N件）
-        axios
-            .get<TierType[]>(`${getApiBaseUrl()}/user-tiers/latest?limit=10`)
-            .then((res) => {
-                setTiers(res.data);
-                if (res.data.length > 0) {
-                    const latestTimestamp = new Date(res.data[0].createdAt).getTime();
-                    setLastUpdated(latestTimestamp);
+                setCategories(categoriesRes.data);
+                setTiers(tiersRes.data);
+                if (tiersRes.data.length > 0) {
+                    lastPolledTimeRef.current = new Date(tiersRes.data[0].createdAt).getTime();
                 }
-            })
-            .catch((err) => console.error("Failed to fetch tiers:", err));
+            } catch (err) {
+                console.error("Failed to fetch initial data:", err);
+            }
+        };
+
+        fetchInitialData();
     }, []);
 
     useEffect(() => {
-        // ロングポーリングでTierの更新を監視
         let isMounted = true;
+        let timer: NodeJS.Timeout | null = null;
 
-        const longPolling = () => {
-            axios
-                .get<TierType[]>(`${getApiBaseUrl()}/user-tiers/since?since=${lastUpdated}`)
-                .then((res) => {
-                    if (isMounted && res.data.length > 0) {
-                        setTiers((prevTiers) => {
-                            const newTiers = [...res.data, ...prevTiers];
-                            return newTiers.slice(0, 10); // 最新10件を保持
+        const longPolling = async () => {
+            if (!isMounted) return;
+
+            try {
+                const res = await axios.get<TierType[]>(
+                    `${getApiBaseUrl()}/user-tiers/since?since=${lastPolledTimeRef.current}`,
+                    { timeout: 35000 }
+                );
+
+                if (!isMounted) return;
+
+                if (res.data && res.data.length > 0) {
+                    const prevIds = new Set(tiers.map(t => t.id));
+                    const newData = res.data.filter(t => !prevIds.has(t.id));
+
+                    if (newData.length > 0) {
+                        const timestamps = newData.map(tier => new Date(tier.createdAt).getTime());
+                        const newestTimestamp = Math.max(...timestamps);
+                        lastPolledTimeRef.current = newestTimestamp;
+
+                        setTiers(prevTiers => {
+                            const newList = [...newData, ...prevTiers];
+                            return newList.slice(0, 10);
                         });
-                        // 最新の更新日時を更新
-                        const latestTimestamp = new Date(res.data[0].createdAt).getTime();
-                        setLastUpdated(latestTimestamp);
+
+                        timer = setTimeout(() => {
+                            if (isMounted) longPolling();
+                        }, 0);
+                    } else {
+                        lastPolledTimeRef.current = Date.now();
+                        timer = setTimeout(() => {
+                            if (isMounted) longPolling();
+                        }, 2000);
                     }
-                    // 再度ポーリング
-                    longPolling();
-                })
-                .catch((err) => {
-                    console.error("Failed during long polling:", err);
-                    setTimeout(() => {
-                        if (isMounted) {
-                            longPolling();
-                        }
-                    }, 5000); // 5秒後に再試行
-                });
+                } else {
+                    lastPolledTimeRef.current = Date.now();
+                    timer = setTimeout(() => {
+                        if (isMounted) longPolling();
+                    }, 2000);
+                }
+            } catch (err) {
+                timer = setTimeout(() => {
+                    if (isMounted) longPolling();
+                }, 5000);
+            }
         };
 
         longPolling();
 
         return () => {
             isMounted = false;
+            if (timer) {
+                clearTimeout(timer);
+            }
         };
-    }, [lastUpdated]);
+    }, [tiers]);
 
     return (
         <div className="container mx-auto px-4">
             <h1 className="text-4xl font-bold text-center mt-10 mb-12">新着Tier一覧</h1>
-            <UserTierList tiers={tiers}/>
+            <UserTierList tiers={tiers} />
 
             <h1 className="text-4xl font-bold text-center mt-10 mb-12">カテゴリ一覧</h1>
-            <UserCategoryList categories={categories}/>
+            <UserCategoryList categories={categories} />
         </div>
     );
 };

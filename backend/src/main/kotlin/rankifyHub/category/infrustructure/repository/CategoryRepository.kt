@@ -44,9 +44,9 @@ class CategoryRepository(private val dsl: DSLContext) : CategoryRepository {
     }
   }
 
-  override fun findById(id: UUID): Optional<Category> {
+  override fun findById(id: UUID): Category? {
     val categoryRecord =
-      dsl.selectFrom(CATEGORY).where(CATEGORY.ID.eq(id)).fetchOne() ?: return Optional.empty()
+      dsl.selectFrom(CATEGORY).where(CATEGORY.ID.eq(id)).fetchOne() ?: return null
 
     val itemRecords = dsl.selectFrom(ITEM).where(ITEM.CATEGORY_ID.eq(id)).fetch()
 
@@ -67,7 +67,7 @@ class CategoryRepository(private val dsl: DSLContext) : CategoryRepository {
           }
       )
 
-    return Optional.of(category)
+    return category
   }
 
   override fun save(category: Category): Category {
