@@ -13,7 +13,7 @@ export function getImageUrl(imageName: string | StaticImport | null | undefined)
 
     // 入力が null または undefined の場合、デフォルトのサムネイル画像を返す
     if (!imageName) {
-        return `${baseUrl}/resources/default-thumbnail.webp`;
+        return '/default-thumbnail.svg';
     }
 
     // 入力が `StaticImport` 型の場合、`src` を返す（通常 Next.js が対応）
