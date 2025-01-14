@@ -1,5 +1,6 @@
 package rankifyHub.shared.infrustructure
 
+import java.net.URI
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import rankifyHub.shared.domain.repository.FileStorageRepository
@@ -10,7 +11,6 @@ import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
-import java.net.URI
 
 @Component
 class S3FileStorageAdapter(
