@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://db:5432/my_database
+    username: user
+    password: password
+    hikari:
+      schema: public
+
+aws:
+  s3:
+    bucket-name: my-bucket
+    region: ap-northeast-1
+    access-key: minioadmin
+    secret-key: minioadmin
+    endpoint-override: http://minio:9000
