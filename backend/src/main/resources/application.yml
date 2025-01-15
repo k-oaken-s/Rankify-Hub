@@ -1,0 +1,33 @@
+spring:
+  profiles:
+    active: local
+  datasource:
+    driver-class-name: org.postgresql.Driver
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    encoding: UTF-8
+    driver-class-name: org.postgresql.Driver
+  jooq:
+    sql-dialect: POSTGRES
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: true
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+      enabled: true
+  web:
+    resources:
+      static-locations: classpath:/static/,file:./public/
+
+jooq:
+  generator:
+    database:
+      name:
+
+server:
+  address: 0.0.0.0
