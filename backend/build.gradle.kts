@@ -150,3 +150,7 @@ tasks.named("generateJooq") {
         .withPathSensitivity(PathSensitivity.RELATIVE)
     outputs.upToDateWhen { false }
 }
+
+tasks.register("stage") {
+    dependsOn("build", "clean")
+}
