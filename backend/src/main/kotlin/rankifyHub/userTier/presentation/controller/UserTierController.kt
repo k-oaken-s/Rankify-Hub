@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.context.request.async.DeferredResult
 import rankifyHub.userTier.application.CreateUserTierUseCase
-import rankifyHub.userTier.application.GetLatestUserTiersUseCase
+import rankifyHub.userTier.application.GetPublicUserTiersUseCase
 import rankifyHub.userTier.application.GetUserTierUseCase
 import rankifyHub.userTier.presentation.dto.CreateUserTierRequest
 import rankifyHub.userTier.presentation.dto.UserTierDetailResponse
@@ -20,7 +20,7 @@ import rankifyHub.userTier.presentation.presenter.UserTierPresenter
 class UserTierController(
   private val createUserTierUseCase: CreateUserTierUseCase,
   private val getUserTierUseCase: GetUserTierUseCase,
-  private val getLatestUserTiersUseCase: GetLatestUserTiersUseCase,
+  private val getPublicUserTiersUseCase: GetPublicUserTiersUseCase,
   private val presenter: UserTierPresenter
 ) {
 
@@ -43,13 +43,13 @@ class UserTierController(
 
   @GetMapping("/public")
   fun getPublicUserTiers(): List<UserTierResponse> {
-    val userTiersWithCategory = getLatestUserTiersUseCase.getPublicUserTiers()
+    val userTiersWithCategory = getPublicUserTiersUseCase.getRecent()
     return userTiersWithCategory.map { presenter.toResponse(it) }
   }
 
   @GetMapping("/latest")
   fun getLatestUserTiers(@RequestParam limit: Int): List<UserTierResponse> {
-    val userTiersWithCategory = getLatestUserTiersUseCase.getLatestUserTiers(limit)
+    val userTiersWithCategory = getPublicUserTiersUseCase.getRecentWithLimit(limit)
     return userTiersWithCategory.map { presenter.toResponse(it) }
   }
 
@@ -62,7 +62,7 @@ class UserTierController(
         {
           val timestamp = Instant.ofEpochMilli(since)
           while (!deferredResult.isSetOrExpired) {
-            val newUserTiers = getLatestUserTiersUseCase.getUserTiersSince(timestamp)
+            val newUserTiers = getPublicUserTiersUseCase.getCreatedAfter(timestamp)
             if (newUserTiers.isNotEmpty()) {
               val responses = newUserTiers.map { presenter.toResponse(it) }
               deferredResult.setResult(responses)

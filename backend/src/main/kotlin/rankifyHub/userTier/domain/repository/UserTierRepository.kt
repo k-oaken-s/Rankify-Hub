@@ -9,7 +9,7 @@ interface UserTierRepository {
 
   fun findById(userTierId: UUID): UserTier?
 
-  fun findByIsPublicTrueOrderByCreatedAtDesc(): List<UserTier>
+  fun findAllOrderByCreatedAtDesc(): List<UserTier>
 
   fun findLatest(limit: Int): List<UserTier>
 
