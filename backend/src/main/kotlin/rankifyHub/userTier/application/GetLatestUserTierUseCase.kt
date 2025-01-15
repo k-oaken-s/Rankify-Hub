@@ -7,29 +7,29 @@ import rankifyHub.userTier.application.dto.UserTierWithCategory
 import rankifyHub.userTier.domain.repository.UserTierRepository
 
 @Service
-class GetLatestUserTiersUseCase(
+class GetPublicUserTiersUseCase(
   private val userTierRepository: UserTierRepository,
   private val categoryRepository: CategoryRepository
 ) {
 
-  fun getPublicUserTiers(): List<UserTierWithCategory> {
-    val userTiers = userTierRepository.findByIsPublicTrueOrderByCreatedAtDesc()
+  fun getRecent(): List<UserTierWithCategory> {
+    val userTiers = userTierRepository.findAllOrderByCreatedAtDesc().filter { it.isPublic }
     return userTiers.mapNotNull { userTier ->
       val category = categoryRepository.findById(userTier.categoryId)
       category?.let { UserTierWithCategory(userTier = userTier, category = it) }
     }
   }
 
-  fun getLatestUserTiers(limit: Int): List<UserTierWithCategory> {
-    val userTiers = userTierRepository.findLatest(limit)
+  fun getRecentWithLimit(limit: Int): List<UserTierWithCategory> {
+    val userTiers = userTierRepository.findLatest(limit).filter { it.isPublic }
     return userTiers.mapNotNull { userTier ->
       val category = categoryRepository.findById(userTier.categoryId)
       category?.let { UserTierWithCategory(userTier = userTier, category = it) }
     }
   }
 
-  fun getUserTiersSince(timestamp: Instant): List<UserTierWithCategory> {
-    val userTiers = userTierRepository.findSince(timestamp)
+  fun getCreatedAfter(timestamp: Instant): List<UserTierWithCategory> {
+    val userTiers = userTierRepository.findSince(timestamp).filter { it.isPublic }
     return userTiers.mapNotNull { userTier ->
       val category = categoryRepository.findById(userTier.categoryId)
       category?.let { UserTierWithCategory(userTier = userTier, category = it) }

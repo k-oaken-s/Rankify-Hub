@@ -185,13 +185,9 @@ class UserTierJooqRepository(private val dsl: DSLContext) : UserTierRepository {
     )
   }
 
-  override fun findByIsPublicTrueOrderByCreatedAtDesc(): List<UserTier> {
+  override fun findAllOrderByCreatedAtDesc(): List<UserTier> {
     val records =
-      dsl
-        .selectFrom(JUserTier.USER_TIER)
-        .where(JUserTier.USER_TIER.IS_PUBLIC.eq(true))
-        .orderBy(JUserTier.USER_TIER.CREATED_AT.desc())
-        .fetch()
+      dsl.selectFrom(JUserTier.USER_TIER).orderBy(JUserTier.USER_TIER.CREATED_AT.desc()).fetch()
 
     return records.map { rec ->
       UserTier.reconstruct(
