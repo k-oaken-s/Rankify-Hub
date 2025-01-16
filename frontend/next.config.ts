@@ -42,8 +42,8 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "rankify-hub-bucket.s3.ap-northeast-1.amazonaws.com",
-        pathname: "/**",
+        hostname: "s3.ap-northeast-1.amazonaws.com",
+        pathname: "rankify-hub-bucket/images/**",
       },
     ],
   },
