@@ -3,8 +3,9 @@ package rankifyHub
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
-@SpringBootApplication open class TierMakerApplication
+@SpringBootApplication
+open class RankifyHubApplication
 
 fun main(args: Array<String>) {
-  runApplication<TierMakerApplication>(*args)
+    runApplication<RankifyHubApplication>(*args)
 }

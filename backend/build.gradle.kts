@@ -164,3 +164,12 @@ tasks {
         mustRunAfter("stage")
     }
 }
+
+springBoot {
+    mainClass.set("rankifyHub.RankifyHubApplicationKt")
+}
+
+tasks.bootJar {
+    archiveBaseName.set("app")
+    archiveVersion.set("")
+}
