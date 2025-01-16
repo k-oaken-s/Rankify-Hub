@@ -1,46 +1,52 @@
-import type {NextConfig} from "next";
-import type {Configuration} from "webpack";
 import path from "path";
+import type { Configuration } from "webpack";
+
+import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-    output: "standalone",
-    reactStrictMode: true,
-    webpack: (config: Configuration, { isServer }: { isServer: boolean }) => {
-        config.resolve = {
-            ...config.resolve,
-            alias: {
-                ...(config.resolve?.alias || {}),
-                "@": path.resolve(__dirname, "src"),
-            },
-            fallback: isServer
-                ? config.resolve?.fallback
-                : { ...(config.resolve?.fallback || {}), fs: false },
-        };
+  output: "standalone",
+  reactStrictMode: true,
+  webpack: (config: Configuration, { isServer }: { isServer: boolean }) => {
+    config.resolve = {
+      ...config.resolve,
+      alias: {
+        ...(config.resolve?.alias || {}),
+        "@": path.resolve(__dirname, "src"),
+      },
+      fallback: isServer
+        ? config.resolve?.fallback
+        : { ...(config.resolve?.fallback || {}), fs: false },
+    };
 
-        return config;
-    },
-    images: {
-        remotePatterns: [
-            {
-                protocol: 'http',
-                hostname: 'backend',
-                port: '8080',
-                pathname: '/images/**',
-            },
-            {
-                protocol: 'http',
-                hostname: 'localhost',
-                port: '8080',
-                pathname: '/images/**',
-            },
-            {
-                protocol: 'http',
-                hostname: 'minio',
-                port: '9000',
-                pathname: '/my-bucket/images/**',
-            }
-        ],
-    },
+    return config;
+  },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "http",
+        hostname: "backend",
+        port: "8080",
+        pathname: "/images/**",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "8080",
+        pathname: "/images/**",
+      },
+      {
+        protocol: "http",
+        hostname: "minio",
+        port: "9000",
+        pathname: "/my-bucket/images/**",
+      },
+      {
+        protocol: "https",
+        hostname: "rankify-hub-bucket.s3.ap-northeast-1.amazonaws.com",
+        pathname: "/**",
+      },
+    ],
+  },
 };
 
 export default nextConfig;
