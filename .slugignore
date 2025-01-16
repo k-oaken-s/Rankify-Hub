@@ -1,0 +1,39 @@
+# テスト関連
+**/test/
+**/tests/
+**/Test.kt
+**/Tests.kt
+**/spec/
+
+# ドキュメント
+*.md
+docs/
+README*
+
+# ビルド関連
+gradle/
+gradlew
+gradlew.bat
+.gradle/
+build.gradle.kts
+settings.gradle.kts
+
+# Git関連
+.git/
+.gitignore
+.gitattributes
+
+# 開発環境関連
+.idea/
+*.iml
+.vscode/
+
+# フロントエンド関連（バックエンドのみデプロイする場合）
+frontend/
+node_modules/
+package.json
+package-lock.json
+
+# その他
+*.log
+.env*
