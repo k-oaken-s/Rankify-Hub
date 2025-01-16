@@ -151,6 +151,10 @@ tasks.named("generateJooq") {
     outputs.upToDateWhen { false }
 }
 
-tasks.register("stage") {
-    dependsOn("build", "clean")
+tasks.named("stage") {
+    dependsOn("build")
+}
+
+tasks.named("build") {
+    mustRunAfter("clean")
 }
