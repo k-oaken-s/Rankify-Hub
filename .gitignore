@@ -6,11 +6,6 @@
 #gradle
 .gradle/
 
-# Gradle wrapper
-!gradle/wrapper/
-!gradle/wrapper/gradle-wrapper.properties
-!gradle/wrapper/gradle-wrapper.jar
-
 # OS generated files
 .DS_Store
 Thumbs.db
