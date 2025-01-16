@@ -1,16 +1,10 @@
 # Kotlin/Java specific
-*.class
-*.jar
-*.war
-*.ear
-*.iml
 build/
 bin/
 out/
 
 #gradle
 .gradle/
-!gradle/wrapper/gradle-wrapper.jar
 
 # OS generated files
 .DS_Store
