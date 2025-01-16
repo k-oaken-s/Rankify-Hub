@@ -1,3 +1,5 @@
+# .slugignore
+
 # テスト関連
 **/test/
 **/tests/
@@ -10,14 +12,6 @@
 docs/
 README*
 
-# ビルド関連
-gradle/
-gradlew
-gradlew.bat
-.gradle/
-build.gradle.kts
-settings.gradle.kts
-
 # Git関連
 .git/
 .gitignore
@@ -28,7 +22,7 @@ settings.gradle.kts
 *.iml
 .vscode/
 
-# フロントエンド関連（バックエンドのみデプロイする場合）
+# フロントエンド関連
 frontend/
 node_modules/
 package.json
