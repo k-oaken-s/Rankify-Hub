@@ -13,3 +13,12 @@ aws:
     access-key: minioadmin
     secret-key: minioadmin
     endpoint-override: http://minio:9000
+
+jwt:
+  secret: 3v/ZZChDqaoe0/DLn15PkG4EQXkD4eRHRXk5qO0r/sM=
+  expiration: 86400000
+
+admin:
+  initial:
+    username: admin
+    password: password

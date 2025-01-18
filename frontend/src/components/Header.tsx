@@ -1,28 +1,75 @@
-import Link from 'next/link';
+"use client";
 
-const Header = () => {
-    return (
-        <header className="bg-blue-600 text-white shadow-md py-4 px-6">
-            <div className="container mx-auto flex justify-between items-center">
-                <h1 className="text-xl font-bold">
-                    <Link href="/" className="hover:text-blue-300">TierMaker</Link>
-                </h1>
-                <nav>
-                    <ul className="flex space-x-6">
-                        <li>
-                            <Link href="/about" className="hover:text-blue-300">About</Link>
-                        </li>
-                        <li>
-                            <Link href="/categories" className="hover:text-blue-300">Categories</Link>
-                        </li>
-                        <li>
-                            <Link href="/contact" className="hover:text-blue-300">Contact</Link>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-        </header>
-    );
-};
+import {
+  AppstoreOutlined,
+  HomeOutlined,
+  LikeOutlined,
+  UnorderedListOutlined,
+} from "@ant-design/icons";
 
-export default Header;
+import { useState } from "react";
+
+import Link from "next/link";
+
+export default function Header() {
+  const [selectedKey, setSelectedKey] = useState("1");
+
+  const handleMenuClick = (key: string) => {
+    setSelectedKey(key);
+  };
+
+  return (
+    <header className="bg-gradient-to-r from-[#4b278f] to-[#28508f] shadow-lg">
+      <div className="container mx-auto flex justify-between items-center p-4">
+        <h1
+          className="text-2xl font-bold cursor-pointer hover:text-yellow-300 transition duration-200"
+          onClick={() => setSelectedKey("1")}
+        >
+          Rankify Hub
+        </h1>
+        <nav className="flex space-x-4">
+          <Link
+            href="/"
+            onClick={() => handleMenuClick("1")}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-md ${
+              selectedKey === "1" ? "bg-yellow-300 text-black" : "hover:text-yellow-300"
+            } transition duration-200`}
+          >
+            <HomeOutlined />
+            <span>ホーム</span>
+          </Link>
+          <Link
+            href="/categories"
+            onClick={() => handleMenuClick("2")}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-md ${
+              selectedKey === "2" ? "bg-yellow-300 text-black" : "hover:text-yellow-300"
+            } transition duration-200`}
+          >
+            <AppstoreOutlined />
+            <span>カテゴリー一覧</span>
+          </Link>
+          <Link
+            href="/latest"
+            onClick={() => handleMenuClick("3")}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-md ${
+              selectedKey === "3" ? "bg-yellow-300 text-black" : "hover:text-yellow-300"
+            } transition duration-200`}
+          >
+            <UnorderedListOutlined />
+            <span>最新順</span>
+          </Link>
+          <Link
+            href="/popular"
+            onClick={() => handleMenuClick("4")}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-md ${
+              selectedKey === "4" ? "bg-yellow-300 text-black" : "hover:text-yellow-300"
+            } transition duration-200`}
+          >
+            <LikeOutlined />
+            <span>イイね順</span>
+          </Link>
+        </nav>
+      </div>
+    </header>
+  );
+}

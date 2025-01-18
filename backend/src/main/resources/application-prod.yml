@@ -12,3 +12,12 @@ aws:
     secret-key: ${AWS_SECRET_ACCESS_KEY}
     region: ${AWS_REGION}
     bucket-name: ${S3_BUCKET_NAME}
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION}
+
+admin:
+  initial:
+    username: ${ADMIN_USERNAME}
+    password: ${ADMIN_PASSWORD}
