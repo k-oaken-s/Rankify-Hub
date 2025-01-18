@@ -6,6 +6,11 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   output: "standalone",
   reactStrictMode: true,
+
+  eslint: {
+    dirs: ["src"],
+  },
+
   webpack: (config: Configuration, { isServer }: { isServer: boolean }) => {
     config.resolve = {
       ...config.resolve,
@@ -20,6 +25,7 @@ const nextConfig: NextConfig = {
 
     return config;
   },
+
   images: {
     remotePatterns: [
       {
