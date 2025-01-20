@@ -1,25 +1,29 @@
-### backend
+# Rankify Hub
 
-- Kotlin
-- Spring Boot
-- Hibernate
-- MySQL
-- kotest
+## Overview
+Rankify Hub is a simple tier maker application.
 
-### frontend
+## 🔧 Tech Stack
 
-- TypeScript
-- Next.js
-- React
-- dnd-kit
-- Axios
-- Tailwind CSS
-- Ant Design
+### Backend
+- Language: Kotlin
+- Framework: Spring Boot
+- Architecture: Onion Architecture
+- Database: PostgreSQL
+- Database Access: jOOQ
+- Testing: Kotest
+- Build Tool: Gradle
 
-### infra
+### Frontend
+- Language: TypeScript
+- Framework: Next.js
+- Library: React
+- Styling: Tailwind CSS
 
-- Docker
-
-### CI/CD
-
-- GitHub Actions
+### Infrastructure
+- Containerization: Docker
+- Backend Hosting: Heroku
+- Database Hosting: Heroku Postgres
+- Frontend Hosting: Vercel
+- Object Storage: AWS S3
+- CI/CD: GitHub Actions
