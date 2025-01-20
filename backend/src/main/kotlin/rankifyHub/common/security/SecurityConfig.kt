@@ -32,7 +32,9 @@ class SecurityConfig(private val jwtAuthenticationFilter: JwtAuthenticationFilte
           .permitAll()
           .requestMatchers(HttpMethod.GET, "/categories/**")
           .permitAll()
-          .requestMatchers(HttpMethod.GET, "/user-tiers/**")
+          .requestMatchers("/categories/**")
+          .hasRole("ADMIN")
+          .requestMatchers("/user-tiers/**")
           .permitAll()
           .requestMatchers("/admin/**")
           .hasRole("ADMIN")
@@ -48,9 +50,17 @@ class SecurityConfig(private val jwtAuthenticationFilter: JwtAuthenticationFilte
     val source = UrlBasedCorsConfigurationSource()
     val config =
       CorsConfiguration().apply {
-        allowedOriginPatterns = listOf("*") // 本番環境では具体的なオリジンを指定
+        allowedOriginPatterns =
+          listOf(
+            "http://localhost:3000",
+            "http://frontend:3000",
+            "https://www.rankify-hub.com",
+            "https://rankify-hub.com",
+            "https://rankify-hub.vercel.app"
+          )
         allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
-        allowedHeaders = listOf("Authorization", "Content-Type")
+        allowedHeaders = listOf("Authorization", "Content-Type", "X-Requested-With", "Accept")
+        exposedHeaders = listOf("Authorization")
         allowCredentials = true
         maxAge = 3600L
       }
