@@ -58,16 +58,6 @@ export default function Header() {
             <UnorderedListOutlined />
             <span>最新順</span>
           </Link>
-          <Link
-            href="/popular"
-            onClick={() => handleMenuClick("4")}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-md ${
-              selectedKey === "4" ? "bg-yellow-300 text-black" : "hover:text-yellow-300"
-            } transition duration-200`}
-          >
-            <LikeOutlined />
-            <span>イイね順</span>
-          </Link>
         </nav>
       </div>
     </header>
