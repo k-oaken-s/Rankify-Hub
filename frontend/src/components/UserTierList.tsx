@@ -1,41 +1,48 @@
-import React from 'react';
-import {Tier as TierType} from '@/types/Tier';
-import Link from 'next/link';
+import React from "react";
+
+import Link from "next/link";
+
 import ImageWrapper from "@/components/ImageWrapper";
-import {getImageUrl} from "@/utils/getImageUrl";
+
+import { Tier as TierType } from "@/types/Tier";
+
+import { getImageUrl } from "@/utils/getImageUrl";
 
 interface UserTierListProps {
-    tiers: TierType[];
+  tiers: TierType[];
 }
 
-const UserTierList: React.FC<UserTierListProps> = ({tiers}) => {
-    return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 p-6">
-            {tiers.map((tier) => (
-                <div
-                    key={tier.accessUrl}
-                    className="bg-white rounded-xl shadow-md p-4 hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1 cursor-pointer"
-                >
-                    <Link href={`/categories/${tier.categoryId}/tiers/${tier.id}`}>
-                        <div>
-                            <ImageWrapper
-                                src={getImageUrl(tier.categoryImageUrl)}
-                                alt={`${tier.categoryName}の画像`}
-                                className="w-full h-40 object-cover rounded-md mb-4"
-                                width={400}
-                                height={200}
-                            />
-                            <h3 className="text-xl font-semibold text-gray-900">{tier.name}</h3>
-                            <p className="text-sm text-gray-700 mt-2">{tier.categoryName}</p>
-                            <p className="text-sm text-gray-500 mt-2">
-                                作成日時: {new Date(tier.createdAt).toLocaleString()}
-                            </p>
-                        </div>
-                    </Link>
-                </div>
-            ))}
-        </div>
-    );
+const UserTierList: React.FC<UserTierListProps> = ({ tiers }) => {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 p-6">
+      {tiers.map((tier) => (
+        <Link key={tier.accessUrl} href={`/categories/${tier.categoryId}/tiers/${tier.id}`}>
+          <div
+            className="bg-gray-800 rounded-md shadow-sm p-3 hover:shadow-lg transition-shadow duration-200 transform hover:-translate-y-1 cursor-pointer flex flex-col items-center"
+            style={{ width: "300px", height: "250px" }}
+          >
+            {/* 画像部分 */}
+            <div className="w-full h-40 bg-gray-700 rounded-md overflow-hidden relative flex items-center justify-center">
+              <ImageWrapper
+                src={getImageUrl(tier.categoryImageUrl)}
+                alt={`${tier.categoryName}の画像`}
+                className="object-contain w-full h-full"
+                width={300}
+                height={160}
+                priority={true}
+              />
+            </div>
+
+            {/* Tier名 */}
+            <h3 className="text-base font-medium text-white mt-2">{tier.name}</h3>
+
+            {/* カテゴリ名 */}
+            <p className="text-sm text-gray-400 mt-2 text-center">{tier.categoryName}</p>
+          </div>
+        </Link>
+      ))}
+    </div>
+  );
 };
 
 export default UserTierList;
