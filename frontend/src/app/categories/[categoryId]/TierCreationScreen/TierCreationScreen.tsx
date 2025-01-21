@@ -30,7 +30,7 @@ const TierCreationScreen: React.FC<TierCreationScreenProps> = ({
 
   return (
     <TierEditor
-      initialTierName={""}
+      initialTierName={`${categoryName} Tier`}
       initialTiers={initialTiers}
       availableItems={items}
       categoryId={categoryId}
