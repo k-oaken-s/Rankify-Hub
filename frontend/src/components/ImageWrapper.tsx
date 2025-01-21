@@ -4,7 +4,12 @@ import Image, { ImageProps } from "next/image";
 
 const MAX_RETRY_COUNT = 3;
 
-function ImageWrapper({ src, alt, width, height, ...props }: ImageProps) {
+type ImageWrapperProps = Omit<ImageProps, "width" | "height"> & {
+  width?: number;
+  height?: number;
+};
+
+function ImageWrapper({ src, alt, width, height, fill, ...props }: ImageWrapperProps) {
   const [retryCount, setRetryCount] = useState(0);
 
   const currentSrc = useMemo(() => {
@@ -19,19 +24,15 @@ function ImageWrapper({ src, alt, width, height, ...props }: ImageProps) {
     }
   };
 
-  const imageWidth = width ?? 300;
-  const imageHeight = height ?? 300;
+  // fillが指定されている場合はwidth/heightを省略
+  const imageProps = fill
+    ? { fill: true }
+    : {
+        width: width ?? 300,
+        height: height ?? 300,
+      };
 
-  return (
-    <Image
-      {...props}
-      src={currentSrc}
-      alt={alt}
-      width={imageWidth}
-      height={imageHeight}
-      onError={handleError}
-    />
-  );
+  return <Image {...props} {...imageProps} src={currentSrc} alt={alt} onError={handleError} />;
 }
 
 export default ImageWrapper;
