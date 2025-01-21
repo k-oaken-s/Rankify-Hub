@@ -1,4 +1,4 @@
-name: Deploy to Heroku
+name: Deploy Backend to Heroku
 
 on:
   workflow_run:
@@ -9,8 +9,10 @@ on:
       - main
 
 jobs:
-  build:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+  deploy:
+    if: |
+      github.event.workflow_run.conclusion == 'success' &&
+      contains(github.event.workflow_run.head_commit.modified_files, 'backend/**')
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
