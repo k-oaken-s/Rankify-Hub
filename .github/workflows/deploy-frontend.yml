@@ -1,18 +1,15 @@
 name: Deploy Frontend to Vercel
 
 on:
-  workflow_run:
-    workflows: ["CI Pipeline"]
-    types:
-      - completed
+  push:
     branches:
       - main
+    paths:
+      - 'frontend/**'
 
 jobs:
   deploy:
-    if: |
-      github.event.workflow_run.conclusion == 'success' &&
-      contains(github.event.workflow_run.head_commit.modified_files, 'frontend/**')
+    needs: [ci-pipeline]
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
