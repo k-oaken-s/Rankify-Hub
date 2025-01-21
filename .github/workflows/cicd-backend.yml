@@ -1,4 +1,4 @@
-name: Deploy Backend to Heroku
+name: Backend CI/CD Pipeline
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   ci:
-    uses: ./.github/workflows/ci.yml
+    uses: ./.github/workflows/ci-backend.yml
 
   deploy:
     needs: [ci]
