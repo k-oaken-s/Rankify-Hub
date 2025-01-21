@@ -1,19 +1,16 @@
 name: Deploy Backend to Heroku
 
 on:
-  workflow_run:
-    workflows: ["CI Pipeline"]
-    types:
-      - completed
+  push:
     branches:
       - main
+    paths:
+      - 'backend/**'
 
 jobs:
   deploy:
-    if: |
-      github.event.workflow_run.conclusion == 'success' &&
-      contains(github.event.workflow_run.head_commit.modified_files, 'backend/**')
     runs-on: ubuntu-22.04
+    needs: [ci-pipeline]
     steps:
       - uses: actions/checkout@v2
       - uses: akhileshns/heroku-deploy@v3.13.15
