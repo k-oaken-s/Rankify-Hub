@@ -21,12 +21,14 @@ export default function Header() {
   return (
     <header className="bg-gradient-to-r from-[#4b278f] to-[#28508f] shadow-lg">
       <div className="container mx-auto flex justify-between items-center p-4">
-        <h1
-          className="text-2xl font-bold cursor-pointer hover:text-yellow-300 transition duration-200"
-          onClick={() => setSelectedKey("1")}
-        >
-          Rankify Hub
-        </h1>
+        <Link href="/">
+          <h1
+            className="text-2xl font-bold cursor-pointer hover:text-yellow-300 transition duration-200"
+            onClick={() => setSelectedKey("1")}
+          >
+            Rankify Hub
+          </h1>
+        </Link>
         <nav className="flex space-x-4">
           <Link
             href="/"
