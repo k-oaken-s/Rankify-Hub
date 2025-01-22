@@ -256,7 +256,7 @@ const TierEditor: React.FC<TierEditorProps> = ({
         })),
       }));
 
-      const response = await axios.post(`${getApiBaseUrl()}/user-tiers`, {
+      const response = await axios.post(`${getApiBaseUrl()}/tiers`, {
         anonymousId,
         categoryId,
         name: tierName,

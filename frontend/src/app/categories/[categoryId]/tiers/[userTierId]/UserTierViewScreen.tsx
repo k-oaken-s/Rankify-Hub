@@ -58,7 +58,7 @@ const UserTierViewScreen: React.FC<UserTierViewScreenProps> = ({ categoryId, use
     const fetchData = async () => {
       try {
         const response = await axios.get<UserTierDetailResponse>(
-          `${getApiBaseUrl()}/user-tiers/${userTierId}`,
+          `${getApiBaseUrl()}/tiers/${userTierId}`,
         );
         const data = response.data;
 
