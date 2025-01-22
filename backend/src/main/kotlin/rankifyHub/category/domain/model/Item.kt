@@ -2,7 +2,6 @@ package rankifyHub.category.domain.model
 
 import java.util.*
 
-/** ドメイン層の純粋なエンティティ。 */
 class Item
 private constructor(
   val id: UUID,
@@ -27,7 +26,6 @@ private constructor(
   }
 
   fun update(name: String, imagePath: String?, description: String?): Item {
-    // 更新後の新しいエンティティを生成して返す（イミュータブルに扱う場合）
     return Item(id = this.id, name = name, imagePath = imagePath, description = description)
   }
 }

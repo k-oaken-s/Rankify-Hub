@@ -24,7 +24,6 @@ class AdminController(private val adminAuthenticationUseCase: AdminAuthenticatio
     return ResponseEntity.ok(LoginResponse(token))
   }
 
-  // 認証が必要なエンドポイントの例
   @GetMapping("/protected")
   fun getProtectedResource(): ResponseEntity<Map<String, String>> {
     return ResponseEntity.ok(mapOf("message" to "This is a protected resource"))

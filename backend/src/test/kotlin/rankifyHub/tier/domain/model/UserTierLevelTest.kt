@@ -4,9 +4,9 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
+import rankifyHub.tier.domain.vo.OrderIndex
 import java.time.Instant
 import java.util.*
-import rankifyHub.tier.domain.vo.OrderIndex
 
 class UserTierLevelTest :
   StringSpec({
@@ -14,7 +14,7 @@ class UserTierLevelTest :
       val userTierLevel =
         UserTierLevel(
           id = UUID.randomUUID(),
-          userTierId = UUID.randomUUID(), // userTier ではなく userTierId を使用
+          userTierId = UUID.randomUUID(),
           name = "Test Level",
           orderIndex = OrderIndex(1),
           createdAt = Instant.now(),
@@ -32,7 +32,6 @@ class UserTierLevelTest :
           updatedAt = Instant.now()
         )
 
-      // アイテムを追加
       userTierLevel.addItem(item)
 
       userTierLevel.items shouldHaveSize 1

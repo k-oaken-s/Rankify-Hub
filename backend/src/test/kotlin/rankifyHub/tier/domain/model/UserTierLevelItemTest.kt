@@ -2,9 +2,9 @@ package rankifyHub.tier.domain.model
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
+import rankifyHub.tier.domain.vo.OrderIndex
 import java.time.Instant
 import java.util.*
-import rankifyHub.tier.domain.vo.OrderIndex
 
 class UserTierLevelItemTest :
   StringSpec({
@@ -27,7 +27,6 @@ class UserTierLevelItemTest :
           updatedAt = updatedAt
         )
 
-      // 順序を変更
       item.updateOrder(OrderIndex(2))
 
       item.orderIndex.value shouldBe 2

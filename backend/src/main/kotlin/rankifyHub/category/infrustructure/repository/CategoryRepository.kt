@@ -1,6 +1,5 @@
 package rankifyHub.category.infrastructure.repository
 
-import java.util.*
 import org.jooq.DSLContext
 import org.springframework.stereotype.Repository
 import rankifyHub.category.domain.model.Category
@@ -8,6 +7,7 @@ import rankifyHub.category.domain.model.Item
 import rankifyHub.category.domain.repository.CategoryRepository
 import rankifyHub.tables.Category.CATEGORY
 import rankifyHub.tables.Item.ITEM
+import java.util.*
 
 @Repository
 class CategoryRepository(private val dsl: DSLContext) : CategoryRepository {
@@ -71,7 +71,6 @@ class CategoryRepository(private val dsl: DSLContext) : CategoryRepository {
   }
 
   override fun save(category: Category): Category {
-    // 1) CategoryをUpsertする
     dsl
       .insertInto(CATEGORY)
       .set(CATEGORY.ID, category.id)
@@ -84,7 +83,6 @@ class CategoryRepository(private val dsl: DSLContext) : CategoryRepository {
       .set(CATEGORY.IMAGE, category.imagePath)
       .execute()
 
-    // 2) Itemを削除・追加
     dsl.deleteFrom(ITEM).where(ITEM.CATEGORY_ID.eq(category.id)).execute()
 
     category.items.forEach { item ->
@@ -94,7 +92,7 @@ class CategoryRepository(private val dsl: DSLContext) : CategoryRepository {
         .set(ITEM.NAME, item.name)
         .set(ITEM.IMAGE, item.imagePath)
         .set(ITEM.DESCRIPTION, item.description)
-        .set(ITEM.CATEGORY_ID, category.id) // ここで関連付けを設定
+        .set(ITEM.CATEGORY_ID, category.id)
         .execute()
     }
 
@@ -102,10 +100,8 @@ class CategoryRepository(private val dsl: DSLContext) : CategoryRepository {
   }
 
   override fun deleteById(id: UUID) {
-    // Itemの削除
     dsl.deleteFrom(ITEM).where(ITEM.CATEGORY_ID.eq(id)).execute()
 
-    // Categoryの削除
     dsl.deleteFrom(CATEGORY).where(CATEGORY.ID.eq(id)).execute()
   }
 }

@@ -1,9 +1,9 @@
 package rankifyHub.tier.domain.model
 
-import java.util.*
 import org.springframework.stereotype.Component
 import rankifyHub.tier.domain.vo.AnonymousId
 import rankifyHub.tier.domain.vo.UserTierName
+import java.util.*
 
 @Component
 class UserTierFactory {
@@ -23,7 +23,6 @@ class UserTierFactory {
         isPublic = isPublic
       )
 
-    // UserTierLevel の userTierId をセットし、items も紐付け
     levels.forEach { level ->
       level.userTierId = userTier.id
       userTier.addLevel(level)
