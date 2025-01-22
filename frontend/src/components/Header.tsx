@@ -48,17 +48,17 @@ export default function Header() {
             } transition duration-200`}
           >
             <AppstoreOutlined />
-            <span>カテゴリー一覧</span>
+            <span>カテゴリーから新規作成</span>
           </Link>
           <Link
-            href="/latest"
+            href="/tiers"
             onClick={() => handleMenuClick("3")}
             className={`flex items-center space-x-2 px-4 py-2 rounded-md ${
               selectedKey === "3" ? "bg-yellow-300 text-black" : "hover:text-yellow-300"
             } transition duration-200`}
           >
             <UnorderedListOutlined />
-            <span>最新順</span>
+            <span>公開されたTierを見る</span>
           </Link>
         </nav>
       </div>

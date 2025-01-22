@@ -34,7 +34,7 @@ class SecurityConfig(private val jwtAuthenticationFilter: JwtAuthenticationFilte
           .permitAll()
           .requestMatchers("/categories/**")
           .hasRole("ADMIN")
-          .requestMatchers("/user-tiers/**")
+          .requestMatchers("/tiers/**")
           .permitAll()
           .requestMatchers("/admin/**")
           .hasRole("ADMIN")
