@@ -27,7 +27,6 @@ class UserTierLevelItemTest :
           updatedAt = updatedAt
         )
 
-      // 順序を変更
       item.updateOrder(OrderIndex(2))
 
       item.orderIndex.value shouldBe 2

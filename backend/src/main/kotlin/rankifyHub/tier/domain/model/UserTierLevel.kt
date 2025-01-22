@@ -6,7 +6,7 @@ import rankifyHub.tier.domain.vo.OrderIndex
 
 class UserTierLevel(
   val id: UUID = UUID.randomUUID(),
-  var userTierId: UUID, // UserTierとの紐付け (双方向は要検討)
+  var userTierId: UUID,
   val name: String,
   var orderIndex: OrderIndex = OrderIndex(1),
   val createdAt: Instant = Instant.now(),

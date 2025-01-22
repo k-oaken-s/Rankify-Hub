@@ -24,7 +24,6 @@ function ImageWrapper({ src, alt, width, height, fill, ...props }: ImageWrapperP
     }
   };
 
-  // fillが指定されている場合はwidth/heightを省略
   const imageProps = fill
     ? { fill: true }
     : {

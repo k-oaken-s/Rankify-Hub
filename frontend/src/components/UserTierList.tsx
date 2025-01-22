@@ -21,7 +21,6 @@ const UserTierList: React.FC<UserTierListProps> = ({ tiers }) => {
             className="bg-gray-800 rounded-md shadow-sm p-3 hover:shadow-lg transition-shadow duration-200 transform hover:-translate-y-1 cursor-pointer flex flex-col items-center"
             style={{ width: "300px", height: "250px" }}
           >
-            {/* 画像部分 */}
             <div className="w-full h-40 bg-gray-700 rounded-md overflow-hidden relative flex items-center justify-center">
               <ImageWrapper
                 src={getImageUrl(tier.categoryImageUrl)}
@@ -33,10 +32,8 @@ const UserTierList: React.FC<UserTierListProps> = ({ tiers }) => {
               />
             </div>
 
-            {/* Tier名 */}
             <h3 className="text-base font-medium text-white mt-2">{tier.name}</h3>
 
-            {/* カテゴリ名 */}
             <p className="text-sm text-gray-400 mt-2 text-center">{tier.categoryName}</p>
           </div>
         </Link>

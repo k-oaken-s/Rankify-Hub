@@ -21,7 +21,6 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    // 認証状態チェックを関数化
     const checkAuthStatus = () => {
       try {
         const cookieToken = document.cookie
@@ -53,9 +52,6 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
     setIsAuthenticated(false);
     router.push("/admin/login");
   };
-
-  // トークン取得メソッド
-  const getToken = () => token;
 
   return (
     <AdminAuthContext.Provider

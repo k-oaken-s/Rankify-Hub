@@ -28,11 +28,8 @@ import DraggableItem from "./components/DraggableItem";
 import SortableTier from "./components/SortableTier";
 import Tier from "./components/Tier";
 
-// "URL生成" 等が必要な場合、外部から呼び出せるように onSave() or onGenerateUrl() をpropsで受け取る
-// ここでは「onSave」で公開/非公開を指定できる形にします
 export interface TierEditorProps {
   initialTierName: string;
-  // 初期の Tier 構造 (閲覧時ならバックエンドから取得済み / 新規なら空 or 既定のTier)
   initialTiers: Record<string, { name: string; items: Item[] }>;
   availableItems: Item[];
   categoryId: string;
@@ -40,7 +37,6 @@ export interface TierEditorProps {
   categoryImageUrl: string;
 }
 
-// "levels" の型例
 export interface Level {
   name: string;
   orderIndex: number;
@@ -50,11 +46,6 @@ export interface Level {
   }[];
 }
 
-/**
- * TierEditor コンポーネント
- * - DnDContext & SortableContext を内部に含む共通コンポーネント
- * - 新規/閲覧の違いは上位コンポーネントから渡すpropsで制御
- */
 const TierEditor: React.FC<TierEditorProps> = ({
   initialTierName,
   initialTiers,
@@ -64,29 +55,16 @@ const TierEditor: React.FC<TierEditorProps> = ({
   categoryImageUrl,
 }) => {
   const [tierName, setTierName] = useState<string>(initialTierName);
-
-  // ステート: tiers, tierOrder, ドラッグ中アイテムなど
   const [tiers, setTiers] = useState(initialTiers);
-
-  // Tierの順序を保持する配列 (オブジェクトのkeys() だけでは順序の管理が不安定なため)
   const [tierOrder, setTierOrder] = useState<string[]>(Object.keys(initialTiers));
-
-  // 未割り当てアイテム
   const [unassignedItems, setUnassignedItems] = useState<Item[]>(availableItems);
-
-  // ドラッグ中のID (Tier or Item)
   const [activeTierId, setActiveTierId] = useState<string | null>(null);
   const [activeItemId, setActiveItemId] = useState<string | null>(null);
-
-  // DnD Sensors
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
-
   const [generatedUrl, setGeneratedUrl] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
-
   const anonymousId = getAnonymousId();
 
-  // Tier の色 (例)
   const tierColors: Record<string, string> = {
     Tier1: "#2A1536",
     Tier2: "#3A1A1A",
@@ -97,27 +75,19 @@ const TierEditor: React.FC<TierEditorProps> = ({
     unassigned: "#8A8A8A",
   };
 
-  /**
-   * ドラッグ開始
-   */
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event;
     const activeId = active.id as string;
 
     if (tierOrder.includes(activeId)) {
-      // Tier全体をドラッグ
       setActiveTierId(activeId);
       setActiveItemId(null);
     } else {
-      // アイテムをドラッグ
       setActiveItemId(activeId);
       setActiveTierId(null);
     }
   };
 
-  /**
-   * ドラッグ終了
-   */
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!active || !over) {
@@ -128,7 +98,6 @@ const TierEditor: React.FC<TierEditorProps> = ({
     const activeId = active.id as string;
     const overId = over.id as string;
 
-    // Tier の並び替え
     if (activeTierId && tierOrder.includes(activeTierId)) {
       if (activeId !== overId) {
         const oldIndex = tierOrder.indexOf(activeId);
@@ -139,15 +108,12 @@ const TierEditor: React.FC<TierEditorProps> = ({
       return;
     }
 
-    // アイテムの並び替え
     if (activeItemId) {
       const sourceTierKey = findTierByItem(activeItemId) ?? "unassigned";
       const destinationTierKey = findTierByItem(overId) ?? overId;
 
       if (sourceTierKey === destinationTierKey) {
-        // 同一Tier内の並び替え
         if (sourceTierKey === "unassigned") {
-          // 未割り当て同士の並び替えをする場合は arrayMove を実装する
           resetActiveState();
           return;
         } else {
@@ -164,14 +130,12 @@ const TierEditor: React.FC<TierEditorProps> = ({
           }
         }
       } else {
-        // 異なるTierへ移動
         const movingItem = getItemById(activeItemId);
         if (!movingItem) {
           resetActiveState();
           return;
         }
 
-        // 元のTier or 未割り当てから削除
         if (sourceTierKey === "unassigned") {
           setUnassignedItems((prev) => prev.filter((it) => it.id !== activeItemId));
         } else {
@@ -184,7 +148,6 @@ const TierEditor: React.FC<TierEditorProps> = ({
           }));
         }
 
-        // 先のTier or 未割り当てへ追加
         if (destinationTierKey === "unassigned") {
           setUnassignedItems((prev) => [...prev, movingItem]);
         } else if (tiers[destinationTierKey]) {
@@ -210,13 +173,11 @@ const TierEditor: React.FC<TierEditorProps> = ({
     resetActiveState();
   };
 
-  /** アクティブ状態をリセット */
   const resetActiveState = () => {
     setActiveTierId(null);
     setActiveItemId(null);
   };
 
-  /** Tier 内に itemId があれば TierKey を返す */
   const findTierByItem = (itemId: string): string | undefined => {
     const keys = Object.keys(tiers);
     for (const key of keys) {
@@ -227,7 +188,6 @@ const TierEditor: React.FC<TierEditorProps> = ({
     return undefined;
   };
 
-  /** 全 Tier + 未割り当て から Item を探す */
   const getItemById = (itemId: string): Item | undefined => {
     const fromUnassigned = unassignedItems.find((it) => it.id === itemId);
     if (fromUnassigned) return fromUnassigned;
@@ -328,10 +288,8 @@ const TierEditor: React.FC<TierEditorProps> = ({
           }}
           className="focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
         />
-        {/*</div>*/}
       </div>
 
-      {/* Tiers の SortableContext */}
       <SortableContext items={tierOrder} strategy={rectSortingStrategy}>
         {tierOrder.map((tierKey) => (
           <SortableTier
@@ -415,7 +373,6 @@ const TierEditor: React.FC<TierEditorProps> = ({
         )}
       </div>
 
-      {/* ドラッグオーバーレイ (Tier or Item) */}
       <DragOverlay>
         {activeTierId ? (
           <Tier
@@ -435,7 +392,6 @@ const TierEditor: React.FC<TierEditorProps> = ({
           />
         ) : activeItemId ? (
           (() => {
-            // DraggableItem のオーバーレイ表示
             const item = getItemById(activeItemId);
             return item ? <DraggableItem item={item} isOverlay /> : null;
           })()

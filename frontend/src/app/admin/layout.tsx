@@ -12,16 +12,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
 
   useEffect(() => {
-    // ローディング中は何もしない
     if (isLoading) return;
 
-    // ログインページ以外で未認証の場合はリダイレクト
     if (!isAuthenticated && pathname !== "/admin/login") {
       router.push("/admin/login");
     }
   }, [isAuthenticated, isLoading, pathname, router]);
 
-  // ローディング中は適切なUIを表示
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -32,7 +29,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
 
-  // 未認証時（ログインページ以外）は何も表示しない
   if (!isAuthenticated && pathname !== "/admin/login") {
     return null;
   }

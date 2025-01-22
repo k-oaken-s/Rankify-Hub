@@ -9,7 +9,7 @@ import { Item } from "@/types/Item";
 /** 新規作成用コンポーネント */
 
 type TierCreationScreenProps = {
-  items: Item[]; // すべてのアイテム
+  items: Item[];
   categoryId: string;
   categoryName: string;
   categoryImageUrl: string;

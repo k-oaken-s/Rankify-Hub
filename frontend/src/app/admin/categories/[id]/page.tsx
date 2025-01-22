@@ -22,7 +22,6 @@ import { getImageUrl } from "@/utils/getImageUrl";
 
 const { Title, Text } = Typography;
 
-// カテゴリヘッダー部分をメモ化
 const CategoryHeader = React.memo(function CategoryHeader({ category }: { category: Category }) {
   return (
     <div className="mb-8 p-6 bg-gray-800 rounded-lg shadow-lg">
@@ -41,7 +40,6 @@ const CategoryHeader = React.memo(function CategoryHeader({ category }: { catego
   );
 });
 
-// アイテム一覧部分をメモ化
 const ItemList = React.memo(function ItemList({
   items,
   onEdit,

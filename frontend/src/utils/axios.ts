@@ -11,7 +11,6 @@ const api = axios.create({
 
 console.log("Setting up interceptor");
 
-// リクエストインターセプターでトークンを確実に付与
 api.interceptors.request.use((config) => {
   console.log("Cookies:", document.cookie);
   const token = document.cookie
@@ -25,7 +24,6 @@ api.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${token}`;
   }
 
-  // FormDataの場合、Content-Typeはブラウザが自動設定するため削除
   if (config.data instanceof FormData) {
     delete config.headers["Content-Type"];
   }

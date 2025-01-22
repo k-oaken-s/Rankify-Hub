@@ -14,7 +14,7 @@ class UserTierLevelTest :
       val userTierLevel =
         UserTierLevel(
           id = UUID.randomUUID(),
-          userTierId = UUID.randomUUID(), // userTier ではなく userTierId を使用
+          userTierId = UUID.randomUUID(),
           name = "Test Level",
           orderIndex = OrderIndex(1),
           createdAt = Instant.now(),
@@ -32,7 +32,6 @@ class UserTierLevelTest :
           updatedAt = Instant.now()
         )
 
-      // アイテムを追加
       userTierLevel.addItem(item)
 
       userTierLevel.items shouldHaveSize 1

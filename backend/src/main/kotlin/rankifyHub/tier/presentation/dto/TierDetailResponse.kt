@@ -11,8 +11,8 @@ data class TierDetailResponse(
   val id: UUID,
   val anonymousId: String,
   val categoryId: String,
-  val categoryName: String, // 追加
-  val categoryImageUrl: String?, // 追加
+  val categoryName: String,
+  val categoryImageUrl: String?,
   val name: String,
   val isPublic: Boolean,
   val accessUrl: String,
@@ -62,9 +62,9 @@ data class TierLevelResponse(
 data class TierItemResponse(
   val itemId: UUID,
   val order: Int,
-  val name: String, // 追加
-  val imageUrl: String?, // 追加
-  val description: String? // 追加
+  val name: String,
+  val imageUrl: String?,
+  val description: String?
 ) {
   companion object {
     fun fromEntity(userTierItem: UserTierLevelItem, categoryItem: Item): TierItemResponse {

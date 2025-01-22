@@ -23,7 +23,6 @@ class UserTierFactory {
         isPublic = isPublic
       )
 
-    // UserTierLevel の userTierId をセットし、items も紐付け
     levels.forEach { level ->
       level.userTierId = userTier.id
       userTier.addLevel(level)
