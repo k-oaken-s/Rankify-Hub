@@ -19,7 +19,7 @@
 
 .image-style {
     width: 100%;
-    height: 200px; /* 固定高さ */
-    object-fit: cover; /* アスペクト比を無視して中央を切り取る */
-    border-radius: 8px; /* 必要に応じて角丸 */
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
 }

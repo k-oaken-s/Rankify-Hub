@@ -16,8 +16,6 @@ import { Category } from "@/types/Category";
 import api from "@/utils/axios";
 import { getApiBaseUrl } from "@/utils/getApiBaseUrl";
 
-// Context を import
-
 const AdminDashboard = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const { isAuthenticated, isLoading, logout } = useAdminAuth();

@@ -18,7 +18,6 @@ export default function UserTiersPage() {
     const fetchTiers = async () => {
       try {
         const response = await axios.get<Tier[]>(`${getApiBaseUrl()}/tiers`);
-        // 新着順（作成日時の降順）でソート
         const sortedTiers = response.data.sort(
           (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
         );

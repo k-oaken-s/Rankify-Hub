@@ -11,7 +11,6 @@ import { Item } from "@/types/Item";
 
 import { getApiBaseUrl } from "@/utils/getApiBaseUrl";
 
-// APIレスポンスの型定義
 interface UserTierItemResponse {
   itemId: string;
   order: number;

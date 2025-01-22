@@ -1,7 +1,6 @@
 export type Item = {
-    id: string;
-    name: string;
-    description?: string;
-    image?: string;
-    // その他のプロパティ
+  id: string;
+  name: string;
+  description?: string;
+  image?: string;
 };

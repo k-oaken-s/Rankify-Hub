@@ -9,8 +9,6 @@ body {
     font-family: sans-serif;
 }
 
-/* global.cssなどに追加 */
-
 /* アイテム共通スタイル */
 .item-container {
     width: 120px;
@@ -34,8 +32,6 @@ body {
 }
 
 .item-container:hover {
-    /* hover時にReact側で状態変化はしない */
-    /* 必要なら軽微なbox-shadow変化などをpure CSSで実現 */
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
 }
 

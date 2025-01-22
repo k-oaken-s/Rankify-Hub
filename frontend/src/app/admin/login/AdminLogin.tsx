@@ -29,7 +29,6 @@ const AdminLogin = () => {
         router.push("/admin");
       }
     } catch (error) {
-      // エラーハンドリングの改善
       if (axios.isAxiosError(error)) {
         message.error(error.response?.data?.message || "ログインに失敗しました");
       } else {

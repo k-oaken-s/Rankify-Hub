@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 
 export function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith("/admin")) {
-    // /admin/loginは除外
     if (request.nextUrl.pathname === "/admin/login") {
       return NextResponse.next();
     }
