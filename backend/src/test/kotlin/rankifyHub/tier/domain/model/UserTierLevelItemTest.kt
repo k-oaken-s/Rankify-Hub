@@ -2,9 +2,9 @@ package rankifyHub.tier.domain.model
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
-import rankifyHub.tier.domain.vo.OrderIndex
 import java.time.Instant
 import java.util.*
+import rankifyHub.tier.domain.vo.OrderIndex
 
 class UserTierLevelItemTest :
   StringSpec({

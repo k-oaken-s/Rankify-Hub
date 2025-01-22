@@ -1,5 +1,6 @@
 package rankifyHub.category.infrastructure.repository
 
+import java.util.*
 import org.jooq.DSLContext
 import org.springframework.stereotype.Repository
 import rankifyHub.category.domain.model.Category
@@ -7,7 +8,6 @@ import rankifyHub.category.domain.model.Item
 import rankifyHub.category.domain.repository.CategoryRepository
 import rankifyHub.tables.Category.CATEGORY
 import rankifyHub.tables.Item.ITEM
-import java.util.*
 
 @Repository
 class CategoryRepository(private val dsl: DSLContext) : CategoryRepository {

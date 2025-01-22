@@ -1,9 +1,9 @@
 package rankifyHub.tier.domain.model
 
+import java.util.*
 import org.springframework.stereotype.Component
 import rankifyHub.tier.domain.vo.AnonymousId
 import rankifyHub.tier.domain.vo.UserTierName
-import java.util.*
 
 @Component
 class UserTierFactory {

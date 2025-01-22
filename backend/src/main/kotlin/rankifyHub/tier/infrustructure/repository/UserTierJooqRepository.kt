@@ -1,7 +1,14 @@
 package rankifyHub.tier.infrustructure.repository
 
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.util.*
 import org.jooq.DSLContext
 import org.springframework.stereotype.Repository
+import rankifyHub.tables.UserTier as JUserTier
+import rankifyHub.tables.UserTierLevel as JUserTierLevel
+import rankifyHub.tables.UserTierLevelItem as JUserTierLevelItem
 import rankifyHub.tier.domain.model.UserTier
 import rankifyHub.tier.domain.model.UserTierLevel
 import rankifyHub.tier.domain.model.UserTierLevelItem
@@ -10,13 +17,6 @@ import rankifyHub.tier.domain.vo.AccessUrl
 import rankifyHub.tier.domain.vo.AnonymousId
 import rankifyHub.tier.domain.vo.OrderIndex
 import rankifyHub.tier.domain.vo.UserTierName
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneOffset
-import java.util.*
-import rankifyHub.tables.UserTier as JUserTier
-import rankifyHub.tables.UserTierLevel as JUserTierLevel
-import rankifyHub.tables.UserTierLevelItem as JUserTierLevelItem
 
 @Repository
 class UserTierJooqRepository(private val dsl: DSLContext) : UserTierRepository {

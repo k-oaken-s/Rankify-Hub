@@ -1,11 +1,11 @@
 package rankifyHub.tier.presentation.dto
 
+import java.util.*
 import rankifyHub.category.domain.model.Category
 import rankifyHub.category.domain.model.Item
 import rankifyHub.tier.domain.model.UserTier
 import rankifyHub.tier.domain.model.UserTierLevel
 import rankifyHub.tier.domain.model.UserTierLevelItem
-import java.util.*
 
 data class TierDetailResponse(
   val id: UUID,

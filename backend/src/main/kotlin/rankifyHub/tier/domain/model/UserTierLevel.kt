@@ -1,8 +1,8 @@
 package rankifyHub.tier.domain.model
 
-import rankifyHub.tier.domain.vo.OrderIndex
 import java.time.Instant
 import java.util.*
+import rankifyHub.tier.domain.vo.OrderIndex
 
 class UserTierLevel(
   val id: UUID = UUID.randomUUID(),
