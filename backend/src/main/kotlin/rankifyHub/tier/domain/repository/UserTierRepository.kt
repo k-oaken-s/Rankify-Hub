@@ -4,6 +4,7 @@ import java.time.Instant
 import java.util.*
 import rankifyHub.tier.domain.model.UserTier
 
+/** Tierの永続化を担うリポジトリインターフェース。 Tier集約のルートでTierとLevel、TierItemの整合性を保証する。 */
 interface UserTierRepository {
   fun save(userTier: UserTier): UserTier
 

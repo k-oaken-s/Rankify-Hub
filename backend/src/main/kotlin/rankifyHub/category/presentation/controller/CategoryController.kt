@@ -9,12 +9,12 @@ import rankifyHub.category.application.CategoryUseCase
 import rankifyHub.category.presentation.dto.CategoryResponse
 import rankifyHub.category.presentation.dto.ItemResponse
 
-/** RESTコントローラー: カテゴリおよびカテゴリ内のアイテムを管理します。 */
+/** カテゴリに関するREST APIエンドポイントを提供するコントローラ。 */
 @RestController
 @RequestMapping("/categories")
 class CategoryController(private val categoryUseCase: CategoryUseCase) {
 
-  /** 全てのカテゴリを取得 */
+  /** カテゴリ一覧を取得 */
   @GetMapping
   fun getAllCategories(): ResponseEntity<List<CategoryResponse>> {
     val categories = categoryUseCase.getAllCategories()
@@ -31,7 +31,11 @@ class CategoryController(private val categoryUseCase: CategoryUseCase) {
     return ResponseEntity.ok(response)
   }
 
-  /** カテゴリ1件とそのアイテム一覧を取得 */
+  /**
+   * 指定IDのカテゴリとそのアイテム一覧を取得
+   *
+   * @throws IllegalArgumentException カテゴリが存在しない場合
+   */
   @GetMapping("/{categoryId}")
   fun getCategoryWithItems(@PathVariable categoryId: UUID): ResponseEntity<CategoryResponse> {
     val category = categoryUseCase.getCategoryWithItems(categoryId)
@@ -49,7 +53,11 @@ class CategoryController(private val categoryUseCase: CategoryUseCase) {
     return ResponseEntity.ok(response)
   }
 
-  /** 新しいカテゴリを追加 */
+  /**
+   * 新規カテゴリを作成
+   *
+   * @param file カテゴリ画像（オプション）
+   */
   @PostMapping
   fun addCategory(
     @RequestPart("category") categoryDto: AddCategoryDto,
@@ -66,7 +74,12 @@ class CategoryController(private val categoryUseCase: CategoryUseCase) {
     return ResponseEntity.ok(response)
   }
 
-  /** カテゴリにアイテムを追加 */
+  /**
+   * カテゴリにアイテムを追加
+   *
+   * @param itemJson アイテム情報のJSON
+   * @param file アイテム画像（オプション）
+   */
   @PostMapping("/{categoryId}/items")
   fun addItemToCategory(
     @PathVariable categoryId: UUID,
@@ -78,7 +91,11 @@ class CategoryController(private val categoryUseCase: CategoryUseCase) {
     return ResponseEntity.ok(response)
   }
 
-  /** カテゴリ内のアイテムを更新 */
+  /**
+   * カテゴリ内のアイテムを更新
+   *
+   * @param keepCurrentImage 現在の画像を保持するか（デフォルト: false）
+   */
   @PutMapping("/{categoryId}/items/{itemId}")
   fun updateItemInCategory(
     @PathVariable categoryId: UUID,

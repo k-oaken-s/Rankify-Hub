@@ -18,9 +18,11 @@ import rankifyHub.tier.domain.vo.AnonymousId
 import rankifyHub.tier.domain.vo.OrderIndex
 import rankifyHub.tier.domain.vo.UserTierName
 
+/** TierのJOOQ永続化実装 */
 @Repository
 class UserTierJooqRepository(private val dsl: DSLContext) : UserTierRepository {
 
+  /** Tierとその関連エンティティを保存 */
   override fun save(userTier: UserTier): UserTier {
     dsl
       .insertInto(JUserTier.USER_TIER)
@@ -98,6 +100,7 @@ class UserTierJooqRepository(private val dsl: DSLContext) : UserTierRepository {
     return userTier
   }
 
+  /** 指定IDのTierと関連エンティティを取得 */
   override fun findById(userTierId: UUID): UserTier? {
     val userTierRecord =
       dsl.selectFrom(JUserTier.USER_TIER).where(JUserTier.USER_TIER.ID.eq(userTierId)).fetchOne()
@@ -170,6 +173,7 @@ class UserTierJooqRepository(private val dsl: DSLContext) : UserTierRepository {
     )
   }
 
+  /** 全てのTierを作成日時の降順で取得 */
   override fun findAllOrderByCreatedAtDesc(): List<UserTier> {
     val records =
       dsl.selectFrom(JUserTier.USER_TIER).orderBy(JUserTier.USER_TIER.CREATED_AT.desc()).fetch()
@@ -191,6 +195,7 @@ class UserTierJooqRepository(private val dsl: DSLContext) : UserTierRepository {
     }
   }
 
+  /** 作成日時が最新のTierを指定件数取得 */
   override fun findLatest(limit: Int): List<UserTier> {
     val records =
       dsl
@@ -214,6 +219,7 @@ class UserTierJooqRepository(private val dsl: DSLContext) : UserTierRepository {
     }
   }
 
+  /** 指定日時以降に作成されたTierを取得する */
   override fun findSince(timestamp: Instant): List<UserTier> {
     val records =
       dsl

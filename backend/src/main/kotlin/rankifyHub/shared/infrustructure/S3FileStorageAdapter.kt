@@ -12,6 +12,7 @@ import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 
+/** S3ファイル管理アダプター */
 @Component
 class S3FileStorageAdapter(
   @Value("\${aws.s3.bucket-name}") private val bucketName: String,
@@ -36,6 +37,7 @@ class S3FileStorageAdapter(
     builder.build()
   }
 
+  /** ファイルを保存し、アクセスURLを生成 */
   override fun saveFile(
     directory: String,
     identifier: String,
@@ -49,12 +51,14 @@ class S3FileStorageAdapter(
     return generateUrl(objectKey)
   }
 
+  /** 指定されたファイルを削除 */
   override fun deleteFile(urlOrKey: String) {
     val objectKey = extractKeyFromUrl(urlOrKey)
     val deleteRequest = DeleteObjectRequest.builder().bucket(bucketName).key(objectKey).build()
     s3Client.deleteObject(deleteRequest)
   }
 
+  /** オブジェクトキーからアクセスURLを生成 */
   override fun generateUrl(objectKey: String): String {
     return if (!endpointOverride.isNullOrEmpty()) {
       "http://minio:9000/$bucketName/$objectKey"
@@ -63,6 +67,7 @@ class S3FileStorageAdapter(
     }
   }
 
+  /** URLまたはキーからオブジェクトキーを抽出 MinIOとS3の両方のURL形式に対応 */
   private fun extractKeyFromUrl(urlOrKey: String): String {
     return if (urlOrKey.startsWith("http")) {
       urlOrKey.substringAfter("$bucketName/").substringAfter("/")

@@ -14,6 +14,7 @@ import rankifyHub.tier.domain.vo.OrderIndex
 import rankifyHub.tier.domain.vo.UserTierName
 import rankifyHub.tier.presentation.dto.CreateTierRequest
 
+/** Tierの作成に関するユースケース */
 @Service
 class TierUseCase(
   private val userTierRepository: UserTierRepository,
@@ -21,6 +22,12 @@ class TierUseCase(
   private val fileStorageRepository: FileStorageRepository
 ) {
 
+  /**
+   * 新規Tierを作成
+   *
+   * @param request リクエスト
+   * @return 作成されたTier
+   */
   @Transactional
   fun create(request: CreateTierRequest): UserTier {
     val anonymousId = AnonymousId(request.anonymousId)

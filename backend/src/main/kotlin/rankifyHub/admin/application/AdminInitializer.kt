@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component
 import rankifyHub.admin.domain.model.AdminUser
 import rankifyHub.admin.domain.repository.AdminUserRepository
 
+/** 管理者の初期アカウントを作成する起動時初期化コンポーネント */
 @Component
 class AdminUserInitializer(
   private val adminUserRepository: AdminUserRepository,
@@ -15,6 +16,11 @@ class AdminUserInitializer(
   @Value("\${admin.initial.password:#{null}}") private val initialPassword: String?
 ) : CommandLineRunner {
 
+  /**
+   * アプリケーション起動時に実行
+   * - パスワードが設定されている場合のみ初期化を実行
+   * - 既存のユーザーが存在しない場合のみ作成
+   */
   override fun run(vararg args: String) {
     if (!initialPassword.isNullOrBlank()) {
       val existingUser = adminUserRepository.findByUsername(initialUsername)
