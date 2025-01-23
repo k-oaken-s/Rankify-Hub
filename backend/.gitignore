@@ -1,4 +1,5 @@
 # Kotlin/Java specific
+.kotlin/
 build/
 bin/
 out/
