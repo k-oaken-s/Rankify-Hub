@@ -1,6 +1,0 @@
-services:
-    backend:
-        volumes:
-            - ./backend:/app
-            - ~/.m2:/root/.m2
-        command: sh -c "./gradlew bootRun & while true; do inotifywait -e modify,create,delete -r /app/src && touch /app/reload/.reload; done"
