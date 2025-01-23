@@ -9,9 +9,11 @@ import rankifyHub.category.domain.repository.CategoryRepository
 import rankifyHub.tables.Category.CATEGORY
 import rankifyHub.tables.Item.ITEM
 
+/** カテゴリ集約のJOOQによる永続化実装。 カテゴリとそれに属するアイテムの整合性を保証する。 */
 @Repository
 class CategoryRepository(private val dsl: DSLContext) : CategoryRepository {
 
+  /** 全カテゴリをアイテムと共に取得する。 */
   override fun findAll(): List<Category> {
     val records =
       dsl
@@ -44,6 +46,7 @@ class CategoryRepository(private val dsl: DSLContext) : CategoryRepository {
     }
   }
 
+  /** 指定IDのカテゴリをアイテムと共に取得する。 カテゴリが存在しない場合はnullを返す。 */
   override fun findById(id: UUID): Category? {
     val categoryRecord =
       dsl.selectFrom(CATEGORY).where(CATEGORY.ID.eq(id)).fetchOne() ?: return null
@@ -70,6 +73,11 @@ class CategoryRepository(private val dsl: DSLContext) : CategoryRepository {
     return category
   }
 
+  /**
+   * カテゴリを保存する。
+   *
+   * @return 保存されたカテゴリ（入力と同一インスタンス）
+   */
   override fun save(category: Category): Category {
     dsl
       .insertInto(CATEGORY)
@@ -99,6 +107,7 @@ class CategoryRepository(private val dsl: DSLContext) : CategoryRepository {
     return category
   }
 
+  /** カテゴリとそれに属する全アイテムを削除する。 */
   override fun deleteById(id: UUID) {
     dsl.deleteFrom(ITEM).where(ITEM.CATEGORY_ID.eq(id)).execute()
 

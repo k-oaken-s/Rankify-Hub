@@ -7,6 +7,7 @@ import rankifyHub.tier.domain.vo.AnonymousId
 import rankifyHub.tier.domain.vo.OrderIndex
 import rankifyHub.tier.domain.vo.UserTierName
 
+/** ユーザーが作成したアイテムの階層構造を表すドメインオブジェクト。 複数のレベルとレベルごとの複数のアイテムを持つ。 */
 class UserTier(
   val id: UUID = UUID.randomUUID(),
   val anonymousId: AnonymousId,
@@ -19,8 +20,10 @@ class UserTier(
   private val levels: MutableList<UserTierLevel> = mutableListOf(),
 ) {
 
+  /** レベルの一覧を取得 */
   fun getLevels(): List<UserTierLevel> = levels.toList()
 
+  /** レベルを追加する。 追加時に自動的に最後尾の順序が割り当てられる。 */
   fun addLevel(level: UserTierLevel) {
     val nextOrder = levels.maxOfOrNull { it.orderIndex.value }?.plus(1) ?: 1
     level.orderIndex = OrderIndex(nextOrder)
@@ -28,12 +31,14 @@ class UserTier(
     refreshUpdatedAt()
   }
 
+  /** レベルを削除し、残りのレベルの順序を再整列する。 */
   fun removeLevel(level: UserTierLevel) {
     levels.remove(level)
     reorderLevels()
     refreshUpdatedAt()
   }
 
+  /** レベルの順序を1から連番で振り直す。 現在の順序を維持したまま隙間を埋める。 */
   private fun reorderLevels() {
     levels.sortBy { it.orderIndex.value }
     levels.forEachIndexed { index, lvl -> lvl.updateOrder(OrderIndex(index + 1)) }
@@ -45,6 +50,7 @@ class UserTier(
 
   companion object {
 
+    /** 新規Tierを作成する。 */
     fun create(
       anonymousId: AnonymousId,
       categoryId: UUID,
@@ -61,6 +67,7 @@ class UserTier(
       )
     }
 
+    /** Tierを再作成する。 */
     fun reconstruct(
       id: UUID,
       anonymousId: AnonymousId,

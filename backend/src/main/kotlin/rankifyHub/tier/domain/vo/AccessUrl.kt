@@ -3,7 +3,7 @@ package rankifyHub.tier.domain.vo
 import java.util.*
 
 /**
- * アクセスURL
+ * アクセスURLを表す値オブジェクト。
  *
  * @property value アクセスURLの値
  */

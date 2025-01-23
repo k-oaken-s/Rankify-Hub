@@ -10,17 +10,25 @@ import rankifyHub.category.domain.model.Item
 import rankifyHub.category.domain.repository.CategoryRepository
 import rankifyHub.shared.domain.repository.FileStorageRepository
 
+/** カテゴリに関するユースケースを実装するアプリケーションサービス。 カテゴリとアイテムの作成・更新・削除を担う。 */
 @Service
 class CategoryUseCase(
   private val categoryRepository: CategoryRepository,
   private val fileStorageRepository: FileStorageRepository
 ) {
 
+  /** 全カテゴリを取得 */
   fun getAllCategories(): List<Category> = categoryRepository.findAll()
 
+  /**
+   * カテゴリをIDで取得
+   *
+   * @throws IllegalArgumentException カテゴリが存在しない場合
+   */
   fun getCategoryWithItems(id: UUID): Category =
     categoryRepository.findById(id) ?: throw IllegalArgumentException("Category not found")
 
+  /** 新規カテゴリを作成 */
   fun addCategory(addCategoryDto: AddCategoryDto, fileBytes: ByteArray?): Category {
     val imagePath =
       fileBytes?.let {
@@ -37,6 +45,7 @@ class CategoryUseCase(
     return categoryRepository.save(category)
   }
 
+  /** カテゴリを削除 */
   fun deleteCategory(id: UUID) = categoryRepository.deleteById(id)
 
   @Transactional
@@ -65,6 +74,12 @@ class CategoryUseCase(
     return newItem
   }
 
+  /**
+   * カテゴリ内のアイテムを更新
+   *
+   * @param keepCurrentImage 現在の画像を保持するか
+   * @throws IllegalArgumentException カテゴリまたはアイテムが存在しない場合
+   */
   @Transactional
   fun updateItemInCategory(
     categoryId: UUID,

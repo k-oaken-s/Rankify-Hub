@@ -1,7 +1,7 @@
 package rankifyHub.tier.domain.vo
 
 /**
- * 匿名ユーザー識別子
+ * 匿名ユーザー識別子を表す値オブジェクト。
  *
  * @property value 匿名IDの値
  */
