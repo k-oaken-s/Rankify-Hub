@@ -4,6 +4,7 @@
 
 #gradle
 .gradle/
+/build
 
 # OS generated files
 .DS_Store
@@ -25,3 +26,6 @@ yarn-error.log*
 
 # Secrets and sensitive files
 .secrets
+
+# minio
+/minio_data
