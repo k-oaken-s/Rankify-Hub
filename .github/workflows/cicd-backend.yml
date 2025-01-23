@@ -23,4 +23,5 @@ jobs:
           heroku_app_name: ${{secrets.HEROKU_APP_NAME}}
           heroku_email: ${{secrets.HEROKU_EMAIL}}
           appdir: "backend"
-          # procfile: "web: java -Dserver.port=$PORT $JAVA_OPTS -jar build/libs/*.jar"
+          force: true
+          branch: "main"
