@@ -25,4 +25,4 @@ jobs:
           appdir: "backend"
           buildpack: "https://github.com/lstoll/heroku-buildpack-monorepo.git,heroku/gradle"
         env:
-          HD_APP_BASE: "backend"
+          APP_BASE: "backend"
