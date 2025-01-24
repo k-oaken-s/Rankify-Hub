@@ -7,12 +7,26 @@ import {
   UnorderedListOutlined,
 } from "@ant-design/icons";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
+  const pathname = usePathname();
   const [selectedKey, setSelectedKey] = useState("1");
+
+  useEffect(() => {
+    if (pathname === "/") {
+      setSelectedKey("1");
+    } else if (pathname === "/categories") {
+      setSelectedKey("2");
+    } else if (pathname === "/tiers") {
+      setSelectedKey("3");
+    } else {
+      setSelectedKey("");
+    }
+  }, [pathname]);
 
   const handleMenuClick = (key: string) => {
     setSelectedKey(key);

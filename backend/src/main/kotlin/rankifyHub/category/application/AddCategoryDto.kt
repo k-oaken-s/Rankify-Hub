@@ -1,3 +1,5 @@
 package rankifyHub.category.application
 
-data class AddCategoryDto(val name: String, val description: String?)
+import java.time.LocalDate
+
+data class AddCategoryDto(val name: String, val releaseDate: LocalDate, val description: String?)

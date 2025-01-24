@@ -6,6 +6,7 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import java.time.LocalDate
 import java.util.*
 import rankifyHub.category.domain.model.Category
 import rankifyHub.category.domain.model.Item
@@ -21,8 +22,8 @@ class CategoryUseCaseTest :
     "すべてのカテゴリを取得できること" {
       val categories =
         listOf(
-          Category.create("Category1", "Description1", null),
-          Category.create("Category2", "Description2", null)
+          Category.create("Category1", "Description1", null, LocalDate.of(2025, 1, 1)),
+          Category.create("Category2", "Description2", null, LocalDate.of(2025, 1, 1))
         )
       every { categoryRepository.findAll() } returns categories
 
@@ -34,7 +35,7 @@ class CategoryUseCaseTest :
 
     "指定されたIDのカテゴリを取得できること" {
       val categoryId = UUID.randomUUID()
-      val category = Category.create("Category1", "Description1", null)
+      val category = Category.create("Category1", "Description1", null, LocalDate.of(2025, 1, 1))
       every { categoryRepository.findById(categoryId) } returns category
 
       val result = categoryUseCase.getCategoryWithItems(categoryId)
@@ -44,8 +45,10 @@ class CategoryUseCaseTest :
     }
 
     "新しいカテゴリを追加できること" {
-      val addCategoryDto = AddCategoryDto("New Category", "New Description")
-      val category = Category.create(addCategoryDto.name, addCategoryDto.description, null)
+      val releaseDate = LocalDate.of(2025, 1, 1)
+      val addCategoryDto = AddCategoryDto("New Category", releaseDate, "New Description")
+      val category =
+        Category.create(addCategoryDto.name, addCategoryDto.description, null, releaseDate)
       every { categoryRepository.save(any()) } returns category
       every { fileStorageRepository.saveFile(any(), any(), any(), any()) } returns "imagePath"
 

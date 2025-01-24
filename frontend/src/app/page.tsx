@@ -5,8 +5,8 @@ import "tailwindcss/tailwind.css";
 
 import { useEffect, useRef, useState } from "react";
 
+import TierList from "@/components/TierList";
 import UserCategoryList from "@/components/UserCategoryList";
-import UserTierList from "@/components/UserTierList";
 
 import { Category as CategoryType } from "@/types/Category";
 import { Tier as TierType } from "@/types/Tier";
@@ -103,7 +103,7 @@ const TopPage = () => {
   return (
     <div className="container mx-auto px-4">
       <h1 className="text-4xl font-bold text-center mt-10 mb-12">新着Tier一覧</h1>
-      <UserTierList tiers={tiers} />
+      <TierList tiers={tiers} />
 
       <h1 className="text-4xl font-bold text-center mt-10 mb-12">カテゴリ一覧</h1>
       <UserCategoryList categories={categories} />

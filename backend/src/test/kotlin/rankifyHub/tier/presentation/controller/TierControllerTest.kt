@@ -13,10 +13,10 @@ import rankifyHub.tier.application.GetPublicTiersUseCase
 import rankifyHub.tier.application.GetTierUseCase
 import rankifyHub.tier.application.TierUseCase
 import rankifyHub.tier.application.dto.TierWithCategory
-import rankifyHub.tier.domain.model.UserTier
+import rankifyHub.tier.domain.model.Tier
 import rankifyHub.tier.domain.vo.AccessUrl
 import rankifyHub.tier.domain.vo.AnonymousId
-import rankifyHub.tier.domain.vo.UserTierName
+import rankifyHub.tier.domain.vo.TierName
 import rankifyHub.tier.presentation.dto.CreateTierRequest
 import rankifyHub.tier.presentation.dto.TierDetailResponse
 import rankifyHub.tier.presentation.dto.TierResponse
@@ -41,11 +41,11 @@ class TierControllerTest :
     describe("create") {
       it("should create a new tier and return its ID") {
         val request = mockk<CreateTierRequest>()
-        val userTier = mockk<UserTier>()
+        val tier = mockk<Tier>()
         val tierId = UUID.randomUUID()
 
-        every { tierUseCase.create(request) } returns userTier
-        every { userTier.id } returns tierId
+        every { tierUseCase.create(request) } returns tier
+        every { tier.id } returns tierId
 
         val response = controller.create(request)
 
@@ -56,20 +56,20 @@ class TierControllerTest :
       }
     }
 
-    describe("getUserTierById") {
+    describe("getTierById") {
       it("should return tier detail response") {
         val tierId = UUID.randomUUID()
         val categoryId = UUID.randomUUID()
         val anonymousId = AnonymousId("test-anonymous-id")
-        val userTierName = UserTierName("Test Tier")
+        val tierName = TierName("Test Tier")
         val accessUrl = AccessUrl("test-url")
 
-        val userTier =
-          mockk<UserTier> {
+        val tier =
+          mockk<Tier> {
             every { id } returns tierId
             every { this@mockk.categoryId } returns categoryId
             every { this@mockk.anonymousId.value } returns anonymousId.value
-            every { this@mockk.name } returns userTierName
+            every { this@mockk.name } returns tierName
             every { this@mockk.isPublic } returns true
             every { this@mockk.accessUrl.value } returns accessUrl.value
             every { createdAt } returns Instant.now()
@@ -86,7 +86,7 @@ class TierControllerTest :
             every { items } returns emptyList()
           }
 
-        val tierWithCategory = TierWithCategory(userTier, category)
+        val tierWithCategory = TierWithCategory(tier, category)
         val expectedResponse =
           TierDetailResponse(
             id = tierId,
@@ -94,24 +94,24 @@ class TierControllerTest :
             categoryId = categoryId.toString(),
             categoryName = category.name,
             categoryImageUrl = category.imagePath,
-            name = userTierName.value,
+            name = tierName.value,
             isPublic = true,
             accessUrl = accessUrl.value,
             levels = emptyList()
           )
 
-        every { getTierUseCase.getUserTierById(tierId) } returns tierWithCategory
+        every { getTierUseCase.getTierById(tierId) } returns tierWithCategory
 
-        val response = controller.getUserTierById(tierId)
+        val response = controller.getTierById(tierId)
 
         response.statusCode shouldBe HttpStatus.OK
         response.body shouldBe expectedResponse
 
-        verify { getTierUseCase.getUserTierById(tierId) }
+        verify { getTierUseCase.getTierById(tierId) }
       }
     }
 
-    describe("getPublicUserTiers") {
+    describe("getPublicTiers") {
       it("should return list of public tiers") {
         val tierWithCategory = mockk<TierWithCategory>()
         val tierResponse = mockk<TierResponse>()
@@ -119,7 +119,7 @@ class TierControllerTest :
         every { getPublicTiersUseCase.getRecent() } returns listOf(tierWithCategory)
         every { presenter.toResponse(tierWithCategory) } returns tierResponse
 
-        val result = controller.getPublicUserTiers()
+        val result = controller.getPublicTiers()
 
         result shouldBe listOf(tierResponse)
 
@@ -130,7 +130,7 @@ class TierControllerTest :
       }
     }
 
-    describe("getLatestUserTiers") {
+    describe("getLatestTiers") {
       it("should return limited list of latest tiers") {
         val limit = 5
         val tierWithCategory = mockk<TierWithCategory>()
@@ -139,7 +139,7 @@ class TierControllerTest :
         every { getPublicTiersUseCase.getRecentWithLimit(limit) } returns listOf(tierWithCategory)
         every { presenter.toResponse(tierWithCategory) } returns tierResponse
 
-        val result = controller.getLatestUserTiers(limit)
+        val result = controller.getLatestTiers(limit)
 
         result shouldBe listOf(tierResponse)
 
@@ -150,7 +150,7 @@ class TierControllerTest :
       }
     }
 
-    describe("getUserTiersSince") {
+    describe("getTiersSince") {
       it("should return deferred result with tiers") {
         val timestamp = 1234567890L
         val tierWithCategory = mockk<TierWithCategory>()
@@ -159,7 +159,7 @@ class TierControllerTest :
         every { getPublicTiersUseCase.getCreatedAfter(any()) } returns listOf(tierWithCategory)
         every { presenter.toResponse(tierWithCategory) } returns tierResponse
 
-        val result = controller.getUserTiersSince(timestamp)
+        val result = controller.getTiersSince(timestamp)
 
         Thread.sleep(100)
 
@@ -174,7 +174,7 @@ class TierControllerTest :
 
         every { getPublicTiersUseCase.getCreatedAfter(any()) } returns emptyList()
 
-        val result = controller.getUserTiersSince(timestamp)
+        val result = controller.getTiersSince(timestamp)
 
         verify { getPublicTiersUseCase.getCreatedAfter(Instant.ofEpochMilli(timestamp)) }
       }

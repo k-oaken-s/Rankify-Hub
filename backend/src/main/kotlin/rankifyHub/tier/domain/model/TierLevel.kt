@@ -4,23 +4,23 @@ import java.time.Instant
 import java.util.*
 import rankifyHub.tier.domain.vo.OrderIndex
 
-/** ティア内の個別レベルを表すドメインオブジェクト。 レベル内のアイテムの順序管理と更新履歴を担う。 */
-class UserTierLevel(
+/** Tier内の個別レベルを表すドメインオブジェクト。 レベル内のアイテムの順序管理と更新履歴を担う。 */
+class TierLevel(
   val id: UUID = UUID.randomUUID(),
-  var userTierId: UUID,
+  var tierId: UUID,
   val name: String,
   var orderIndex: OrderIndex = OrderIndex(1),
   val createdAt: Instant = Instant.now(),
   var updatedAt: Instant = Instant.now(),
-  private val _items: MutableList<UserTierLevelItem> = mutableListOf()
+  private val _items: MutableList<TierLevelItem> = mutableListOf()
 ) {
 
   /** アイテム一覧を取得 */
-  val items: List<UserTierLevelItem>
+  val items: List<TierLevelItem>
     get() = _items.toList()
 
   /** アイテムを最後尾に追加する */
-  fun addItem(item: UserTierLevelItem) {
+  fun addItem(item: TierLevelItem) {
     val nextOrder = _items.maxOfOrNull { it.orderIndex.value }?.plus(1) ?: 1
     item.orderIndex = OrderIndex(nextOrder)
     _items.add(item)
@@ -28,7 +28,7 @@ class UserTierLevel(
   }
 
   /** アイテムを削除し、残りのアイテムの順序を再整列 */
-  fun removeItem(item: UserTierLevelItem) {
+  fun removeItem(item: TierLevelItem) {
     _items.remove(item)
     reorderItems()
     refreshUpdatedAt()
@@ -53,13 +53,13 @@ class UserTierLevel(
   companion object {
     /** 新規レベルを作成 */
     fun create(
-      userTierId: UUID,
+      tierId: UUID,
       name: String,
       orderIndex: OrderIndex,
-    ): UserTierLevel {
-      return UserTierLevel(
+    ): TierLevel {
+      return TierLevel(
         id = UUID.randomUUID(),
-        userTierId = userTierId,
+        tierId = tierId,
         name = name,
         orderIndex = orderIndex,
       )
@@ -68,16 +68,16 @@ class UserTierLevel(
     /** レベルを再作成 */
     fun reconstruct(
       id: UUID,
-      userTierId: UUID,
+      tierId: UUID,
       name: String,
       orderIndex: OrderIndex,
       createdAt: Instant,
       updatedAt: Instant,
-      items: List<UserTierLevelItem>
-    ): UserTierLevel {
-      return UserTierLevel(
+      items: List<TierLevelItem>
+    ): TierLevel {
+      return TierLevel(
         id = id,
-        userTierId = userTierId,
+        tierId = tierId,
         name = name,
         orderIndex = orderIndex,
         createdAt = createdAt,

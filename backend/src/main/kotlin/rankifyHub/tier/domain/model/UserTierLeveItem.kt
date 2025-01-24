@@ -4,11 +4,11 @@ import java.time.Instant
 import java.util.*
 import rankifyHub.tier.domain.vo.OrderIndex
 
-/** ティアレベル内の個別アイテムを表すドメインオブジェクト。 アイテムの順序と紐付け情報を管理する。 */
-class UserTierLevelItem(
+/** Tier Level内の個別アイテムを表すドメインオブジェクト。 アイテムの順序と紐付け情報を管理する。 */
+class TierLevelItem(
   val id: UUID = UUID.randomUUID(),
-  var userTierLevelId: UUID,
-  var userTierId: UUID,
+  var tierLevelId: UUID,
+  var tierId: UUID,
   var itemId: UUID,
   var orderIndex: OrderIndex,
   val createdAt: Instant = Instant.now(),
@@ -24,15 +24,15 @@ class UserTierLevelItem(
   companion object {
     /** 新規アイテムを作成 */
     fun create(
-      userTierLevelId: UUID,
-      userTierId: UUID,
+      tierLevelId: UUID,
+      tierId: UUID,
       itemId: UUID,
       orderIndex: OrderIndex,
-    ): UserTierLevelItem {
-      return UserTierLevelItem(
+    ): TierLevelItem {
+      return TierLevelItem(
         id = UUID.randomUUID(),
-        userTierLevelId = userTierLevelId,
-        userTierId = userTierId,
+        tierLevelId = tierLevelId,
+        tierId = tierId,
         itemId = itemId,
         orderIndex = orderIndex,
       )
@@ -41,22 +41,14 @@ class UserTierLevelItem(
     /** 新規アイテムを作成 */
     fun reconstruct(
       id: UUID,
-      userTierLevelId: UUID,
-      userTierId: UUID,
+      tierLevelId: UUID,
+      tierId: UUID,
       itemId: UUID,
       orderIndex: OrderIndex,
       createdAt: Instant,
       updatedAt: Instant
-    ): UserTierLevelItem {
-      return UserTierLevelItem(
-        id,
-        userTierLevelId,
-        userTierId,
-        itemId,
-        orderIndex,
-        createdAt,
-        updatedAt
-      )
+    ): TierLevelItem {
+      return TierLevelItem(id, tierLevelId, tierId, itemId, orderIndex, createdAt, updatedAt)
     }
   }
 }

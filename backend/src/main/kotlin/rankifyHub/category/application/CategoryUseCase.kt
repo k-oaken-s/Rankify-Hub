@@ -5,10 +5,13 @@ import java.util.*
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
+import rankifyHub.category.domain.model.Categories
 import rankifyHub.category.domain.model.Category
 import rankifyHub.category.domain.model.Item
 import rankifyHub.category.domain.repository.CategoryRepository
+import rankifyHub.category.domain.vo.CategorySearchCriteria
 import rankifyHub.shared.domain.repository.FileStorageRepository
+import rankifyHub.shared.vo.SortOrder
 
 /** カテゴリに関するユースケースを実装するアプリケーションサービス。 カテゴリとアイテムの作成・更新・削除を担う。 */
 @Service
@@ -17,8 +20,21 @@ class CategoryUseCase(
   private val fileStorageRepository: FileStorageRepository
 ) {
 
-  /** 全カテゴリを取得 */
-  fun getAllCategories(): List<Category> = categoryRepository.findAll()
+  /** 全カテゴリをリリース日が新しい順に取得 */
+  fun getAllCategories(sortOrder: SortOrder = SortOrder.DESC): List<Category> =
+    categoryRepository.findAll().let { categories ->
+      when (sortOrder) {
+        SortOrder.ASC -> categories.sortedBy { it.releaseDate }
+        SortOrder.DESC -> categories.sortedByDescending { it.releaseDate }
+      }
+    }
+
+  /** カテゴリーを検索する */
+  fun searchCategories(criteria: CategorySearchCriteria): List<Category> =
+    Categories.from(categoryRepository.findAll())
+      .let { categories -> criteria.nameFilter?.let { categories.filterByName(it) } ?: categories }
+      .sortByReleaseDate(criteria.sortOrder)
+      .toList()
 
   /**
    * カテゴリをIDで取得
@@ -40,7 +56,8 @@ class CategoryUseCase(
       Category.create(
         name = addCategoryDto.name,
         description = addCategoryDto.description,
-        imagePath = imagePath
+        imagePath = imagePath,
+        releaseDate = addCategoryDto.releaseDate
       )
     return categoryRepository.save(category)
   }

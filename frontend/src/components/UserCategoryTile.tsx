@@ -14,10 +14,7 @@ interface UserCategoryTileProps {
 const UserCategoryTile = ({ category }: UserCategoryTileProps) => {
   return (
     <Link href={`/categories/${category.id}`}>
-      <div
-        className="bg-gray-800 rounded-md shadow-sm p-3 hover:shadow-lg transition-shadow duration-200 transform hover:-translate-y-1 cursor-pointer flex flex-col items-center"
-        style={{ width: "300px", height: "250px" }}
-      >
+      <div className="bg-gray-800 rounded-md shadow-sm p-3 hover:shadow-lg transition-shadow duration-200 transform hover:-translate-y-1 cursor-pointer flex flex-col items-center w-full h-[250px]">
         <div className="w-full h-40 bg-gray-700 rounded-md overflow-hidden relative flex items-center justify-center">
           <ImageWrapper
             src={getImageUrl(category.image)}

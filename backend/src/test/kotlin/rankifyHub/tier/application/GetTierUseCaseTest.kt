@@ -10,71 +10,71 @@ import java.util.*
 import rankifyHub.category.domain.model.Category
 import rankifyHub.category.domain.repository.CategoryRepository
 import rankifyHub.tier.application.dto.TierWithCategory
-import rankifyHub.tier.domain.model.UserTier
-import rankifyHub.tier.domain.repository.UserTierRepository
+import rankifyHub.tier.domain.model.Tier
+import rankifyHub.tier.domain.repository.TierRepository
 
 class GetTierUseCaseTest :
   DescribeSpec({
-    lateinit var userTierRepository: UserTierRepository
+    lateinit var tierRepository: TierRepository
     lateinit var categoryRepository: CategoryRepository
     lateinit var getTierUseCase: GetTierUseCase
 
     beforeTest {
-      userTierRepository = mockk()
+      tierRepository = mockk()
       categoryRepository = mockk()
-      getTierUseCase = GetTierUseCase(userTierRepository, categoryRepository)
+      getTierUseCase = GetTierUseCase(tierRepository, categoryRepository)
     }
 
-    describe("getUserTierById") {
-      val userTierId = UUID.randomUUID()
+    describe("getTierById") {
+      val tierId = UUID.randomUUID()
       val categoryId = UUID.randomUUID()
 
-      context("when both userTier and category exist") {
+      context("when both tier and category exist") {
         it("should return TierWithCategory") {
-          val userTier = mockk<UserTier>()
+          val tier = mockk<Tier>()
           val category = mockk<Category>()
-          val expectedTierWithCategory = TierWithCategory(userTier, category)
+          val expectedTierWithCategory = TierWithCategory(tier, category)
 
-          every { userTier.categoryId } returns categoryId
-          every { userTierRepository.findById(userTierId) } returns userTier
+          every { tier.categoryId } returns categoryId
+          every { tierRepository.findById(tierId) } returns tier
           every { categoryRepository.findById(categoryId) } returns category
 
-          val result = getTierUseCase.getUserTierById(userTierId)
+          val result = getTierUseCase.getTierById(tierId)
 
           result shouldBe expectedTierWithCategory
 
           verify(exactly = 1) {
-            userTierRepository.findById(userTierId)
+            tierRepository.findById(tierId)
             categoryRepository.findById(categoryId)
           }
         }
       }
 
-      context("when userTier does not exist") {
+      context("when tier does not exist") {
         it("should throw NoSuchElementException") {
-          every { userTierRepository.findById(userTierId) } returns null
+          every { tierRepository.findById(tierId) } returns null
 
-          shouldThrow<NoSuchElementException> { getTierUseCase.getUserTierById(userTierId) }
-            .message shouldBe "UserTier not found"
+          shouldThrow<NoSuchElementException> { getTierUseCase.getTierById(tierId) }
+            .message shouldBe "Tier not found"
 
-          verify(exactly = 1) { userTierRepository.findById(userTierId) }
+          verify(exactly = 1) { tierRepository.findById(tierId) }
           verify(exactly = 0) { categoryRepository.findById(any()) }
         }
       }
 
-      context("when userTier exists but category does not exist") {
+      context("when tier exists but category does not exist") {
         it("should throw NoSuchElementException") {
-          val userTier = mockk<UserTier>()
+          val tier = mockk<Tier>()
 
-          every { userTier.categoryId } returns categoryId
-          every { userTierRepository.findById(userTierId) } returns userTier
+          every { tier.categoryId } returns categoryId
+          every { tierRepository.findById(tierId) } returns tier
           every { categoryRepository.findById(categoryId) } returns null
 
-          shouldThrow<NoSuchElementException> { getTierUseCase.getUserTierById(userTierId) }
+          shouldThrow<NoSuchElementException> { getTierUseCase.getTierById(tierId) }
             .message shouldBe "Category not found"
 
           verify(exactly = 1) {
-            userTierRepository.findById(userTierId)
+            tierRepository.findById(tierId)
             categoryRepository.findById(categoryId)
           }
         }

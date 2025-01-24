@@ -5,26 +5,26 @@ import java.util.*
 import rankifyHub.tier.domain.vo.AccessUrl
 import rankifyHub.tier.domain.vo.AnonymousId
 import rankifyHub.tier.domain.vo.OrderIndex
-import rankifyHub.tier.domain.vo.UserTierName
+import rankifyHub.tier.domain.vo.TierName
 
 /** ユーザーが作成したアイテムの階層構造を表すドメインオブジェクト。 複数のレベルとレベルごとの複数のアイテムを持つ。 */
-class UserTier(
+class Tier(
   val id: UUID = UUID.randomUUID(),
   val anonymousId: AnonymousId,
   val categoryId: UUID,
-  val name: UserTierName,
+  val name: TierName,
   val isPublic: Boolean = false,
   val accessUrl: AccessUrl,
   val createdAt: Instant = Instant.now(),
   var updatedAt: Instant = Instant.now(),
-  private val levels: MutableList<UserTierLevel> = mutableListOf(),
+  private val levels: MutableList<TierLevel> = mutableListOf(),
 ) {
 
   /** レベルの一覧を取得 */
-  fun getLevels(): List<UserTierLevel> = levels.toList()
+  fun getLevels(): List<TierLevel> = levels.toList()
 
   /** レベルを追加する。 追加時に自動的に最後尾の順序が割り当てられる。 */
-  fun addLevel(level: UserTierLevel) {
+  fun addLevel(level: TierLevel) {
     val nextOrder = levels.maxOfOrNull { it.orderIndex.value }?.plus(1) ?: 1
     level.orderIndex = OrderIndex(nextOrder)
     levels.add(level)
@@ -32,7 +32,7 @@ class UserTier(
   }
 
   /** レベルを削除し、残りのレベルの順序を再整列する。 */
-  fun removeLevel(level: UserTierLevel) {
+  fun removeLevel(level: TierLevel) {
     levels.remove(level)
     reorderLevels()
     refreshUpdatedAt()
@@ -54,10 +54,10 @@ class UserTier(
     fun create(
       anonymousId: AnonymousId,
       categoryId: UUID,
-      name: UserTierName,
+      name: TierName,
       isPublic: Boolean,
-    ): UserTier {
-      return UserTier(
+    ): Tier {
+      return Tier(
         id = UUID.randomUUID(),
         anonymousId = anonymousId,
         categoryId = categoryId,
@@ -72,14 +72,14 @@ class UserTier(
       id: UUID,
       anonymousId: AnonymousId,
       categoryId: UUID,
-      name: UserTierName,
+      name: TierName,
       isPublic: Boolean,
       accessUrl: AccessUrl,
       createdAt: Instant,
       updatedAt: Instant,
-      levels: List<UserTierLevel>
-    ): UserTier {
-      return UserTier(
+      levels: List<TierLevel>
+    ): Tier {
+      return Tier(
         id = id,
         anonymousId = anonymousId,
         categoryId = categoryId,

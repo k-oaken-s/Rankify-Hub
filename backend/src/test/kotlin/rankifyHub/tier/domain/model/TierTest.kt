@@ -6,36 +6,36 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.mockk.*
 import rankifyHub.tier.domain.vo.OrderIndex
 
-class UserTierTest :
+class TierTest :
   StringSpec({
     "レベルを追加できることを確認" {
-      val userTier = mockk<UserTier>(relaxed = true)
-      val levels = mutableListOf<UserTierLevel>()
-      every { userTier.getLevels() } returns levels
+      val tier = mockk<Tier>(relaxed = true)
+      val levels = mutableListOf<TierLevel>()
+      every { tier.getLevels() } returns levels
 
-      val level = mockk<UserTierLevel>(relaxed = true)
-      every { userTier.addLevel(level) } answers
+      val level = mockk<TierLevel>(relaxed = true)
+      every { tier.addLevel(level) } answers
         {
           levels.add(level)
           every { level.orderIndex = OrderIndex(levels.size) } just runs
         }
 
-      userTier.addLevel(level)
+      tier.addLevel(level)
 
-      userTier.getLevels() shouldHaveSize 1
-      userTier.getLevels() shouldContain level
+      tier.getLevels() shouldHaveSize 1
+      tier.getLevels() shouldContain level
     }
 
     "レベルの順序を並べ替えられることを確認" {
-      val levels = mutableListOf<UserTierLevel>()
-      val userTier = mockk<UserTier>(relaxed = true)
-      val level1 = mockk<UserTierLevel>(relaxed = true)
-      val level2 = mockk<UserTierLevel>(relaxed = true)
+      val levels = mutableListOf<TierLevel>()
+      val tier = mockk<Tier>(relaxed = true)
+      val level1 = mockk<TierLevel>(relaxed = true)
+      val level2 = mockk<TierLevel>(relaxed = true)
 
       levels.addAll(listOf(level1, level2))
-      every { userTier.getLevels() } returns levels
+      every { tier.getLevels() } returns levels
 
-      every { userTier.removeLevel(level1) } answers
+      every { tier.removeLevel(level1) } answers
         {
           levels.remove(level1)
           levels.forEachIndexed { index, level ->
@@ -44,10 +44,10 @@ class UserTierTest :
           }
         }
 
-      userTier.removeLevel(level1)
+      tier.removeLevel(level1)
 
-      userTier.getLevels() shouldHaveSize 1
-      userTier.getLevels() shouldContain level2
+      tier.getLevels() shouldHaveSize 1
+      tier.getLevels() shouldContain level2
       verify { level2.orderIndex = OrderIndex(1) }
     }
   })

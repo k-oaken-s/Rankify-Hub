@@ -3,6 +3,7 @@ package rankifyHub.category.domain.model
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
+import java.time.LocalDate
 import java.util.*
 
 class CategoryTest :
@@ -11,8 +12,9 @@ class CategoryTest :
       val name = "Test Category"
       val description = "Test Description"
       val imagePath = "images/test-category.jpg"
+      val releaseDate = LocalDate.of(2025, 1, 1)
 
-      val category = Category.create(name, description, imagePath)
+      val category = Category.create(name, description, imagePath, releaseDate)
 
       category.name shouldBe name
       category.description shouldBe description
@@ -20,7 +22,8 @@ class CategoryTest :
     }
 
     "カテゴリーにアイテムを追加できること" {
-      val category = Category.create("Test Category", "Test Description", null)
+      val category =
+        Category.create("Test Category", "Test Description", null, LocalDate.of(2025, 1, 1))
       val itemName = "Test Item"
       val imagePath = "images/test-item.jpg"
 
@@ -37,7 +40,8 @@ class CategoryTest :
     }
 
     "カテゴリー内のアイテムを更新できること" {
-      val category = Category.create("Test Category", "Test Description", null)
+      val category =
+        Category.create("Test Category", "Test Description", null, LocalDate.of(2025, 1, 1))
       val item =
         category.addItem(name = "Old Item", imagePath = null, description = "Old Description")
 
@@ -56,7 +60,7 @@ class CategoryTest :
     }
 
     "存在しないアイテムを更新しようとすると例外がスローされること" {
-      val category = Category.create("テストカテゴリー", null, null)
+      val category = Category.create("テストカテゴリー", null, null, LocalDate.of(2025, 1, 1))
 
       shouldThrow<IllegalArgumentException> {
           category.updateItem(
@@ -71,7 +75,7 @@ class CategoryTest :
     }
 
     "アイテム更新時にkeepCurrentImage=trueの場合、既存の画像が保持されること" {
-      val category = Category.create("テストカテゴリー", null, null)
+      val category = Category.create("テストカテゴリー", null, null, LocalDate.of(2025, 1, 1))
       val item = category.addItem("アイテム名", "初期画像のパス", "説明")
 
       val updatedItem =

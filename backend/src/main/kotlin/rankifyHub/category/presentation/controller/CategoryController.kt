@@ -6,8 +6,10 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import rankifyHub.category.application.AddCategoryDto
 import rankifyHub.category.application.CategoryUseCase
+import rankifyHub.category.domain.vo.CategorySearchCriteria
 import rankifyHub.category.presentation.dto.CategoryResponse
 import rankifyHub.category.presentation.dto.ItemResponse
+import rankifyHub.shared.vo.SortOrder
 
 /** カテゴリに関するREST APIエンドポイントを提供するコントローラ。 */
 @RestController
@@ -16,8 +18,12 @@ class CategoryController(private val categoryUseCase: CategoryUseCase) {
 
   /** カテゴリ一覧を取得 */
   @GetMapping
-  fun getAllCategories(): ResponseEntity<List<CategoryResponse>> {
-    val categories = categoryUseCase.getAllCategories()
+  fun getAllCategories(
+    @RequestParam(required = false) name: String?,
+    @RequestParam(defaultValue = "DESC") sortOrder: SortOrder
+  ): ResponseEntity<List<CategoryResponse>> {
+    val criteria = CategorySearchCriteria(sortOrder = sortOrder, nameFilter = name)
+    val categories = categoryUseCase.searchCategories(criteria)
 
     val response =
       categories.map { category ->
@@ -25,7 +31,8 @@ class CategoryController(private val categoryUseCase: CategoryUseCase) {
           id = category.id,
           name = category.name,
           description = category.description,
-          image = category.imagePath
+          image = category.imagePath,
+          releaseDate = category.releaseDate
         )
       }
     return ResponseEntity.ok(response)
@@ -45,6 +52,7 @@ class CategoryController(private val categoryUseCase: CategoryUseCase) {
         name = category.name,
         description = category.description,
         image = category.imagePath,
+        releaseDate = category.releaseDate,
         items =
           category.items.map { item ->
             ItemResponse(id = item.id, name = item.name, image = item.imagePath)
@@ -69,6 +77,7 @@ class CategoryController(private val categoryUseCase: CategoryUseCase) {
         id = category.id,
         name = category.name,
         description = category.description,
+        releaseDate = category.releaseDate,
         image = category.imagePath
       )
     return ResponseEntity.ok(response)

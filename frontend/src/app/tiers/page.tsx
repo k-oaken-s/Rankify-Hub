@@ -4,13 +4,13 @@ import axios from "axios";
 
 import React, { useEffect, useState } from "react";
 
-import UserTierListPage from "@/components/UserTierListPage";
+import TierListPage from "@/components/TierListPage";
 
 import { Tier } from "@/types/Tier";
 
 import { getApiBaseUrl } from "@/utils/getApiBaseUrl";
 
-export default function UserTiersPage() {
+export default function TiersPage() {
   const [tiers, setTiers] = useState<Tier[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -32,5 +32,5 @@ export default function UserTiersPage() {
     fetchTiers();
   }, []);
 
-  return <UserTierListPage tiers={tiers} isLoading={isLoading} />;
+  return <TierListPage tiers={tiers} isLoading={isLoading} />;
 }

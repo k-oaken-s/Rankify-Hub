@@ -10,23 +10,23 @@ import java.util.*
 import rankifyHub.category.domain.model.Category
 import rankifyHub.category.domain.repository.CategoryRepository
 import rankifyHub.tier.application.dto.TierWithCategory
-import rankifyHub.tier.domain.model.UserTier
-import rankifyHub.tier.domain.repository.UserTierRepository
+import rankifyHub.tier.domain.model.Tier
+import rankifyHub.tier.domain.repository.TierRepository
 
 class GetPublicTiersUseCaseTest :
   DescribeSpec({
-    lateinit var userTierRepository: UserTierRepository
+    lateinit var tierRepository: TierRepository
     lateinit var categoryRepository: CategoryRepository
     lateinit var getPublicTiersUseCase: GetPublicTiersUseCase
 
     beforeTest {
-      userTierRepository = mockk()
+      tierRepository = mockk()
       categoryRepository = mockk()
-      getPublicTiersUseCase = GetPublicTiersUseCase(userTierRepository, categoryRepository)
+      getPublicTiersUseCase = GetPublicTiersUseCase(tierRepository, categoryRepository)
     }
 
-    fun createMockUserTier(isPublic: Boolean = true): UserTier {
-      return mockk<UserTier>().also {
+    fun createMockTier(isPublic: Boolean = true): Tier {
+      return mockk<Tier>().also {
         every { it.isPublic } returns isPublic
         every { it.categoryId } returns UUID.randomUUID()
       }
@@ -34,14 +34,14 @@ class GetPublicTiersUseCaseTest :
 
     describe("getRecent") {
       it("should return only public tiers with their categories") {
-        val publicTier1 = createMockUserTier(true)
-        val publicTier2 = createMockUserTier(true)
-        val privateTier = createMockUserTier(false)
+        val publicTier1 = createMockTier(true)
+        val publicTier2 = createMockTier(true)
+        val privateTier = createMockTier(false)
 
         val category1 = mockk<Category>()
         val category2 = mockk<Category>()
 
-        every { userTierRepository.findAllOrderByCreatedAtDesc() } returns
+        every { tierRepository.findAllOrderByCreatedAtDesc() } returns
           listOf(publicTier1, privateTier, publicTier2)
         every { categoryRepository.findById(publicTier1.categoryId) } returns category1
         every { categoryRepository.findById(publicTier2.categoryId) } returns category2
@@ -52,16 +52,16 @@ class GetPublicTiersUseCaseTest :
           listOf(TierWithCategory(publicTier1, category1), TierWithCategory(publicTier2, category2))
 
         verify {
-          userTierRepository.findAllOrderByCreatedAtDesc()
+          tierRepository.findAllOrderByCreatedAtDesc()
           categoryRepository.findById(publicTier1.categoryId)
           categoryRepository.findById(publicTier2.categoryId)
         }
       }
 
       it("should handle missing categories") {
-        val publicTier = createMockUserTier(true)
+        val publicTier = createMockTier(true)
 
-        every { userTierRepository.findAllOrderByCreatedAtDesc() } returns listOf(publicTier)
+        every { tierRepository.findAllOrderByCreatedAtDesc() } returns listOf(publicTier)
         every { categoryRepository.findById(publicTier.categoryId) } returns null
 
         val result = getPublicTiersUseCase.getRecent()
@@ -73,10 +73,10 @@ class GetPublicTiersUseCaseTest :
     describe("getRecentWithLimit") {
       it("should return limited number of public tiers") {
         val limit = 2
-        val publicTier = createMockUserTier(true)
+        val publicTier = createMockTier(true)
         val category = mockk<Category>()
 
-        every { userTierRepository.findLatest(limit) } returns listOf(publicTier)
+        every { tierRepository.findLatest(limit) } returns listOf(publicTier)
         every { categoryRepository.findById(publicTier.categoryId) } returns category
 
         val result = getPublicTiersUseCase.getRecentWithLimit(limit)
@@ -84,7 +84,7 @@ class GetPublicTiersUseCaseTest :
         result shouldBe listOf(TierWithCategory(publicTier, category))
 
         verify {
-          userTierRepository.findLatest(limit)
+          tierRepository.findLatest(limit)
           categoryRepository.findById(publicTier.categoryId)
         }
       }
@@ -93,10 +93,10 @@ class GetPublicTiersUseCaseTest :
     describe("getCreatedAfter") {
       it("should return tiers created after specified timestamp") {
         val timestamp = Instant.now()
-        val publicTier = createMockUserTier(true)
+        val publicTier = createMockTier(true)
         val category = mockk<Category>()
 
-        every { userTierRepository.findSince(timestamp) } returns listOf(publicTier)
+        every { tierRepository.findSince(timestamp) } returns listOf(publicTier)
         every { categoryRepository.findById(publicTier.categoryId) } returns category
 
         val result = getPublicTiersUseCase.getCreatedAfter(timestamp)
@@ -104,7 +104,7 @@ class GetPublicTiersUseCaseTest :
         result shouldBe listOf(TierWithCategory(publicTier, category))
 
         verify {
-          userTierRepository.findSince(timestamp)
+          tierRepository.findSince(timestamp)
           categoryRepository.findById(publicTier.categoryId)
         }
       }
@@ -112,13 +112,13 @@ class GetPublicTiersUseCaseTest :
       it("should handle empty result") {
         val timestamp = Instant.now()
 
-        every { userTierRepository.findSince(timestamp) } returns emptyList()
+        every { tierRepository.findSince(timestamp) } returns emptyList()
 
         val result = getPublicTiersUseCase.getCreatedAfter(timestamp)
 
         result shouldBe emptyList()
 
-        verify { userTierRepository.findSince(timestamp) }
+        verify { tierRepository.findSince(timestamp) }
 
         verify(exactly = 0) { categoryRepository.findById(any()) }
       }
@@ -127,9 +127,9 @@ class GetPublicTiersUseCaseTest :
     describe("common behavior for all methods") {
       it("should filter out private tiers") {
         val timestamp = Instant.now()
-        val privateTier = createMockUserTier(false)
+        val privateTier = createMockTier(false)
 
-        every { userTierRepository.findSince(timestamp) } returns listOf(privateTier)
+        every { tierRepository.findSince(timestamp) } returns listOf(privateTier)
 
         val result = getPublicTiersUseCase.getCreatedAfter(timestamp)
 
@@ -139,11 +139,11 @@ class GetPublicTiersUseCaseTest :
       }
 
       it("should handle null categories") {
-        val publicTier1 = createMockUserTier(true)
-        val publicTier2 = createMockUserTier(true)
+        val publicTier1 = createMockTier(true)
+        val publicTier2 = createMockTier(true)
         val category = mockk<Category>()
 
-        every { userTierRepository.findAllOrderByCreatedAtDesc() } returns
+        every { tierRepository.findAllOrderByCreatedAtDesc() } returns
           listOf(publicTier1, publicTier2)
         every { categoryRepository.findById(publicTier1.categoryId) } returns category
         every { categoryRepository.findById(publicTier2.categoryId) } returns null
