@@ -1,5 +1,5 @@
 import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
-import "@ant-design/v5-patch-for-react-19";
+// import "@ant-design/v5-patch-for-react-19";
 import "tailwindcss/tailwind.css";
 
 import Footer from "@/components/Footer";
