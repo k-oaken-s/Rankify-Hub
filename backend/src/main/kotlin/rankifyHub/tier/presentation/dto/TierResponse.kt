@@ -2,7 +2,7 @@ package rankifyHub.tier.presentation.dto
 
 import java.time.Instant
 
-/** クライアントに返却するUserTierのレスポンスDTO */
+/** クライアントに返却するTierのレスポンスDTO */
 data class TierResponse(
   val id: String,
   val accessUrl: String,

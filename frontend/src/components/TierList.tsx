@@ -8,11 +8,11 @@ import { Tier as TierType } from "@/types/Tier";
 
 import { getImageUrl } from "@/utils/getImageUrl";
 
-interface UserTierListProps {
+interface TierListProps {
   tiers: TierType[];
 }
 
-const UserTierList: React.FC<UserTierListProps> = ({ tiers }) => {
+const TierList: React.FC<TierListProps> = ({ tiers }) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 p-6">
       {tiers.map((tier) => (
@@ -42,4 +42,4 @@ const UserTierList: React.FC<UserTierListProps> = ({ tiers }) => {
   );
 };
 
-export default UserTierList;
+export default TierList;

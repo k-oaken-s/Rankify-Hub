@@ -28,31 +28,31 @@ class TierController(
   /** Tierを新規作成 */
   @PostMapping
   fun create(@RequestBody request: CreateTierRequest): ResponseEntity<String?> {
-    val userTier = tierUseCase.create(request)
-    return ResponseEntity.ok(userTier.id.toString())
+    val tier = tierUseCase.create(request)
+    return ResponseEntity.ok(tier.id.toString())
   }
 
   /** 指定IDのTierを取得 */
   @GetMapping("/{tierId}")
-  fun getUserTierById(@PathVariable tierId: UUID): ResponseEntity<TierDetailResponse> {
-    val userTierWithCategory = getTierUseCase.getUserTierById(tierId)
+  fun getTierById(@PathVariable tierId: UUID): ResponseEntity<TierDetailResponse> {
+    val tierWithCategory = getTierUseCase.getTierById(tierId)
     return ResponseEntity.ok(
-      TierDetailResponse.fromEntity(userTierWithCategory.userTier, userTierWithCategory.category)
+      TierDetailResponse.fromEntity(tierWithCategory.tier, tierWithCategory.category)
     )
   }
 
   /** 公開Tierの一覧を取得 */
   @GetMapping
-  fun getPublicUserTiers(): List<TierResponse> {
-    val userTiersWithCategory = getPublicTiersUseCase.getRecent()
-    return userTiersWithCategory.map { presenter.toResponse(it) }
+  fun getPublicTiers(): List<TierResponse> {
+    val tiersWithCategory = getPublicTiersUseCase.getRecent()
+    return tiersWithCategory.map { presenter.toResponse(it) }
   }
 
   /** 最新の公開Tierを取得 */
   @GetMapping("/latest")
-  fun getLatestUserTiers(@RequestParam limit: Int): List<TierResponse> {
-    val userTiersWithCategory = getPublicTiersUseCase.getRecentWithLimit(limit)
-    return userTiersWithCategory.map { presenter.toResponse(it) }
+  fun getLatestTiers(@RequestParam limit: Int): List<TierResponse> {
+    val tiersWithCategory = getPublicTiersUseCase.getRecentWithLimit(limit)
+    return tiersWithCategory.map { presenter.toResponse(it) }
   }
 
   /**
@@ -62,7 +62,7 @@ class TierController(
    * - タイムアウト時は空配列を返却
    */
   @GetMapping("/since")
-  fun getUserTiersSince(@RequestParam since: Long): DeferredResult<List<TierResponse>> {
+  fun getTiersSince(@RequestParam since: Long): DeferredResult<List<TierResponse>> {
     val deferredResult = DeferredResult<List<TierResponse>>(30000L)
     val executor = Executors.newSingleThreadExecutor()
 
@@ -70,9 +70,9 @@ class TierController(
         {
           val timestamp = Instant.ofEpochMilli(since)
           while (!deferredResult.isSetOrExpired) {
-            val newUserTiers = getPublicTiersUseCase.getCreatedAfter(timestamp)
-            if (newUserTiers.isNotEmpty()) {
-              val responses = newUserTiers.map { presenter.toResponse(it) }
+            val newTiers = getPublicTiersUseCase.getCreatedAfter(timestamp)
+            if (newTiers.isNotEmpty()) {
+              val responses = newTiers.map { presenter.toResponse(it) }
               deferredResult.setResult(responses)
               break
             }

@@ -11,7 +11,7 @@ import { Item } from "@/types/Item";
 
 import { getApiBaseUrl } from "@/utils/getApiBaseUrl";
 
-interface UserTierItemResponse {
+interface TierItemResponse {
   itemId: string;
   order: number;
   name: string;
@@ -19,14 +19,14 @@ interface UserTierItemResponse {
   description: string | null;
 }
 
-interface UserTierLevelResponse {
+interface TierLevelResponse {
   id: string;
   name: string;
   order: number;
-  items: UserTierItemResponse[];
+  items: TierItemResponse[];
 }
 
-interface UserTierDetailResponse {
+interface TierDetailResponse {
   id: string;
   anonymousId: string;
   categoryId: string;
@@ -35,15 +35,15 @@ interface UserTierDetailResponse {
   name: string;
   isPublic: boolean;
   accessUrl: string;
-  levels: UserTierLevelResponse[];
+  levels: TierLevelResponse[];
 }
 
-type UserTierViewScreenProps = {
+type TierViewScreenProps = {
   categoryId: string;
-  userTierId: string;
+  tierId: string;
 };
 
-const UserTierViewScreen: React.FC<UserTierViewScreenProps> = ({ categoryId, userTierId }) => {
+const TierViewScreen: React.FC<TierViewScreenProps> = ({ categoryId, tierId }) => {
   const [loading, setLoading] = useState(true);
   const [tierName, setTierName] = useState("");
   const [categoryName, setCategoryName] = useState("");
@@ -56,9 +56,7 @@ const UserTierViewScreen: React.FC<UserTierViewScreenProps> = ({ categoryId, use
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get<UserTierDetailResponse>(
-          `${getApiBaseUrl()}/tiers/${userTierId}`,
-        );
+        const response = await axios.get<TierDetailResponse>(`${getApiBaseUrl()}/tiers/${tierId}`);
         const data = response.data;
 
         // レスポンスデータの変換
@@ -90,7 +88,7 @@ const UserTierViewScreen: React.FC<UserTierViewScreenProps> = ({ categoryId, use
     };
 
     fetchData();
-  }, [userTierId]);
+  }, [tierId]);
 
   if (loading) return <div>読み込み中...</div>;
 
@@ -106,4 +104,4 @@ const UserTierViewScreen: React.FC<UserTierViewScreenProps> = ({ categoryId, use
   );
 };
 
-export default UserTierViewScreen;
+export default TierViewScreen;

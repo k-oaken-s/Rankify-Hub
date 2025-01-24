@@ -1,18 +1,17 @@
-// components/UserTierListPage.tsx
 import { Spin } from "antd";
 
 import React from "react";
 
-import UserTierList from "@/components/UserTierList";
+import TierList from "@/components/TierList";
 
 import { Tier } from "@/types/Tier";
 
-interface UserTierListPageProps {
+interface TierListPageProps {
   tiers: Tier[];
   isLoading?: boolean;
 }
 
-export default function UserTierListPage({ tiers, isLoading = false }: UserTierListPageProps) {
+export default function TierListPage({ tiers, isLoading = false }: TierListPageProps) {
   return (
     <div className="min-h-screen py-8">
       <div className="container mx-auto px-4">
@@ -25,7 +24,7 @@ export default function UserTierListPage({ tiers, isLoading = false }: UserTierL
         ) : (
           <>
             {tiers.length > 0 ? (
-              <UserTierList tiers={tiers} />
+              <TierList tiers={tiers} />
             ) : (
               <div className="text-center text-gray-400 py-12">Tierが見つかりませんでした</div>
             )}

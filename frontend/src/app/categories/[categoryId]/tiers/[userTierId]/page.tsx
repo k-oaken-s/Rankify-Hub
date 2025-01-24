@@ -4,28 +4,23 @@ import React from "react";
 
 import { useParams } from "next/navigation";
 
-import UserTierViewScreen from "./UserTierViewScreen";
+import TierViewScreen from "./TierViewScreen";
 
 type Params = {
   categoryId: string;
-  userTierId: string;
+  tierId: string;
 };
 
 /**
- * /categories/[categoryId]/tiers/[userTierId]/page.tsx
- *  - UserTierViewScreen にパラメータを渡し、既存Tierを閲覧・再編集できるページ
+ * /categories/[categoryId]/tiers/[tierId]/page.tsx
+ *  - TierViewScreen にパラメータを渡し、既存Tierを閲覧・再編集できるページ
  */
 export default function SharedTierPage() {
   const params = useParams<Params>();
 
-  if (!params.categoryId || !params.userTierId) {
+  if (!params.categoryId || !params.tierId) {
     return <p>URLパラメータが不正です</p>;
   }
 
-  return (
-    <UserTierViewScreen
-      categoryId={String(params.categoryId)}
-      userTierId={String(params.userTierId)}
-    />
-  );
+  return <TierViewScreen categoryId={String(params.categoryId)} tierId={String(params.tierId)} />;
 }

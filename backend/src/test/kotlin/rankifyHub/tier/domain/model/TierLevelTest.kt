@@ -8,13 +8,13 @@ import java.time.Instant
 import java.util.*
 import rankifyHub.tier.domain.vo.OrderIndex
 
-class UserTierLevelTest :
+class TierLevelTest :
   StringSpec({
     "アイテムを追加できることを確認" {
-      val userTierLevel =
-        UserTierLevel(
+      val tierLevel =
+        TierLevel(
           id = UUID.randomUUID(),
-          userTierId = UUID.randomUUID(),
+          tierId = UUID.randomUUID(),
           name = "Test Level",
           orderIndex = OrderIndex(1),
           createdAt = Instant.now(),
@@ -22,30 +22,30 @@ class UserTierLevelTest :
         )
 
       val item =
-        UserTierLevelItem(
+        TierLevelItem(
           id = UUID.randomUUID(),
-          userTierLevelId = userTierLevel.id,
-          userTierId = userTierLevel.userTierId,
+          tierLevelId = tierLevel.id,
+          tierId = tierLevel.tierId,
           itemId = UUID.randomUUID(),
           orderIndex = OrderIndex(1),
           createdAt = Instant.now(),
           updatedAt = Instant.now()
         )
 
-      userTierLevel.addItem(item)
+      tierLevel.addItem(item)
 
-      userTierLevel.items shouldHaveSize 1
-      userTierLevel.items shouldContain item
+      tierLevel.items shouldHaveSize 1
+      tierLevel.items shouldContain item
       item.orderIndex.value shouldBe 1
-      item.userTierLevelId shouldBe userTierLevel.id
-      item.userTierId shouldBe userTierLevel.userTierId
+      item.tierLevelId shouldBe tierLevel.id
+      item.tierId shouldBe tierLevel.tierId
     }
 
     "アイテムを削除できることを確認" {
-      val userTierLevel =
-        UserTierLevel(
+      val tierLevel =
+        TierLevel(
           id = UUID.randomUUID(),
-          userTierId = UUID.randomUUID(),
+          tierId = UUID.randomUUID(),
           name = "Test Level",
           orderIndex = OrderIndex(1),
           createdAt = Instant.now(),
@@ -53,27 +53,27 @@ class UserTierLevelTest :
         )
 
       val item =
-        UserTierLevelItem(
+        TierLevelItem(
           id = UUID.randomUUID(),
-          userTierLevelId = userTierLevel.id,
-          userTierId = userTierLevel.userTierId,
+          tierLevelId = tierLevel.id,
+          tierId = tierLevel.tierId,
           itemId = UUID.randomUUID(),
           orderIndex = OrderIndex(1),
           createdAt = Instant.now(),
           updatedAt = Instant.now()
         )
 
-      userTierLevel.addItem(item)
-      userTierLevel.removeItem(item)
+      tierLevel.addItem(item)
+      tierLevel.removeItem(item)
 
-      userTierLevel.items shouldHaveSize 0
+      tierLevel.items shouldHaveSize 0
     }
 
     "アイテムの順序を並べ替えられることを確認" {
-      val userTierLevel =
-        UserTierLevel(
+      val tierLevel =
+        TierLevel(
           id = UUID.randomUUID(),
-          userTierId = UUID.randomUUID(),
+          tierId = UUID.randomUUID(),
           name = "Test Level",
           orderIndex = OrderIndex(1),
           createdAt = Instant.now(),
@@ -81,34 +81,34 @@ class UserTierLevelTest :
         )
 
       val item1 =
-        UserTierLevelItem(
+        TierLevelItem(
           id = UUID.randomUUID(),
-          userTierLevelId = userTierLevel.id,
-          userTierId = userTierLevel.userTierId,
+          tierLevelId = tierLevel.id,
+          tierId = tierLevel.tierId,
           itemId = UUID.randomUUID(),
           orderIndex = OrderIndex(1),
           createdAt = Instant.now(),
           updatedAt = Instant.now()
         )
       val item2 =
-        UserTierLevelItem(
+        TierLevelItem(
           id = UUID.randomUUID(),
-          userTierLevelId = userTierLevel.id,
-          userTierId = userTierLevel.userTierId,
+          tierLevelId = tierLevel.id,
+          tierId = tierLevel.tierId,
           itemId = UUID.randomUUID(),
           orderIndex = OrderIndex(2),
           createdAt = Instant.now(),
           updatedAt = Instant.now()
         )
 
-      userTierLevel.addItem(item1)
-      userTierLevel.addItem(item2)
+      tierLevel.addItem(item1)
+      tierLevel.addItem(item2)
 
-      userTierLevel.items[0].orderIndex.value shouldBe 1
-      userTierLevel.items[1].orderIndex.value shouldBe 2
+      tierLevel.items[0].orderIndex.value shouldBe 1
+      tierLevel.items[1].orderIndex.value shouldBe 2
 
-      userTierLevel.removeItem(item1)
+      tierLevel.removeItem(item1)
 
-      userTierLevel.items[0].orderIndex.value shouldBe 1
+      tierLevel.items[0].orderIndex.value shouldBe 1
     }
   })

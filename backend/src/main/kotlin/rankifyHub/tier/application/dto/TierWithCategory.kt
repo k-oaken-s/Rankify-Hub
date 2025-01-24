@@ -1,6 +1,6 @@
 package rankifyHub.tier.application.dto
 
 import rankifyHub.category.domain.model.Category
-import rankifyHub.tier.domain.model.UserTier
+import rankifyHub.tier.domain.model.Tier
 
-data class TierWithCategory(val userTier: UserTier, val category: Category)
+data class TierWithCategory(val tier: Tier, val category: Category)

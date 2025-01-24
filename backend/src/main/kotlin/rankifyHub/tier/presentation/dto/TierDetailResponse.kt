@@ -3,9 +3,9 @@ package rankifyHub.tier.presentation.dto
 import java.util.*
 import rankifyHub.category.domain.model.Category
 import rankifyHub.category.domain.model.Item
-import rankifyHub.tier.domain.model.UserTier
-import rankifyHub.tier.domain.model.UserTierLevel
-import rankifyHub.tier.domain.model.UserTierLevelItem
+import rankifyHub.tier.domain.model.Tier
+import rankifyHub.tier.domain.model.TierLevel
+import rankifyHub.tier.domain.model.TierLevelItem
 
 data class TierDetailResponse(
   val id: UUID,
@@ -19,17 +19,17 @@ data class TierDetailResponse(
   val levels: List<TierLevelResponse>
 ) {
   companion object {
-    fun fromEntity(userTier: UserTier, category: Category): TierDetailResponse {
+    fun fromEntity(tier: Tier, category: Category): TierDetailResponse {
       return TierDetailResponse(
-        id = userTier.id,
-        anonymousId = userTier.anonymousId.value,
-        categoryId = userTier.categoryId.toString(),
+        id = tier.id,
+        anonymousId = tier.anonymousId.value,
+        categoryId = tier.categoryId.toString(),
         categoryName = category.name,
         categoryImageUrl = category.imagePath,
-        name = userTier.name.value,
-        isPublic = userTier.isPublic,
-        accessUrl = userTier.accessUrl.value,
-        levels = userTier.getLevels().map { TierLevelResponse.fromEntity(it, category) }
+        name = tier.name.value,
+        isPublic = tier.isPublic,
+        accessUrl = tier.accessUrl.value,
+        levels = tier.getLevels().map { TierLevelResponse.fromEntity(it, category) }
       )
     }
   }
@@ -42,13 +42,13 @@ data class TierLevelResponse(
   val items: List<TierItemResponse>
 ) {
   companion object {
-    fun fromEntity(userTierLevel: UserTierLevel, category: Category): TierLevelResponse {
+    fun fromEntity(tierLevel: TierLevel, category: Category): TierLevelResponse {
       return TierLevelResponse(
-        id = userTierLevel.id,
-        name = userTierLevel.name,
-        order = userTierLevel.orderIndex.value,
+        id = tierLevel.id,
+        name = tierLevel.name,
+        order = tierLevel.orderIndex.value,
         items =
-          userTierLevel.items.map { tierItem ->
+          tierLevel.items.map { tierItem ->
             val categoryItem =
               category.items.find { it.id == tierItem.itemId }
                 ?: throw IllegalStateException("Item not found")
@@ -67,10 +67,10 @@ data class TierItemResponse(
   val description: String?
 ) {
   companion object {
-    fun fromEntity(userTierItem: UserTierLevelItem, categoryItem: Item): TierItemResponse {
+    fun fromEntity(tierItem: TierLevelItem, categoryItem: Item): TierItemResponse {
       return TierItemResponse(
-        itemId = userTierItem.id,
-        order = userTierItem.orderIndex.value,
+        itemId = tierItem.id,
+        order = tierItem.orderIndex.value,
         name = categoryItem.name,
         imageUrl = categoryItem.imagePath,
         description = categoryItem.description

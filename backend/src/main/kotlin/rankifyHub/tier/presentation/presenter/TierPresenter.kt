@@ -9,20 +9,20 @@ import rankifyHub.tier.presentation.dto.TierResponse
 class TierPresenter(private val fileStorageRepository: FileStorageRepository) {
 
   /**
-   * UserTierWithCategoryDtoをUserTierResponseに変換します。
+   * TierWithCategoryDtoをTierResponseに変換します。
    *
-   * @param dto UserTierとCategory情報をまとめたDTO
+   * @param dto TierとCategory情報をまとめたDTO
    * @return クライアントに返却するレスポンスDTO
    */
   fun toResponse(dto: TierWithCategory): TierResponse {
     return TierResponse(
-      id = dto.userTier.id.toString(),
-      accessUrl = dto.userTier.accessUrl.value,
-      createdAt = dto.userTier.createdAt,
-      name = dto.userTier.name.value,
+      id = dto.tier.id.toString(),
+      accessUrl = dto.tier.accessUrl.value,
+      createdAt = dto.tier.createdAt,
+      name = dto.tier.name.value,
       categoryName = dto.category.name,
       categoryImageUrl = dto.category.imagePath ?: "",
-      categoryId = dto.userTier.categoryId.toString()
+      categoryId = dto.tier.categoryId.toString()
     )
   }
 }

@@ -8,20 +8,20 @@ import io.mockk.slot
 import io.mockk.verify
 import java.util.*
 import rankifyHub.shared.domain.repository.FileStorageRepository
-import rankifyHub.tier.domain.model.UserTier
-import rankifyHub.tier.domain.model.UserTierFactory
-import rankifyHub.tier.domain.model.UserTierLevel
-import rankifyHub.tier.domain.repository.UserTierRepository
+import rankifyHub.tier.domain.model.Tier
+import rankifyHub.tier.domain.model.TierFactory
+import rankifyHub.tier.domain.model.TierLevel
+import rankifyHub.tier.domain.repository.TierRepository
 import rankifyHub.tier.domain.vo.AnonymousId
-import rankifyHub.tier.domain.vo.UserTierName
+import rankifyHub.tier.domain.vo.TierName
 import rankifyHub.tier.presentation.dto.CreateTierRequest
 import rankifyHub.tier.presentation.dto.TierItemRequest
 import rankifyHub.tier.presentation.dto.TierLevelRequest
 
 class TierUseCaseTest :
   DescribeSpec({
-    lateinit var userTierRepository: UserTierRepository
-    lateinit var userTierFactory: UserTierFactory
+    lateinit var tierRepository: TierRepository
+    lateinit var tierFactory: TierFactory
     lateinit var fileStorageRepository: FileStorageRepository
     lateinit var tierUseCase: TierUseCase
 
@@ -30,10 +30,10 @@ class TierUseCaseTest :
     val tierName = "Test Tier"
 
     beforeTest {
-      userTierRepository = mockk()
-      userTierFactory = mockk()
+      tierRepository = mockk()
+      tierFactory = mockk()
       fileStorageRepository = mockk()
-      tierUseCase = TierUseCase(userTierRepository, userTierFactory, fileStorageRepository)
+      tierUseCase = TierUseCase(tierRepository, tierFactory, fileStorageRepository)
     }
 
     describe("create") {
@@ -55,35 +55,35 @@ class TierUseCaseTest :
               )
           )
 
-        val userTierSlot = slot<UserTier>()
-        val expectedUserTier = mockk<UserTier>()
+        val tierSlot = slot<Tier>()
+        val expectedTier = mockk<Tier>()
 
         every {
-          userTierFactory.create(
+          tierFactory.create(
             anonymousId = AnonymousId(request.anonymousId),
             categoryId = UUID.fromString(request.categoryId),
-            name = UserTierName(request.name),
+            name = TierName(request.name),
             isPublic = request.isPublic,
-            any<List<UserTierLevel>>()
+            any<List<TierLevel>>()
           )
-        } returns expectedUserTier
+        } returns expectedTier
 
-        every { userTierRepository.save(capture(userTierSlot)) } returns expectedUserTier
+        every { tierRepository.save(capture(tierSlot)) } returns expectedTier
 
         val result = tierUseCase.create(request)
 
-        result shouldBe expectedUserTier
+        result shouldBe expectedTier
 
         verify(exactly = 1) {
-          userTierFactory.create(
+          tierFactory.create(
             anonymousId = AnonymousId(request.anonymousId),
             categoryId = UUID.fromString(request.categoryId),
-            name = UserTierName(request.name),
+            name = TierName(request.name),
             isPublic = request.isPublic,
-            any<List<UserTierLevel>>()
+            any<List<TierLevel>>()
           )
         }
-        verify(exactly = 1) { userTierRepository.save(expectedUserTier) }
+        verify(exactly = 1) { tierRepository.save(expectedTier) }
       }
 
       it("should handle empty levels list") {
@@ -96,29 +96,29 @@ class TierUseCaseTest :
             levels = emptyList()
           )
 
-        val expectedUserTier = mockk<UserTier>()
+        val expectedTier = mockk<Tier>()
 
         every {
-          userTierFactory.create(
+          tierFactory.create(
             anonymousId = AnonymousId(request.anonymousId),
             categoryId = UUID.fromString(request.categoryId),
-            name = UserTierName(request.name),
+            name = TierName(request.name),
             isPublic = request.isPublic,
             levels = emptyList()
           )
-        } returns expectedUserTier
+        } returns expectedTier
 
-        every { userTierRepository.save(expectedUserTier) } returns expectedUserTier
+        every { tierRepository.save(expectedTier) } returns expectedTier
 
         val result = tierUseCase.create(request)
 
-        result shouldBe expectedUserTier
+        result shouldBe expectedTier
 
         verify(exactly = 1) {
-          userTierFactory.create(
+          tierFactory.create(
             anonymousId = AnonymousId(request.anonymousId),
             categoryId = UUID.fromString(request.categoryId),
-            name = UserTierName(request.name),
+            name = TierName(request.name),
             isPublic = request.isPublic,
             levels = emptyList()
           )
@@ -136,23 +136,23 @@ class TierUseCaseTest :
               levels = emptyList()
             )
 
-          val expectedUserTier = mockk<UserTier>()
+          val expectedTier = mockk<Tier>()
 
           every {
-            userTierFactory.create(
+            tierFactory.create(
               anonymousId = AnonymousId(request.anonymousId),
               categoryId = UUID.fromString(request.categoryId),
-              name = UserTierName(request.name),
+              name = TierName(request.name),
               isPublic = false,
               levels = emptyList()
             )
-          } returns expectedUserTier
+          } returns expectedTier
 
-          every { userTierRepository.save(expectedUserTier) } returns expectedUserTier
+          every { tierRepository.save(expectedTier) } returns expectedTier
 
           val result = tierUseCase.create(request)
 
-          result shouldBe expectedUserTier
+          result shouldBe expectedTier
         }
       }
     }
