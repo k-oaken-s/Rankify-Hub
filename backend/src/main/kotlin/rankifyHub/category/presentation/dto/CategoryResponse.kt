@@ -1,5 +1,6 @@
 package rankifyHub.category.presentation.dto
 
+import java.time.LocalDate
 import java.util.*
 
 data class CategoryResponse(
@@ -7,5 +8,6 @@ data class CategoryResponse(
   val name: String,
   val description: String?,
   val image: String? = null,
+  val releaseDate: LocalDate,
   val items: List<ItemResponse> = emptyList()
 )

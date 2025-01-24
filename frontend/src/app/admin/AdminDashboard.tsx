@@ -29,13 +29,16 @@ const AdminDashboard = () => {
       });
   }, [isAuthenticated, isLoading, logout, router]);
 
-  const addCategory = (name: string, image: File | null) => {
+  const addCategory = (name: string, image: File | null, releaseDate: string) => {
     if (!isAuthenticated) {
       return;
     }
 
     const formData = new FormData();
-    formData.append("category", new Blob([JSON.stringify({ name })], { type: "application/json" }));
+    formData.append(
+      "category",
+      new Blob([JSON.stringify({ name, releaseDate })], { type: "application/json" }),
+    );
     if (image) formData.append("file", image);
 
     api

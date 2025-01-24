@@ -38,18 +38,17 @@ const Category = ({ category }: CategoryProps) => (
         </div>
       }
     >
-      <div
-        style={{
-          padding: "16px",
-          flexGrow: 1,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <span style={{ fontWeight: "bold", fontSize: "16px", textAlign: "center" }}>
-          {category.name}
-        </span>
+      <div style={{ padding: "16px" }}>
+        <div className="mb-2">
+          <span
+            style={{ fontWeight: "bold", fontSize: "16px", display: "block", textAlign: "center" }}
+          >
+            {category.name}
+          </span>
+        </div>
+        <div style={{ textAlign: "center", color: "#666" }}>
+          発売日: {new Date(category.releaseDate).toLocaleDateString("ja-JP")}
+        </div>
       </div>
     </Card>
   </Link>

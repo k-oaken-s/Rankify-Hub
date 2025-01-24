@@ -33,6 +33,7 @@ class CategoryRepository(private val dsl: DSLContext) : CategoryRepository {
         name = categoryRecord[CATEGORY.NAME]!!,
         description = categoryRecord[CATEGORY.DESCRIPTION],
         imagePath = categoryRecord[CATEGORY.IMAGE],
+        releaseDate = categoryRecord[CATEGORY.RELEASE_DATE],
         items =
           itemRecords.map { itemRec ->
             Item.reconstruct(
@@ -59,6 +60,7 @@ class CategoryRepository(private val dsl: DSLContext) : CategoryRepository {
         name = categoryRecord[CATEGORY.NAME]!!,
         description = categoryRecord[CATEGORY.DESCRIPTION],
         imagePath = categoryRecord[CATEGORY.IMAGE],
+        releaseDate = categoryRecord[CATEGORY.RELEASE_DATE],
         items =
           itemRecords.map { itemRec ->
             Item.reconstruct(
@@ -85,10 +87,12 @@ class CategoryRepository(private val dsl: DSLContext) : CategoryRepository {
       .set(CATEGORY.NAME, category.name)
       .set(CATEGORY.DESCRIPTION, category.description)
       .set(CATEGORY.IMAGE, category.imagePath)
+      .set(CATEGORY.RELEASE_DATE, category.releaseDate)
       .onDuplicateKeyUpdate()
       .set(CATEGORY.NAME, category.name)
       .set(CATEGORY.DESCRIPTION, category.description)
       .set(CATEGORY.IMAGE, category.imagePath)
+      .set(CATEGORY.RELEASE_DATE, category.releaseDate)
       .execute()
 
     dsl.deleteFrom(ITEM).where(ITEM.CATEGORY_ID.eq(category.id)).execute()

@@ -1,5 +1,6 @@
 package rankifyHub.category.domain.model
 
+import java.time.LocalDate
 import java.util.*
 
 /** カテゴリを表すドメインオブジェクト。 ランク付けの対象となるアイテムのグループを表現し、アイテムを管理する責務を持つ。 */
@@ -9,6 +10,7 @@ private constructor(
   val name: String,
   val description: String?,
   val imagePath: String?,
+  val releaseDate: LocalDate,
   private val _items: MutableList<Item> = mutableListOf()
 ) {
 
@@ -18,12 +20,18 @@ private constructor(
   companion object {
 
     /** 新規カテゴリを作成する。 一意なIDは自動的に生成される。 */
-    fun create(name: String, description: String?, imagePath: String?): Category {
+    fun create(
+      name: String,
+      description: String?,
+      imagePath: String?,
+      releaseDate: LocalDate
+    ): Category {
       return Category(
         id = UUID.randomUUID(),
         name = name,
         description = description,
-        imagePath = imagePath
+        imagePath = imagePath,
+        releaseDate = releaseDate
       )
     }
 
@@ -33,9 +41,10 @@ private constructor(
       name: String,
       description: String?,
       imagePath: String?,
+      releaseDate: LocalDate,
       items: List<Item> = emptyList()
     ): Category {
-      return Category(id, name, description, imagePath, items.toMutableList())
+      return Category(id, name, description, imagePath, releaseDate, items.toMutableList())
     }
   }
 

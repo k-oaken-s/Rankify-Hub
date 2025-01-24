@@ -15,8 +15,6 @@ export default function TierListPage({ tiers, isLoading = false }: TierListPageP
   return (
     <div className="min-h-screen py-8">
       <div className="container mx-auto px-4">
-        <h1 className="text-3xl font-bold text-white mb-8">新着ユーザーTier一覧</h1>
-
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
             <Spin size="large" />

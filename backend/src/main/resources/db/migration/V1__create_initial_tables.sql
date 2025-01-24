@@ -1,8 +1,17 @@
+CREATE TABLE admin_users (
+    id UUID PRIMARY KEY,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    hashed_password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE category (
                           id          UUID PRIMARY KEY,
                           name        VARCHAR(255) NOT NULL,
                           description TEXT,
-                          image       VARCHAR(512), -- S3保存先URLを格納
+                          image       VARCHAR(512),
+                          release_date DATE,
                           created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                           updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -11,7 +20,7 @@ CREATE TABLE item (
                       id          UUID PRIMARY KEY,
                       category_id UUID         NOT NULL,
                       name        VARCHAR(255) NOT NULL,
-                      image       VARCHAR(512), -- S3保存先URLを格納
+                      image       VARCHAR(512),
                       description TEXT,
                       created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                       updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
