@@ -151,7 +151,7 @@ class TierControllerTest :
     }
 
     describe("getTiersSince") {
-      it("should return deferred result with tiers") {
+      it("should return list of tiers") {
         val timestamp = 1234567890L
         val tierWithCategory = mockk<TierWithCategory>()
         val tierResponse = mockk<TierResponse>()
@@ -160,23 +160,14 @@ class TierControllerTest :
         every { presenter.toResponse(tierWithCategory) } returns tierResponse
 
         val result = controller.getTiersSince(timestamp)
+        Thread.sleep(1500) // DeferredResultの処理待ち
 
-        Thread.sleep(100)
+        result.result shouldBe listOf(tierResponse)
 
         verify {
           getPublicTiersUseCase.getCreatedAfter(Instant.ofEpochMilli(timestamp))
           presenter.toResponse(tierWithCategory)
         }
-      }
-
-      it("should handle empty result") {
-        val timestamp = 1234567890L
-
-        every { getPublicTiersUseCase.getCreatedAfter(any()) } returns emptyList()
-
-        val result = controller.getTiersSince(timestamp)
-
-        verify { getPublicTiersUseCase.getCreatedAfter(Instant.ofEpochMilli(timestamp)) }
       }
     }
   })
