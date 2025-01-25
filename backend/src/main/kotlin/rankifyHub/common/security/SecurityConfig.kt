@@ -59,7 +59,18 @@ class SecurityConfig(private val jwtAuthenticationFilter: JwtAuthenticationFilte
             "https://rankify-hub.vercel.app"
           )
         allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
-        allowedHeaders = listOf("Authorization", "Content-Type", "X-Requested-With", "Accept")
+        allowedHeaders =
+          listOf(
+            "Authorization",
+            "Content-Type",
+            "X-Requested-With",
+            "Accept",
+            "Referer",
+            "User-Agent",
+            "sec-ch-ua",
+            "sec-ch-ua-mobile",
+            "sec-ch-ua-platform"
+          )
         exposedHeaders = listOf("Authorization")
         allowCredentials = true
         maxAge = 3600L
