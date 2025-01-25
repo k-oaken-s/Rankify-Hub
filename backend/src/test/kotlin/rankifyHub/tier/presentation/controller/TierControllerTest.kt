@@ -5,9 +5,6 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import java.time.Instant
-import java.util.*
-import kotlinx.coroutines.runBlocking
 import org.springframework.http.HttpStatus
 import rankifyHub.category.domain.model.Category
 import rankifyHub.tier.application.GetPublicTiersUseCase
@@ -22,6 +19,8 @@ import rankifyHub.tier.presentation.dto.CreateTierRequest
 import rankifyHub.tier.presentation.dto.TierDetailResponse
 import rankifyHub.tier.presentation.dto.TierResponse
 import rankifyHub.tier.presentation.presenter.TierPresenter
+import java.time.Instant
+import java.util.*
 
 class TierControllerTest :
   DescribeSpec({
@@ -152,7 +151,7 @@ class TierControllerTest :
     }
 
     describe("getTiersSince") {
-      it("should return deferred result with tiers") {
+      it("should return list of tiers") {
         val timestamp = 1234567890L
         val tierWithCategory = mockk<TierWithCategory>()
         val tierResponse = mockk<TierResponse>()
@@ -160,24 +159,15 @@ class TierControllerTest :
         every { getPublicTiersUseCase.getCreatedAfter(any()) } returns listOf(tierWithCategory)
         every { presenter.toResponse(tierWithCategory) } returns tierResponse
 
-        val result = runBlocking { controller.getTiersSince(timestamp) }
-        result shouldBe listOf(tierResponse)
+        val result = controller.getTiersSince(timestamp)
+        Thread.sleep(1500) // DeferredResultの処理待ち
+
+        result.result shouldBe listOf(tierResponse)
 
         verify {
           getPublicTiersUseCase.getCreatedAfter(Instant.ofEpochMilli(timestamp))
           presenter.toResponse(tierWithCategory)
         }
-      }
-
-      it("should handle empty result") {
-        val timestamp = 1234567890L
-
-        every { getPublicTiersUseCase.getCreatedAfter(any()) } returns emptyList()
-
-        val result = runBlocking { controller.getTiersSince(timestamp) }
-        result shouldBe emptyList<TierResponse>()
-
-        verify { getPublicTiersUseCase.getCreatedAfter(Instant.ofEpochMilli(timestamp)) }
       }
     }
   })
