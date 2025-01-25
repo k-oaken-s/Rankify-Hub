@@ -5,6 +5,8 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import java.time.Instant
+import java.util.*
 import org.springframework.http.HttpStatus
 import rankifyHub.category.domain.model.Category
 import rankifyHub.tier.application.GetPublicTiersUseCase
@@ -19,8 +21,6 @@ import rankifyHub.tier.presentation.dto.CreateTierRequest
 import rankifyHub.tier.presentation.dto.TierDetailResponse
 import rankifyHub.tier.presentation.dto.TierResponse
 import rankifyHub.tier.presentation.presenter.TierPresenter
-import java.time.Instant
-import java.util.*
 
 class TierControllerTest :
   DescribeSpec({
