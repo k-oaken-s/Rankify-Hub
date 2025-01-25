@@ -7,6 +7,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import java.time.Instant
 import java.util.*
+import kotlinx.coroutines.runBlocking
 import org.springframework.http.HttpStatus
 import rankifyHub.category.domain.model.Category
 import rankifyHub.tier.application.GetPublicTiersUseCase
@@ -159,7 +160,7 @@ class TierControllerTest :
         every { getPublicTiersUseCase.getCreatedAfter(any()) } returns listOf(tierWithCategory)
         every { presenter.toResponse(tierWithCategory) } returns tierResponse
 
-        val result = controller.getTiersSince(timestamp)
+        val result = runBlocking { controller.getTiersSince(timestamp) }
         result shouldBe listOf(tierResponse)
 
         verify {
@@ -173,7 +174,8 @@ class TierControllerTest :
 
         every { getPublicTiersUseCase.getCreatedAfter(any()) } returns emptyList()
 
-        controller.getTiersSince(timestamp)
+        val result = runBlocking { controller.getTiersSince(timestamp) }
+        result shouldBe emptyList<TierResponse>()
 
         verify { getPublicTiersUseCase.getCreatedAfter(Instant.ofEpochMilli(timestamp)) }
       }
