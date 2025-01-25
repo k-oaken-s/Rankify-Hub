@@ -5,8 +5,6 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import java.time.Instant
-import java.util.*
 import org.springframework.http.HttpStatus
 import rankifyHub.category.domain.model.Category
 import rankifyHub.tier.application.GetPublicTiersUseCase
@@ -21,6 +19,8 @@ import rankifyHub.tier.presentation.dto.CreateTierRequest
 import rankifyHub.tier.presentation.dto.TierDetailResponse
 import rankifyHub.tier.presentation.dto.TierResponse
 import rankifyHub.tier.presentation.presenter.TierPresenter
+import java.time.Instant
+import java.util.*
 
 class TierControllerTest :
   DescribeSpec({
@@ -160,8 +160,7 @@ class TierControllerTest :
         every { presenter.toResponse(tierWithCategory) } returns tierResponse
 
         val result = controller.getTiersSince(timestamp)
-
-        Thread.sleep(100)
+        result shouldBe listOf(tierResponse)
 
         verify {
           getPublicTiersUseCase.getCreatedAfter(Instant.ofEpochMilli(timestamp))
@@ -174,7 +173,7 @@ class TierControllerTest :
 
         every { getPublicTiersUseCase.getCreatedAfter(any()) } returns emptyList()
 
-        val result = controller.getTiersSince(timestamp)
+        controller.getTiersSince(timestamp)
 
         verify { getPublicTiersUseCase.getCreatedAfter(Instant.ofEpochMilli(timestamp)) }
       }
