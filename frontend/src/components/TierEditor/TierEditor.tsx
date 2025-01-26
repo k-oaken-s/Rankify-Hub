@@ -27,6 +27,7 @@ import { getImageUrl } from "@/utils/getImageUrl";
 import DraggableItem from "./components/DraggableItem";
 import SortableTier from "./components/SortableTier";
 import Tier from "./components/Tier";
+import UnassignedArea from "./components/UnassignedArea";
 
 export interface TierEditorProps {
   initialTierName: string;
@@ -98,6 +99,7 @@ const TierEditor: React.FC<TierEditorProps> = ({
     const activeId = active.id as string;
     const overId = over.id as string;
 
+    // Tier間の移動
     if (activeTierId && tierOrder.includes(activeTierId)) {
       if (activeId !== overId) {
         const oldIndex = tierOrder.indexOf(activeId);
@@ -108,66 +110,85 @@ const TierEditor: React.FC<TierEditorProps> = ({
       return;
     }
 
+    // アイテムの移動
     if (activeItemId) {
       const sourceTierKey = findTierByItem(activeItemId) ?? "unassigned";
       const destinationTierKey = findTierByItem(overId) ?? overId;
 
+      // 同一エリア内の移動
       if (sourceTierKey === destinationTierKey) {
         if (sourceTierKey === "unassigned") {
-          resetActiveState();
-          return;
+          const oldIndex = unassignedItems.findIndex((item) => item.id === activeItemId);
+          const newIndex = unassignedItems.findIndex((item) => item.id === overId);
+          if (oldIndex >= 0 && newIndex >= 0) {
+            setUnassignedItems((prev) => arrayMove(prev, oldIndex, newIndex));
+          }
         } else {
-          const oldIndex = tiers[sourceTierKey].items.findIndex((itm) => itm.id === activeItemId);
-          const newIndex = tiers[sourceTierKey].items.findIndex((itm) => itm.id === overId);
-          if (oldIndex >= 0 && newIndex >= 0 && oldIndex !== newIndex) {
+          const items = tiers[sourceTierKey].items;
+          const oldIndex = items.findIndex((item) => item.id === activeItemId);
+          const newIndex = items.findIndex((item) => item.id === overId);
+          if (oldIndex >= 0 && newIndex >= 0) {
             setTiers((prev) => ({
               ...prev,
               [sourceTierKey]: {
                 ...prev[sourceTierKey],
-                items: arrayMove(prev[sourceTierKey].items, oldIndex, newIndex),
+                items: arrayMove(items, oldIndex, newIndex),
               },
             }));
           }
         }
-      } else {
-        const movingItem = getItemById(activeItemId);
-        if (!movingItem) {
-          resetActiveState();
-          return;
-        }
-
-        if (sourceTierKey === "unassigned") {
-          setUnassignedItems((prev) => prev.filter((it) => it.id !== activeItemId));
-        } else {
-          setTiers((prev) => ({
-            ...prev,
-            [sourceTierKey]: {
-              ...prev[sourceTierKey],
-              items: prev[sourceTierKey].items.filter((it) => it.id !== activeItemId),
-            },
-          }));
-        }
-
-        if (destinationTierKey === "unassigned") {
-          setUnassignedItems((prev) => [...prev, movingItem]);
-        } else if (tiers[destinationTierKey]) {
-          const destItems = [...tiers[destinationTierKey].items];
-          const overIndex = destItems.findIndex((it) => it.id === overId);
-          if (overIndex >= 0) {
-            destItems.splice(overIndex, 0, movingItem);
-          } else {
-            destItems.push(movingItem);
-          }
-
-          setTiers((prev) => ({
-            ...prev,
-            [destinationTierKey]: {
-              ...prev[destinationTierKey],
-              items: destItems,
-            },
-          }));
-        }
+        resetActiveState();
+        return;
       }
+
+      const movingItem = getItemById(activeItemId);
+
+      if (!movingItem) {
+        resetActiveState();
+        return;
+      }
+
+      // 移動元からアイテムを削除
+      if (sourceTierKey === "unassigned") {
+        setUnassignedItems((prev) => prev.filter((it) => it.id !== activeItemId));
+      } else {
+        setTiers((prev) => ({
+          ...prev,
+          [sourceTierKey]: {
+            ...prev[sourceTierKey],
+            items: prev[sourceTierKey].items.filter((it) => it.id !== activeItemId),
+          },
+        }));
+      }
+
+      // 未割り当てエリアへの移動
+      if (overId === "unassigned-area") {
+        setUnassignedItems((prev) => [...prev, movingItem]);
+        resetActiveState();
+        return;
+      }
+
+      // Tierへの移動
+      if (!tiers[destinationTierKey]) {
+        resetActiveState();
+        return;
+      }
+
+      const destItems = [...tiers[destinationTierKey].items];
+      const overIndex = destItems.findIndex((it) => it.id === overId);
+      if (overIndex >= 0) {
+        destItems.splice(overIndex, 0, movingItem);
+      } else {
+        destItems.push(movingItem);
+      }
+
+      setTiers((prev) => ({
+        ...prev,
+        [destinationTierKey]: {
+          ...prev[destinationTierKey],
+          items: destItems,
+        },
+      }));
     }
 
     resetActiveState();
@@ -312,26 +333,7 @@ const TierEditor: React.FC<TierEditorProps> = ({
         ))}
       </SortableContext>
 
-      <div
-        className="mt-8 p-4 rounded-md shadow-md"
-        style={{
-          backgroundColor: tierColors.unassigned,
-          minHeight: "150px",
-        }}
-      >
-        <h3 className="text-lg font-semibold mb-4" style={{ color: "#333" }}>
-          未割り当てアイテム
-        </h3>
-        <div className="flex gap-4 flex-wrap">
-          {unassignedItems.map(
-            (
-              item, // unassignedItems を使用
-            ) => (
-              <DraggableItem key={item.id} item={item} />
-            ),
-          )}
-        </div>
-      </div>
+      <UnassignedArea items={unassignedItems} backgroundColor={tierColors.unassigned} />
 
       <div className="mt-8 text-center">
         <button
