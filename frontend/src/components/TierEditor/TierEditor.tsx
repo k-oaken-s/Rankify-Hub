@@ -64,6 +64,7 @@ const TierEditor: React.FC<TierEditorProps> = ({
   const [activeItemId, setActiveItemId] = useState<string | null>(null);
   const [generatedUrl, setGeneratedUrl] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const anonymousId = getAnonymousId();
   const [dropPreview, setDropPreview] = useState<{
     tierId: string;
     index: number;
