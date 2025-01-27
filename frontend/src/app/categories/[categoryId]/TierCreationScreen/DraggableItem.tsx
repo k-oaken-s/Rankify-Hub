@@ -23,52 +23,72 @@ const DraggableItem: React.FC<DraggableItemProps> = ({ item, isOverlay = false }
     },
   });
 
-  const style: React.CSSProperties = {
+  // ベースとなるスタイル
+  const baseStyle: React.CSSProperties = {
     opacity: isDragging ? 0.4 : 1,
     transform: transform ? CSS.Transform.toString(transform) : undefined,
     transition: transition ?? "transform 0.2s ease",
     width: "120px",
     height: "120px",
+    position: "relative",
     borderRadius: "8px",
     overflow: "hidden",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-    position: "relative",
     cursor: "move",
-    // ドラッグ中のアイテムでもポインターイベントを有効にする
-    pointerEvents: "auto",
   };
 
+  // 画像コンテナのスタイル
+  const imageContainerStyle: React.CSSProperties = {
+    position: "relative",
+    width: "100%",
+    height: "100%",
+  };
+
+  // 画像のスタイル
+  const imageStyle: React.CSSProperties = {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+  };
+
+  // グラデーションオーバーレイのスタイル
+  const overlayStyle: React.CSSProperties = {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: "50%",
+    background: "linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%)",
+  };
+
+  // テキストのスタイル
   const textStyle: React.CSSProperties = {
     position: "absolute",
     bottom: 0,
-    width: "100%",
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
-    color: "#fff",
-    textAlign: "center",
+    left: 0,
+    right: 0,
+    padding: "8px",
+    color: "white",
     fontSize: "14px",
-    fontWeight: "bold",
-    padding: "4px 0",
+    textAlign: "center",
+    fontWeight: "500",
+    textOverflow: "ellipsis",
+    overflow: "hidden",
+    whiteSpace: "nowrap",
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
-      <ImageWrapper
-        src={getImageUrl(item.image || "")}
-        alt={item.name}
-        width={120}
-        height={120}
-        style={{
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          borderRadius: "8px",
-        }}
-      />
-      <div style={textStyle}>{item.name}</div>
+    <div ref={setNodeRef} style={baseStyle} {...listeners} {...attributes}>
+      <div style={imageContainerStyle}>
+        <ImageWrapper
+          src={getImageUrl(item.image || "")}
+          alt={item.name}
+          width={120}
+          height={120}
+          style={imageStyle}
+        />
+        <div style={overlayStyle} />
+        <div style={textStyle}>{item.name}</div>
+      </div>
     </div>
   );
 };
