@@ -26,6 +26,7 @@ const TierCreationScreen: React.FC<TierCreationScreenProps> = ({
     Tier2: { name: "Tier 2", items: [] },
     Tier3: { name: "Tier 3", items: [] },
     Tier4: { name: "Tier 4", items: [] },
+    Tier5: { name: "Tier 5", items: [] },
   };
 
   return (

@@ -1,5 +1,3 @@
-import React from "react";
-
 import Link from "next/link";
 
 import ImageWrapper from "@/components/ImageWrapper";
@@ -14,13 +12,10 @@ interface TierListProps {
 
 const TierList: React.FC<TierListProps> = ({ tiers }) => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 p-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
       {tiers.map((tier) => (
         <Link key={tier.accessUrl} href={`/categories/${tier.categoryId}/tiers/${tier.id}`}>
-          <div
-            className="bg-gray-800 rounded-md shadow-sm p-3 hover:shadow-lg transition-shadow duration-200 transform hover:-translate-y-1 cursor-pointer flex flex-col items-center"
-            style={{ width: "300px", height: "250px" }}
-          >
+          <div className="bg-gray-800 rounded-md shadow-sm p-3 hover:shadow-lg transition-shadow duration-200 transform hover:-translate-y-1 cursor-pointer flex flex-col items-center w-full h-[250px]">
             <div className="w-full h-40 bg-gray-700 rounded-md overflow-hidden relative flex items-center justify-center">
               <ImageWrapper
                 src={getImageUrl(tier.categoryImageUrl)}
@@ -33,7 +28,6 @@ const TierList: React.FC<TierListProps> = ({ tiers }) => {
             </div>
 
             <h3 className="text-base font-medium text-white mt-2">{tier.name}</h3>
-
             <p className="text-sm text-gray-400 mt-2 text-center">{tier.categoryName}</p>
           </div>
         </Link>

@@ -1,54 +1,69 @@
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
 import React from "react";
-import {useSortable} from "@dnd-kit/sortable";
-import {CSS} from "@dnd-kit/utilities";
-import Tier from "./Tier";
-import {Item} from "@/types/Item";
 
-type SortableTierProps = {
-    id: string;
-    name: string;
-    items: Item[];
-    tierKey: string;
-    onNameChange: (newName: string) => void;
-    backgroundColor: string;
-};
+import { Item } from "@/types/Item";
 
-const SortableTier: React.FC<SortableTierProps> = ({id, name, items, onNameChange, backgroundColor}) => {
-    const {
-        attributes,
-        listeners,
-        setNodeRef,
-        transform,
-        transition,
-        isDragging,
-    } = useSortable({id});
+import DraggableItem from "./DraggableItem";
+import DropPreview from "./DropPreview";
 
-    const style = {
-        transform: CSS.Transform.toString(transform),
-        transition,
-        opacity: isDragging ? 0.8 : 1,
-        cursor: "move",
-    };
+interface SortableTierProps {
+  id: string;
+  tierKey: string;
+  name: string;
+  items: Item[];
+  backgroundColor: string;
+  onNameChange: (newName: string) => void;
+  dropPreview?: { index: number } | null;
+}
 
-    return (
-        <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-            <Tier
-                id={id}
-                name={name}
-                items={items}
-                onNameChange={onNameChange}
-                backgroundColor={backgroundColor}
-            />
+const SortableTier: React.FC<SortableTierProps> = ({
+  id,
+  tierKey,
+  name,
+  items,
+  backgroundColor,
+  onNameChange,
+  dropPreview,
+}) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes}>
+      <div className="flex mb-4 rounded-md shadow-md overflow-hidden" style={{ backgroundColor }}>
+        <div className="w-32 flex items-center justify-center p-4 cursor-move" {...listeners}>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => onNameChange(e.target.value)}
+            className="w-full text-center bg-transparent text-white border-none focus:outline-none"
+            style={{ cursor: "text" }}
+            onClick={(e) => e.stopPropagation()}
+          />
         </div>
-    );
+        <div className="flex-1 bg-gray-800 p-4">
+          <div className="flex gap-4 flex-wrap relative min-h-[120px]">
+            {items.map((item, index) => (
+              <React.Fragment key={item.id}>
+                {dropPreview && index === dropPreview.index && <DropPreview />}
+                <DraggableItem item={item} />
+              </React.Fragment>
+            ))}
+            {dropPreview && dropPreview.index >= items.length && <DropPreview />}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
-export default React.memo(SortableTier, (prev, next) => {
-    if (prev.name !== next.name) return false;
-    if (prev.items.length !== next.items.length) return false;
-    for (let i = 0; i < prev.items.length; i++) {
-        if (prev.items[i].id !== next.items[i].id) return false;
-    }
-    if (prev.backgroundColor !== next.backgroundColor) return false;
-    return true;
-});
+export default SortableTier;
