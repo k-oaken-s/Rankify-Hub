@@ -56,31 +56,85 @@ const TierViewScreen: React.FC<TierViewScreenProps> = ({ categoryId, tierId }) =
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get<TierDetailResponse>(`${getApiBaseUrl()}/tiers/${tierId}`);
-        const data = response.data;
+        // カテゴリーのレスポンス型
+        interface CategoryResponse {
+          id: string;
+          name: string;
+          image: string;
+          items: {
+            id: string;
+            name: string;
+            image: string;
+          }[];
+        }
 
-        // レスポンスデータの変換
+        // Tierのレスポンス型
+        interface TierDetailResponse {
+          id: string;
+          name: string;
+          categoryName: string;
+          categoryImageUrl: string;
+          levels: {
+            id: string;
+            name: string;
+            order: number;
+            items: {
+              id: string;
+              itemId: string;
+              order: number;
+              name: string;
+              imageUrl: string | null;
+              description: string | null;
+            }[];
+          }[];
+        }
+
+        // 並行してデータを取得
+        const [tierResponse, categoryResponse] = await Promise.all([
+          axios.get<TierDetailResponse>(`${getApiBaseUrl()}/tiers/${tierId}`),
+          axios.get<CategoryResponse>(`${getApiBaseUrl()}/categories/${categoryId}`),
+        ]);
+
+        const tierData = tierResponse.data;
+        const categoryData = categoryResponse.data;
+
+        // カテゴリーのアイテムを変換
+        const categoryItems: Item[] = categoryData.items.map((item) => ({
+          id: item.id,
+          name: item.name,
+          image: item.image,
+          order: 0,
+        }));
+
+        // Tierデータを変換
         const loadedTiers: Record<string, { name: string; items: Item[] }> = {};
-        data.levels.forEach((level) => {
-          loadedTiers[`Tier${level.order + 1}`] = {
+        const usedItemIds = new Set<string>();
+
+        tierData.levels.forEach((level) => {
+          loadedTiers[`Tier${level.order}`] = {
             name: level.name,
-            items: level.items.map((item) => ({
-              id: item.itemId,
-              name: item.name,
-              image: item.imageUrl || undefined,
-              description: item.description || undefined,
-              order: item.order,
-            })),
+            items: level.items.map((item) => {
+              usedItemIds.add(item.itemId);
+              return {
+                id: item.itemId,
+                name: item.name,
+                image: item.imageUrl || undefined,
+                order: item.order,
+              };
+            }),
           };
         });
 
         setInitialTiers(loadedTiers);
-        setTierName(data.name);
-        setCategoryName(data.categoryName);
-        setCategoryImageUrl(data.categoryImageUrl == null ? "" : data.categoryImageUrl);
-        setAvailableItems([]);
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        setTierName(tierData.name);
+        setCategoryName(categoryData.name);
+        setCategoryImageUrl(categoryData.image);
+
+        // 未割り当てのアイテムを設定
+        const unassignedItems = categoryItems.filter((item) => !usedItemIds.has(item.id));
+        setAvailableItems(unassignedItems);
       } catch (error) {
+        console.error("Error fetching data:", error);
         message.error("既存Tierの取得に失敗しました");
       } finally {
         setLoading(false);
@@ -88,7 +142,7 @@ const TierViewScreen: React.FC<TierViewScreenProps> = ({ categoryId, tierId }) =
     };
 
     fetchData();
-  }, [tierId]);
+  }, [tierId, categoryId]);
 
   if (loading) return <div>読み込み中...</div>;
 
@@ -100,6 +154,7 @@ const TierViewScreen: React.FC<TierViewScreenProps> = ({ categoryId, tierId }) =
       categoryName={categoryName}
       categoryImageUrl={categoryImageUrl}
       initialTierName={tierName}
+      isViewMode={true}
     />
   );
 };

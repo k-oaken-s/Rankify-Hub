@@ -60,6 +60,7 @@ data class TierLevelResponse(
 }
 
 data class TierItemResponse(
+  val id: UUID,
   val itemId: UUID,
   val order: Int,
   val name: String,
@@ -69,7 +70,8 @@ data class TierItemResponse(
   companion object {
     fun fromEntity(tierItem: TierLevelItem, categoryItem: Item): TierItemResponse {
       return TierItemResponse(
-        itemId = tierItem.id,
+        id = tierItem.id,
+        itemId = tierItem.itemId,
         order = tierItem.orderIndex.value,
         name = categoryItem.name,
         imageUrl = categoryItem.imagePath,

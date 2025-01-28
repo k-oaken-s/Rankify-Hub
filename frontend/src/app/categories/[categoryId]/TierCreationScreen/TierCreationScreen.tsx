@@ -21,24 +21,15 @@ const TierCreationScreen: React.FC<TierCreationScreenProps> = ({
   categoryName,
   categoryImageUrl,
 }) => {
-  const initialTiers = {
-    Tier1: { name: "Tier 1", items: [] },
-    Tier2: { name: "Tier 2", items: [] },
-    Tier3: { name: "Tier 3", items: [] },
-    Tier4: { name: "Tier 4", items: [] },
-    Tier5: { name: "Tier 5", items: [] },
-  };
-
   return (
     <TierEditor
       initialTierName={`${categoryName} Tier`}
-      initialTiers={initialTiers}
       availableItems={items}
       categoryId={categoryId}
       categoryName={categoryName}
       categoryImageUrl={categoryImageUrl}
+      isViewMode={false}
     />
   );
 };
-
 export default TierCreationScreen;

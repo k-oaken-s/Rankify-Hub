@@ -12,12 +12,14 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove, rectSortingStrategy } from "@dnd-kit/sortable";
-import { Input, message } from "antd";
+import { Input } from "antd";
 import axios from "axios";
+import { PlusCircleIcon, XCircleIcon } from "lucide-react";
 
 import React, { useState } from "react";
 
 import ImageWrapper from "@/components/ImageWrapper";
+import ShowNotification from "@/components/ShowNotification";
 
 import { Item } from "@/types/Item";
 
@@ -30,13 +32,39 @@ import SortableTier from "./components/SortableTier";
 import Tier from "./components/Tier";
 import UnassignedArea from "./components/UnassignedArea";
 
+export const TIER_PRESETS = {
+  tier: {
+    label: "Tier",
+    tiers: {
+      Tier1: { name: "Tier 1", items: [] },
+      Tier2: { name: "Tier 2", items: [] },
+      Tier3: { name: "Tier 3", items: [] },
+      Tier4: { name: "Tier 4", items: [] },
+      Tier5: { name: "Tier 5", items: [] },
+    },
+  },
+  rank: {
+    label: "ランク",
+    tiers: {
+      Tier1: { name: "S", items: [] },
+      Tier2: { name: "A", items: [] },
+      Tier3: { name: "B", items: [] },
+      Tier4: { name: "C", items: [] },
+      Tier5: { name: "D", items: [] },
+    },
+  },
+};
+
+const RANK_NAMES = ["S", "A", "B", "C", "D", "E", "F", "G", "H", "I"];
+
 export interface TierEditorProps {
   initialTierName: string;
-  initialTiers: Record<string, { name: string; items: Item[] }>;
+  initialTiers?: Record<string, { name: string; items: Item[] }>;
   availableItems: Item[];
   categoryId: string;
   categoryName: string;
   categoryImageUrl: string;
+  isViewMode?: boolean;
 }
 
 export interface Level {
@@ -48,6 +76,11 @@ export interface Level {
   }[];
 }
 
+interface TierData {
+  name: string;
+  items: Item[];
+}
+
 const TierEditor: React.FC<TierEditorProps> = ({
   initialTierName,
   initialTiers,
@@ -55,77 +88,174 @@ const TierEditor: React.FC<TierEditorProps> = ({
   categoryId,
   categoryName,
   categoryImageUrl,
+  isViewMode = false,
 }) => {
   const [tierName, setTierName] = useState<string>(initialTierName);
-  const [tiers, setTiers] = useState(initialTiers);
-  const [tierOrder, setTierOrder] = useState<string[]>(Object.keys(initialTiers));
+  const [tierOrder, setTierOrder] = useState<string[]>(
+    Object.keys(initialTiers || TIER_PRESETS.tier.tiers),
+  );
   const [unassignedItems, setUnassignedItems] = useState<Item[]>(availableItems);
   const [activeTierId, setActiveTierId] = useState<string | null>(null);
   const [activeItemId, setActiveItemId] = useState<string | null>(null);
   const [generatedUrl, setGeneratedUrl] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [selectedPreset, setSelectedPreset] = useState<keyof typeof TIER_PRESETS>("tier");
   const anonymousId = getAnonymousId();
   const [dropPreview, setDropPreview] = useState<{
     tierId: string;
     index: number;
   } | null>(null);
+  const [tiers, setTiers] = useState<Record<string, TierData>>(
+    initialTiers || TIER_PRESETS.tier.tiers,
+  );
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { distance: 5 },
     }),
   );
+  const getActiveTierIndex = (tierId: string) => {
+    return tierOrder.indexOf(tierId);
+  };
 
-  const tierColors: Record<string, string> = {
-    Tier1: "#2A1536",
-    Tier2: "#3A1A1A",
-    Tier3: "#3A2A15",
-    Tier4: "#152641",
-    Tier5: "#153A29",
-    default: "#2D2D2D",
-    unassigned: "#8A8A8A",
+  const TIER_COLORS = [
+    "#2A1536", // 1番目の背景色
+    "#3A1A1A", // 2番目の背景色
+    "#3A2A15", // 3番目の背景色
+    "#152641", // 4番目の背景色
+    "#153A29", // 5番目の背景色
+    "#2D2D2D", // 6番目以降のデフォルト色
+  ];
+  const UNASSIGNED_COLOR = "#8A8A8A";
+
+  const getTierColor = (index: number) => {
+    return TIER_COLORS[index] || TIER_COLORS[TIER_COLORS.length - 1];
+  };
+
+  const handlePresetChange = (value: keyof typeof TIER_PRESETS) => {
+    if (isViewMode) return;
+
+    setSelectedPreset(value);
+
+    const allItems = [...unassignedItems];
+    Object.values(tiers).forEach((tier) => {
+      allItems.push(...tier.items);
+    });
+
+    const presetTiers = TIER_PRESETS[value].tiers;
+    setTiers(presetTiers);
+    setTierOrder(Object.keys(presetTiers));
+    setUnassignedItems(allItems);
+  };
+
+  const generateNewTierName = () => {
+    if (isViewMode) {
+      const numbers = Object.values(tiers)
+        .map((tier) => {
+          const match = tier.name.match(/\d+/);
+          return match ? parseInt(match[0], 10) : 0;
+        })
+        .filter((num) => !isNaN(num));
+
+      return `Tier ${numbers.length > 0 ? Math.max(...numbers) + 1 : 1}`;
+    }
+
+    const existingNames = Object.values(tiers).map((tier) => tier.name);
+
+    if (selectedPreset === "rank") {
+      const unusedRank = RANK_NAMES.find((rank) => !existingNames.includes(rank));
+      return unusedRank || RANK_NAMES[RANK_NAMES.length - 1];
+    } else {
+      const usedNumbers = existingNames
+        .map((name) => {
+          const match = name.match(/\d+/);
+          return match ? parseInt(match[1], 10) : 0;
+        })
+        .filter((num) => !isNaN(num));
+
+      let newNumber = 1;
+      while (usedNumbers.includes(newNumber)) {
+        newNumber++;
+      }
+      return `Tier ${newNumber}`;
+    }
+  };
+
+  const handleAddTier = () => {
+    if (tierOrder.length >= 10) return;
+
+    const maxTierNumber = Math.max(
+      ...tierOrder.map((tierId) => {
+        const match = tierId.match(/\d+/);
+        return match ? parseInt(match[0], 10) : 0;
+      }),
+    );
+
+    let newTierId = `Tier${maxTierNumber + 1}`;
+    const newTierName = generateNewTierName();
+
+    if (tiers[newTierId]) {
+      let counter = maxTierNumber + 1;
+      while (tiers[`Tier${counter}`]) {
+        counter++;
+      }
+      newTierId = `Tier${counter}`;
+    }
+
+    setTiers((prev: Record<string, TierData>) => ({
+      ...prev,
+      [newTierId]: { name: newTierName, items: [] },
+    }));
+
+    setTierOrder((prev) => [...prev, newTierId]);
+  };
+
+  const handleRemoveTier = (tierId: string) => {
+    if (Object.keys(tiers).length <= 2) return;
+
+    const itemsToMove = tiers[tierId]?.items || [];
+    setUnassignedItems((prev) => [...prev, ...itemsToMove]);
+
+    const newTiers = { ...tiers };
+    delete newTiers[tierId];
+    setTiers(newTiers);
+
+    setTierOrder((prev) => prev.filter((id) => id !== tierId));
   };
 
   const handleDragOver = (event: DragOverEvent) => {
     const { active, over } = event;
-    if (!active || !over) return;
+    if (!active || !over) {
+      setDropPreview(null);
+      return;
+    }
 
     const activeId = active.id as string;
     const overId = over.id as string;
 
-    // Tierのドラッグ中は何もしない
     if (tierOrder.includes(activeId)) {
       setDropPreview(null);
       return;
     }
 
-    // ドロップ先の決定
     let targetTierId: string;
     let targetIndex: number;
 
     if (overId === "unassigned-area") {
-      // 未割り当てエリアへのドロップ
       targetTierId = "unassigned";
       targetIndex = unassignedItems.length;
     } else {
-      // アイテムまたはTierへのドロップ
-      const overTier = findTierByItem(overId);
-      if (overTier) {
-        // アイテムへのドロップ
-        targetTierId = overTier;
-        const items = tiers[overTier].items;
-        targetIndex = items.findIndex((item) => item.id === overId);
+      const overTierId = findTierByItem(overId);
+      if (overTierId) {
+        targetTierId = overTierId;
+        targetIndex = tiers[overTierId].items.findIndex((item) => item.id === overId);
       } else if (tiers[overId]) {
-        // Tierへのドロップ
         targetTierId = overId;
         targetIndex = tiers[overId].items.length;
       } else {
-        // 未割り当てエリア内のアイテムへのドロップ
         targetTierId = "unassigned";
         targetIndex = unassignedItems.findIndex((item) => item.id === overId);
-        if (targetIndex === -1) {
-          targetIndex = unassignedItems.length;
-        }
+        if (targetIndex === -1) targetIndex = unassignedItems.length;
       }
     }
 
@@ -156,7 +286,6 @@ const TierEditor: React.FC<TierEditorProps> = ({
     const activeId = active.id as string;
     const overId = over.id as string;
 
-    // Tier間の移動
     if (activeTierId && tierOrder.includes(activeTierId)) {
       if (activeId !== overId) {
         const oldIndex = tierOrder.indexOf(activeId);
@@ -167,22 +296,18 @@ const TierEditor: React.FC<TierEditorProps> = ({
       return;
     }
 
-    // アイテムの移動
     if (activeItemId) {
       const sourceTierKey = findTierByItem(activeItemId) ?? "unassigned";
       let destinationTierKey = findTierByItem(overId);
 
-      // 移動先の決定
       if (overId === "unassigned-area") {
         destinationTierKey = "unassigned";
       } else if (!destinationTierKey && !tiers[overId]) {
-        // 未割り当てエリア内のアイテムへの移動
         destinationTierKey = "unassigned";
       } else if (!destinationTierKey) {
         destinationTierKey = overId;
       }
 
-      // 同一エリア内の移動
       if (sourceTierKey === destinationTierKey) {
         if (sourceTierKey === "unassigned") {
           const items = unassignedItems;
@@ -222,7 +347,6 @@ const TierEditor: React.FC<TierEditorProps> = ({
         return;
       }
 
-      // 移動元からアイテムを削除
       if (sourceTierKey === "unassigned") {
         setUnassignedItems((prev) => prev.filter((it) => it.id !== activeItemId));
       } else {
@@ -235,7 +359,6 @@ const TierEditor: React.FC<TierEditorProps> = ({
         }));
       }
 
-      // 移動先にアイテムを追加
       if (destinationTierKey === "unassigned") {
         setUnassignedItems((prev) => {
           if (overId === "unassigned-area") {
@@ -298,7 +421,7 @@ const TierEditor: React.FC<TierEditorProps> = ({
 
   const generateTierUrl = async (isPublic: boolean) => {
     if (!tierName.trim()) {
-      message.error("Tier全体の名前を入力してください");
+      ShowNotification("Tier名を入力してください", "error");
       return;
     }
 
@@ -321,27 +444,44 @@ const TierEditor: React.FC<TierEditorProps> = ({
         levels,
       });
 
-      const data = response.data;
-      setGeneratedUrl(data);
+      const tierId = response.data;
+      const generatedUrl = `${window.location.origin}/categories/${categoryId}/tiers/${tierId}`;
 
-      navigator.clipboard.writeText(data);
-      message.success("URLが生成されクリップボードにコピーされました");
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        if (error.response) {
-          message.error(`URLの生成に失敗しました (ステータス: ${error.response.status})`);
-        } else {
-          message.error("サーバーからのレスポンスがありません");
-        }
-      } else if (error instanceof Error) {
-        message.error(`エラー: ${error.message}`);
-      } else {
-        message.error("不明なエラーが発生しました");
-      }
+      setGeneratedUrl(generatedUrl);
+      await navigator.clipboard.writeText(generatedUrl);
+      ShowNotification("URLが生成されクリップボードにコピーされました");
+    } catch (error) {
+      ShowNotification("URLの生成に失敗しました", "error");
     } finally {
       setIsGenerating(false);
     }
   };
+
+  const TierNameInput = ({
+    value,
+    onChange,
+  }: {
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  }) => (
+    <div className="flex items-center gap-4 flex-1 max-w-xl">
+      <label htmlFor="tierNameInput" className="text-gray-300 font-medium whitespace-nowrap">
+        Tier Name
+      </label>
+      <Input
+        id="tierNameInput"
+        value={value}
+        onChange={onChange}
+        placeholder="Your Tier Name"
+        className="w-full h-10 px-3 text-base rounded-lg
+                 bg-gray-700 text-white placeholder-gray-400
+                 border border-gray-600
+                 hover:bg-gray-600 hover:border-indigo-500
+                 focus:bg-gray-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500
+                 transition-all duration-200 ease-in-out"
+      />
+    </div>
+  );
 
   return (
     <DndContext
@@ -351,69 +491,104 @@ const TierEditor: React.FC<TierEditorProps> = ({
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
-      <div className="text-center mb-8">
-        <div className="flex justify-center items-center p-6 mb-6">
-          <div
-            className="flex items-center justify-center max-w-full max-h-full rounded-lg shadow-md
-                        overflow-hidden bg-transparent"
-          >
+      <div className="mb-8">
+        <div className="flex justify-center p-6 mb-6">
+          <div className="relative w-full max-w-lg rounded-lg shadow-md overflow-hidden">
             <ImageWrapper
               src={getImageUrl(categoryImageUrl)}
               alt={categoryName}
-              className="object-cover w-full h-full"
+              className="w-full h-auto object-contain"
             />
           </div>
-
-          <h2 className="text-gray-300 text-3xl">{categoryName}</h2>
         </div>
-        <label htmlFor="tierNameInput" className="block text-lg font-medium text-gray-300 mb-2">
-          Your Tier Name
-        </label>
-        <Input
-          id="tierNameInput"
-          value={tierName}
-          onChange={(e) => setTierName(e.target.value)}
-          placeholder="例: 最強キャラランキング"
-          style={{
-            width: "100%",
-            height: "45px",
-            fontSize: "16px",
-            backgroundColor: "#444",
-            color: "#fff",
-            borderRadius: "6px",
-            border: "1px solid #666",
-            padding: "0 10px",
-          }}
-          className="focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
-        />
+
+        {!isViewMode ? (
+          <div className="flex items-center justify-between gap-8 mb-8 px-4">
+            <div className="flex gap-3">
+              {[
+                { id: "tier", label: "Tier" },
+                { id: "rank", label: "Rank" },
+              ].map((preset) => (
+                <button
+                  key={preset.id}
+                  onClick={() => handlePresetChange(preset.id as keyof typeof TIER_PRESETS)}
+                  className={`
+              px-6 py-2 rounded-lg font-medium text-sm
+              transition-all duration-300 ease-out
+              border-2 
+              ${
+                selectedPreset === preset.id
+                  ? "border-indigo-500 bg-indigo-500/20 text-indigo-300"
+                  : "border-gray-600 bg-gray-800/50 text-gray-400 hover:border-gray-500 hover:text-gray-300"
+              }
+              hover:shadow-[0_0_15px_rgba(99,102,241,0.3)]
+              active:scale-95
+            `}
+                >
+                  {preset.label}
+                </button>
+              ))}
+            </div>
+            <TierNameInput value={tierName} onChange={(e) => setTierName(e.target.value)} />
+          </div>
+        ) : (
+          <div className="px-4">
+            <TierNameInput value={tierName} onChange={(e) => setTierName(e.target.value)} />
+          </div>
+        )}
       </div>
 
       <SortableContext items={tierOrder} strategy={rectSortingStrategy}>
-        {tierOrder.map((tierKey) => (
-          <SortableTier
-            key={tierKey}
-            id={tierKey}
-            tierKey={tierKey}
-            name={tiers[tierKey].name}
-            items={tiers[tierKey].items}
-            dropPreview={dropPreview?.tierId === tierKey ? { index: dropPreview.index } : null}
-            onNameChange={(newName) =>
-              setTiers((prev) => ({
-                ...prev,
-                [tierKey]: {
-                  ...prev[tierKey],
-                  name: newName,
-                },
-              }))
-            }
-            backgroundColor={tierColors[tierKey] || tierColors.default}
-          />
+        {tierOrder.map((tierKey, index) => (
+          <div key={tierKey} className="relative">
+            <SortableTier
+              id={tierKey}
+              tierKey={tierKey}
+              name={tiers[tierKey].name}
+              items={tiers[tierKey].items}
+              dropPreview={dropPreview?.tierId === tierKey ? { index: dropPreview.index } : null}
+              onNameChange={(newName) =>
+                setTiers((prev) => ({
+                  ...prev,
+                  [tierKey]: {
+                    ...prev[tierKey],
+                    name: newName,
+                  },
+                }))
+              }
+              backgroundColor={getTierColor(index)}
+            />
+            {tierOrder.length > 2 && (
+              <button
+                onClick={() => handleRemoveTier(tierKey)}
+                className="absolute -right-8 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300 transition-colors"
+                title="Tierを削除"
+              >
+                <XCircleIcon size={20} />
+              </button>
+            )}
+          </div>
         ))}
       </SortableContext>
 
+      {tierOrder.length < 10 && (
+        <div className="flex justify-center my-6">
+          <button
+            onClick={handleAddTier}
+            className="group flex items-center gap-2 px-4 py-2 rounded-lg  hover:bg-gray-700
+                     text-gray-300 hover:text-white transition-all duration-200"
+          >
+            <PlusCircleIcon
+              size={20}
+              className="group-hover:scale-110 transition-transform duration-200"
+            />
+          </button>
+        </div>
+      )}
+
       <UnassignedArea
         items={unassignedItems}
-        backgroundColor={tierColors.unassigned}
+        backgroundColor={UNASSIGNED_COLOR}
         dropPreview={dropPreview?.tierId === "unassigned" ? { index: dropPreview.index } : null}
       />
 
@@ -477,7 +652,7 @@ const TierEditor: React.FC<TierEditorProps> = ({
                 },
               }))
             }
-            backgroundColor={tierColors[activeTierId] || tierColors.default}
+            backgroundColor={getTierColor(getActiveTierIndex(activeTierId))}
           />
         ) : activeItemId ? (
           (() => {
