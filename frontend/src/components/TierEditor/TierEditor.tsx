@@ -12,13 +12,14 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove, rectSortingStrategy } from "@dnd-kit/sortable";
-import { Input, message } from "antd";
+import { Input } from "antd";
 import axios from "axios";
 import { PlusCircleIcon, XCircleIcon } from "lucide-react";
 
 import React, { useState } from "react";
 
 import ImageWrapper from "@/components/ImageWrapper";
+import ShowNotification from "@/components/ShowNotification";
 
 import { Item } from "@/types/Item";
 
@@ -413,7 +414,7 @@ const TierEditor: React.FC<TierEditorProps> = ({
 
   const generateTierUrl = async (isPublic: boolean) => {
     if (!tierName.trim()) {
-      message.error("Tier名を入力してください");
+      ShowNotification("Tier名を入力してください", "error");
       return;
     }
 
@@ -436,13 +437,14 @@ const TierEditor: React.FC<TierEditorProps> = ({
         levels,
       });
 
-      const data = response.data;
-      setGeneratedUrl(data);
+      const tierId = response.data;
+      const generatedUrl = `${window.location.origin}/categories/${categoryId}/tiers/${tierId}`;
 
-      navigator.clipboard.writeText(data);
-      message.success("URLが生成されクリップボードにコピーされました");
-    } catch (error: unknown) {
-      console.error("Error generating URL:", error);
+      setGeneratedUrl(generatedUrl);
+      await navigator.clipboard.writeText(generatedUrl);
+      ShowNotification("URLが生成されクリップボードにコピーされました");
+    } catch (error) {
+      ShowNotification("URLの生成に失敗しました", "error");
     } finally {
       setIsGenerating(false);
     }
