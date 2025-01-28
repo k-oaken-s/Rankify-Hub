@@ -1,11 +1,11 @@
 package rankifyHub.tier.presentation.dto
 
-import java.util.*
 import rankifyHub.category.domain.model.Category
 import rankifyHub.category.domain.model.Item
 import rankifyHub.tier.domain.model.Tier
 import rankifyHub.tier.domain.model.TierLevel
 import rankifyHub.tier.domain.model.TierLevelItem
+import java.util.*
 
 data class TierDetailResponse(
   val id: UUID,
@@ -60,6 +60,7 @@ data class TierLevelResponse(
 }
 
 data class TierItemResponse(
+  val id: UUID,
   val itemId: UUID,
   val order: Int,
   val name: String,
@@ -69,7 +70,8 @@ data class TierItemResponse(
   companion object {
     fun fromEntity(tierItem: TierLevelItem, categoryItem: Item): TierItemResponse {
       return TierItemResponse(
-        itemId = tierItem.id,
+        id = tierItem.id,
+        itemId = tierItem.itemId,
         order = tierItem.orderIndex.value,
         name = categoryItem.name,
         imageUrl = categoryItem.imagePath,
