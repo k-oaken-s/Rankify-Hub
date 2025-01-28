@@ -449,6 +449,7 @@ const TierEditor: React.FC<TierEditorProps> = ({
       setIsGenerating(false);
     }
   };
+
   const TierNameInput = ({
     value,
     onChange,
@@ -456,9 +457,9 @@ const TierEditor: React.FC<TierEditorProps> = ({
     value: string;
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   }) => (
-    <div className="flex-1 max-w-xl">
-      <label htmlFor="tierNameInput" className="sr-only">
-        Your Tier Name
+    <div className="flex items-center gap-4 flex-1 max-w-xl">
+      <label htmlFor="tierNameInput" className="text-gray-300 font-medium whitespace-nowrap">
+        Tier Name
       </label>
       <Input
         id="tierNameInput"
@@ -483,21 +484,20 @@ const TierEditor: React.FC<TierEditorProps> = ({
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
-      <div className="text-center mb-8">
-        <div className="flex justify-center items-center p-6 mb-6">
-          <div className="flex items-center justify-center w-full max-h-full rounded-lg shadow-md overflow-hidden bg-transparent">
+      <div className="mb-8">
+        <div className="flex justify-center p-6 mb-6">
+          <div className="relative w-full max-w-lg rounded-lg shadow-md overflow-hidden">
             <ImageWrapper
               src={getImageUrl(categoryImageUrl)}
               alt={categoryName}
-              className="object-cover w-full h-full"
+              className="w-full h-auto object-contain"
             />
           </div>
-          <h2 className="text-gray-300 text-3xl">{categoryName}</h2>
         </div>
 
         {!isViewMode ? (
           <div className="flex items-center justify-between gap-8 mb-8 px-4">
-            <div className="flex gap-4">
+            <div className="flex gap-3">
               {[
                 { id: "tier", label: "Tier" },
                 { id: "rank", label: "Rank" },
@@ -506,14 +506,15 @@ const TierEditor: React.FC<TierEditorProps> = ({
                   key={preset.id}
                   onClick={() => handlePresetChange(preset.id as keyof typeof TIER_PRESETS)}
                   className={`
-              px-6 py-2 rounded-lg font-semibold
-              transition-all duration-200 ease-in-out
+              px-6 py-2 rounded-lg font-medium text-sm
+              transition-all duration-300 ease-out
+              border-2 
               ${
                 selectedPreset === preset.id
-                  ? "bg-indigo-600 text-white shadow-lg"
-                  : "bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white"
+                  ? "border-indigo-500 bg-indigo-500/20 text-indigo-300"
+                  : "border-gray-600 bg-gray-800/50 text-gray-400 hover:border-gray-500 hover:text-gray-300"
               }
-              hover:transform hover:scale-105
+              hover:shadow-[0_0_15px_rgba(99,102,241,0.3)]
               active:scale-95
             `}
                 >
@@ -524,7 +525,7 @@ const TierEditor: React.FC<TierEditorProps> = ({
             <TierNameInput value={tierName} onChange={(e) => setTierName(e.target.value)} />
           </div>
         ) : (
-          <div className="mb-8 px-4">
+          <div className="px-4">
             <TierNameInput value={tierName} onChange={(e) => setTierName(e.target.value)} />
           </div>
         )}
