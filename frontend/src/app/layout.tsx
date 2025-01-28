@@ -1,4 +1,5 @@
 import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
+import { Analytics } from "@vercel/analytics/next";
 // import "@ant-design/v5-patch-for-react-19";
 import "tailwindcss/tailwind.css";
 
@@ -18,6 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </main>
           <Footer />
         </AdminAuthProvider>
+        <Analytics />
       </body>
     </html>
   );
