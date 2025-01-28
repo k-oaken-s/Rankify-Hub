@@ -40,7 +40,11 @@ const SortableTier: React.FC<SortableTierProps> = ({
   return (
     <div ref={setNodeRef} style={style} {...attributes}>
       <div className="flex mb-4 rounded-md shadow-md overflow-hidden" style={{ backgroundColor }}>
-        <div className="w-32 flex items-center justify-center p-4 cursor-move" {...listeners}>
+        <div
+          className="w-32 flex items-center justify-center p-4 cursor-move border-r border-white/10" // border-r と border-white/10 を追加
+          {...listeners}
+          style={{ backgroundColor }}
+        >
           <input
             type="text"
             value={name}
@@ -50,7 +54,7 @@ const SortableTier: React.FC<SortableTierProps> = ({
             onClick={(e) => e.stopPropagation()}
           />
         </div>
-        <div className="flex-1 bg-gray-800 p-4">
+        <div className="flex-1 p-4" style={{ backgroundColor }}>
           <div className="flex gap-4 flex-wrap relative min-h-[120px]">
             {items.map((item, index) => (
               <React.Fragment key={item.id}>

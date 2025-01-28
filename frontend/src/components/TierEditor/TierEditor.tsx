@@ -114,15 +114,22 @@ const TierEditor: React.FC<TierEditorProps> = ({
       activationConstraint: { distance: 5 },
     }),
   );
+  const getActiveTierIndex = (tierId: string) => {
+    return tierOrder.indexOf(tierId);
+  };
 
-  const tierColors: Record<string, string> = {
-    Tier1: "#2A1536",
-    Tier2: "#3A1A1A",
-    Tier3: "#3A2A15",
-    Tier4: "#152641",
-    Tier5: "#153A29",
-    default: "#2D2D2D",
-    unassigned: "#8A8A8A",
+  const TIER_COLORS = [
+    "#2A1536", // 1番目の背景色
+    "#3A1A1A", // 2番目の背景色
+    "#3A2A15", // 3番目の背景色
+    "#152641", // 4番目の背景色
+    "#153A29", // 5番目の背景色
+    "#2D2D2D", // 6番目以降のデフォルト色
+  ];
+  const UNASSIGNED_COLOR = "#8A8A8A";
+
+  const getTierColor = (index: number) => {
+    return TIER_COLORS[index] || TIER_COLORS[TIER_COLORS.length - 1];
   };
 
   const handlePresetChange = (value: keyof typeof TIER_PRESETS) => {
@@ -532,7 +539,7 @@ const TierEditor: React.FC<TierEditorProps> = ({
       </div>
 
       <SortableContext items={tierOrder} strategy={rectSortingStrategy}>
-        {tierOrder.map((tierKey) => (
+        {tierOrder.map((tierKey, index) => (
           <div key={tierKey} className="relative">
             <SortableTier
               id={tierKey}
@@ -549,7 +556,7 @@ const TierEditor: React.FC<TierEditorProps> = ({
                   },
                 }))
               }
-              backgroundColor={tierColors[tierKey] || tierColors.default}
+              backgroundColor={getTierColor(index)}
             />
             {tierOrder.length > 2 && (
               <button
@@ -581,7 +588,7 @@ const TierEditor: React.FC<TierEditorProps> = ({
 
       <UnassignedArea
         items={unassignedItems}
-        backgroundColor={tierColors.unassigned}
+        backgroundColor={UNASSIGNED_COLOR}
         dropPreview={dropPreview?.tierId === "unassigned" ? { index: dropPreview.index } : null}
       />
 
@@ -645,7 +652,7 @@ const TierEditor: React.FC<TierEditorProps> = ({
                 },
               }))
             }
-            backgroundColor={tierColors[activeTierId] || tierColors.default}
+            backgroundColor={getTierColor(getActiveTierIndex(activeTierId))}
           />
         ) : activeItemId ? (
           (() => {
