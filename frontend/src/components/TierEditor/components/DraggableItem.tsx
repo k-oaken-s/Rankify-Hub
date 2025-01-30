@@ -17,39 +17,34 @@ type DraggableItemProps = {
 const DraggableItem: React.FC<DraggableItemProps> = ({ item, isOverlay = false }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
-    data: {
-      type: "item",
-      item,
-    },
   });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging && !isOverlay ? 0 : 1,
+  };
 
   return (
     <div
       ref={setNodeRef}
-      style={{
-        transform: CSS.Transform.toString(transform),
-        transition,
-        opacity: isDragging ? 0.4 : 1,
-      }}
-      className="group relative w-[120px] h-[120px] rounded-lg overflow-hidden cursor-move
-                 transition-all duration-300 ease-in-out bg-transparent
-                 hover:shadow-lg hover:-translate-y-1"
+      style={style}
+      className="w-[120px] h-[120px] rounded-lg overflow-hidden cursor-move"
       {...attributes}
       {...listeners}
     >
-      <div className="relative w-full h-full transition-transform duration-300 group-hover:scale-[1.02]">
+      <div className="relative w-full h-full">
         <ImageWrapper
           src={getImageUrl(item.image || "")}
           alt={item.name}
           width={120}
           height={120}
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          className="w-full h-full object-cover"
         />
-
-        <div className="absolute bottom-0 left-0 right-0 bg-black/40 backdrop-blur-[2px]">
+        <div className="absolute bottom-0 left-0 right-0 flex justify-center">
           <p
-            className="text-white text-xs uppercase tracking-wider text-center truncate px-2 py-1.5
-                       transition-all duration-300 group-hover:tracking-widest"
+            className="text-gray-200 text-xs font-bold uppercase tracking-wider text-center truncate px-2 py-1.5
+            bg-black/50 backdrop-blur-[2px] inline-block rounded-md"
           >
             {item.name}
           </p>

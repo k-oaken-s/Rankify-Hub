@@ -238,6 +238,12 @@ const TierEditor: React.FC<TierEditorProps> = ({
       return;
     }
 
+    const sourceTierId = findTierByItem(activeId) ?? "unassigned";
+    const sourceIndex =
+      sourceTierId === "unassigned"
+        ? unassignedItems.findIndex((item) => item.id === activeId)
+        : tiers[sourceTierId].items.findIndex((item) => item.id === activeId);
+
     let targetTierId: string;
     let targetIndex: number;
 
@@ -257,6 +263,11 @@ const TierEditor: React.FC<TierEditorProps> = ({
         targetIndex = unassignedItems.findIndex((item) => item.id === overId);
         if (targetIndex === -1) targetIndex = unassignedItems.length;
       }
+    }
+
+    if (sourceTierId === targetTierId && sourceIndex === targetIndex) {
+      setDropPreview(null);
+      return;
     }
 
     setDropPreview({ tierId: targetTierId, index: targetIndex });
@@ -546,7 +557,6 @@ const TierEditor: React.FC<TierEditorProps> = ({
               tierKey={tierKey}
               name={tiers[tierKey].name}
               items={tiers[tierKey].items}
-              dropPreview={dropPreview?.tierId === tierKey ? { index: dropPreview.index } : null}
               onNameChange={(newName) =>
                 setTiers((prev) => ({
                   ...prev,
@@ -586,11 +596,7 @@ const TierEditor: React.FC<TierEditorProps> = ({
         </div>
       )}
 
-      <UnassignedArea
-        items={unassignedItems}
-        backgroundColor={UNASSIGNED_COLOR}
-        dropPreview={dropPreview?.tierId === "unassigned" ? { index: dropPreview.index } : null}
-      />
+      <UnassignedArea items={unassignedItems} backgroundColor={UNASSIGNED_COLOR} />
 
       <div className="mt-8 text-center">
         <button
