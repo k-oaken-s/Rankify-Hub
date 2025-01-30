@@ -41,8 +41,11 @@ const DraggableItem: React.FC<DraggableItemProps> = ({ item, isOverlay = false }
           height={120}
           className="w-full h-full object-cover"
         />
-        <div className="absolute bottom-0 left-0 right-0 bg-black/40 backdrop-blur-[2px]">
-          <p className="text-white text-xs uppercase tracking-wider text-center truncate px-2 py-1.5">
+        <div className="absolute bottom-0 left-0 right-0 flex justify-center">
+          <p
+            className="text-gray-200 text-xs font-bold uppercase tracking-wider text-center truncate px-2 py-1.5
+            bg-black/50 backdrop-blur-[2px] inline-block rounded-md"
+          >
             {item.name}
           </p>
         </div>
