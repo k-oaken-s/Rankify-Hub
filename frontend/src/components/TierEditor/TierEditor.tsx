@@ -557,7 +557,6 @@ const TierEditor: React.FC<TierEditorProps> = ({
               tierKey={tierKey}
               name={tiers[tierKey].name}
               items={tiers[tierKey].items}
-              dropPreview={dropPreview?.tierId === tierKey ? { index: dropPreview.index } : null}
               onNameChange={(newName) =>
                 setTiers((prev) => ({
                   ...prev,
@@ -597,11 +596,7 @@ const TierEditor: React.FC<TierEditorProps> = ({
         </div>
       )}
 
-      <UnassignedArea
-        items={unassignedItems}
-        backgroundColor={UNASSIGNED_COLOR}
-        dropPreview={dropPreview?.tierId === "unassigned" ? { index: dropPreview.index } : null}
-      />
+      <UnassignedArea items={unassignedItems} backgroundColor={UNASSIGNED_COLOR} />
 
       <div className="mt-8 text-center">
         <button
