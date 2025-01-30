@@ -1,4 +1,5 @@
 import { useSortable } from "@dnd-kit/sortable";
+import { SortableContext, horizontalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
 import React from "react";
@@ -6,7 +7,6 @@ import React from "react";
 import { Item } from "@/types/Item";
 
 import DraggableItem from "./DraggableItem";
-import DropPreview from "./DropPreview";
 
 interface SortableTierProps {
   id: string;
@@ -15,7 +15,6 @@ interface SortableTierProps {
   items: Item[];
   backgroundColor: string;
   onNameChange: (newName: string) => void;
-  dropPreview?: { index: number } | null;
 }
 
 const SortableTier: React.FC<SortableTierProps> = ({
@@ -25,7 +24,6 @@ const SortableTier: React.FC<SortableTierProps> = ({
   items,
   backgroundColor,
   onNameChange,
-  dropPreview,
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id,
@@ -41,7 +39,7 @@ const SortableTier: React.FC<SortableTierProps> = ({
     <div ref={setNodeRef} style={style} {...attributes}>
       <div className="flex mb-4 rounded-md shadow-md overflow-hidden" style={{ backgroundColor }}>
         <div
-          className="w-32 flex items-center justify-center p-4 cursor-move border-r border-white/10" // border-r と border-white/10 を追加
+          className="w-32 flex items-center justify-center p-4 cursor-move border-r border-white/10"
           {...listeners}
           style={{ backgroundColor }}
         >
@@ -55,15 +53,16 @@ const SortableTier: React.FC<SortableTierProps> = ({
           />
         </div>
         <div className="flex-1 p-4" style={{ backgroundColor }}>
-          <div className="flex gap-4 flex-wrap relative min-h-[120px]">
-            {items.map((item, index) => (
-              <React.Fragment key={item.id}>
-                {dropPreview && index === dropPreview.index && <DropPreview />}
-                <DraggableItem item={item} />
-              </React.Fragment>
-            ))}
-            {dropPreview && dropPreview.index >= items.length && <DropPreview />}
-          </div>
+          <SortableContext
+            items={items.map((item) => item.id)}
+            strategy={horizontalListSortingStrategy}
+          >
+            <div className="flex flex-wrap gap-4 min-h-[120px]">
+              {items.map((item) => (
+                <DraggableItem key={item.id} item={item} />
+              ))}
+            </div>
+          </SortableContext>
         </div>
       </div>
     </div>
