@@ -34,7 +34,7 @@ export default function Header() {
 
   return (
     <header className="bg-gradient-to-r from-[#4b278f] to-[#28508f] shadow-lg">
-      <div className="container mx-auto flex justify-between items-center p-4">
+      <div className="container mx-auto flex flex-col sm:flex-row justify-between items-center p-4 gap-4 sm:gap-0">
         <Link href="/">
           <h1
             className="text-2xl font-bold cursor-pointer hover:text-yellow-300 transition duration-200"
@@ -43,13 +43,13 @@ export default function Header() {
             Rankify Hub
           </h1>
         </Link>
-        <nav className="flex space-x-4">
+        <nav className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
           <Link
             href="/"
             onClick={() => handleMenuClick("1")}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-md ${
+            className={`flex items-center justify-center space-x-2 px-4 py-2 rounded-md ${
               selectedKey === "1" ? "bg-yellow-300 text-black" : "hover:text-yellow-300"
-            } transition duration-200`}
+            } transition duration-200 w-full sm:w-auto`}
           >
             <HomeOutlined />
             <span>ホーム</span>
@@ -57,22 +57,24 @@ export default function Header() {
           <Link
             href="/categories"
             onClick={() => handleMenuClick("2")}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-md ${
+            className={`flex items-center justify-center space-x-2 px-4 py-2 rounded-md ${
               selectedKey === "2" ? "bg-yellow-300 text-black" : "hover:text-yellow-300"
-            } transition duration-200`}
+            } transition duration-200 w-full sm:w-auto`}
           >
             <AppstoreOutlined />
-            <span>カテゴリーから新規作成</span>
+            <span className="hidden sm:inline">カテゴリーから新規作成</span>
+            <span className="sm:hidden">新規作成</span>
           </Link>
           <Link
             href="/tiers"
             onClick={() => handleMenuClick("3")}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-md ${
+            className={`flex items-center justify-center space-x-2 px-4 py-2 rounded-md ${
               selectedKey === "3" ? "bg-yellow-300 text-black" : "hover:text-yellow-300"
-            } transition duration-200`}
+            } transition duration-200 w-full sm:w-auto`}
           >
             <UnorderedListOutlined />
-            <span>公開されたTierを見る</span>
+            <span className="hidden sm:inline">公開されたTierを見る</span>
+            <span className="sm:hidden">公開Tier</span>
           </Link>
         </nav>
       </div>
