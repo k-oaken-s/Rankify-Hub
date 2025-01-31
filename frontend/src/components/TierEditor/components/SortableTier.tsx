@@ -52,7 +52,7 @@ const SortableTier: React.FC<SortableTierProps> = ({
             onClick={(e) => e.stopPropagation()}
           />
         </div>
-        <div className="flex-1 p-4" style={{ backgroundColor }}>
+        <div className="flex-1 py-4 px-4" style={{ backgroundColor }}>
           <SortableContext
             items={items.map((item) => item.id)}
             strategy={horizontalListSortingStrategy}
