@@ -35,7 +35,7 @@ const DraggableItem: React.FC<DraggableItemProps> = ({ item, isOverlay = false }
       style={style}
       className="group w-[120px] h-[120px] rounded-lg overflow-hidden cursor-move
                  transition-all duration-300 ease-in-out bg-transparent
-                 hover:shadow-lg hover:-translate-y-1"
+                 hover:shadow-lg hover:-translate-y-1 touch-none"
       {...attributes}
       {...listeners}
     >

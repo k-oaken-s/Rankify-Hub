@@ -7,6 +7,7 @@ import {
   DragOverlay,
   DragStartEvent,
   PointerSensor,
+  TouchSensor,
   rectIntersection,
   useSensor,
   useSensors,
@@ -101,19 +102,25 @@ const TierEditor: React.FC<TierEditorProps> = ({
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedPreset, setSelectedPreset] = useState<keyof typeof TIER_PRESETS>("tier");
   const anonymousId = getAnonymousId();
-  const [dropPreview, setDropPreview] = useState<{
-    tierId: string;
-    index: number;
-  } | null>(null);
   const [tiers, setTiers] = useState<Record<string, TierData>>(
     initialTiers || TIER_PRESETS.tier.tiers,
   );
 
   const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: { distance: 5 },
+    useSensor(PointerSensor),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250,
+        tolerance: 10,
+      },
+      options: {
+        activationConstraint: {
+          distance: 10, // ドラッグ開始までの最小距離
+        },
+      },
     }),
   );
+
   const getActiveTierIndex = (tierId: string) => {
     return tierOrder.indexOf(tierId);
   };
@@ -226,7 +233,6 @@ const TierEditor: React.FC<TierEditorProps> = ({
   const handleDragOver = (event: DragOverEvent) => {
     const { active, over } = event;
     if (!active || !over) {
-      setDropPreview(null);
       return;
     }
 
@@ -234,7 +240,6 @@ const TierEditor: React.FC<TierEditorProps> = ({
     const overId = over.id as string;
 
     if (tierOrder.includes(activeId)) {
-      setDropPreview(null);
       return;
     }
 
@@ -266,11 +271,8 @@ const TierEditor: React.FC<TierEditorProps> = ({
     }
 
     if (sourceTierId === targetTierId && sourceIndex === targetIndex) {
-      setDropPreview(null);
       return;
     }
-
-    setDropPreview({ tierId: targetTierId, index: targetIndex });
   };
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -287,7 +289,6 @@ const TierEditor: React.FC<TierEditorProps> = ({
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
-    setDropPreview(null);
     const { active, over } = event;
     if (!active || !over) {
       resetActiveState();

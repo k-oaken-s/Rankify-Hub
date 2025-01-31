@@ -66,7 +66,7 @@ const SortableTier: React.FC<SortableTierProps> = ({
 
         <div
           {...listeners}
-          className="w-full sm:w-32 flex items-center justify-center p-4 relative border-b sm:border-b-0 sm:border-r border-white/10 cursor-grab"
+          className="w-full sm:w-32 flex items-center justify-center p-4 relative border-b sm:border-b-0 sm:border-r border-white/10 cursor-grab  touch-none"
           style={{ backgroundColor }}
         >
           <input
