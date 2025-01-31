@@ -551,7 +551,7 @@ const TierEditor: React.FC<TierEditorProps> = ({
 
       <SortableContext items={tierOrder} strategy={rectSortingStrategy}>
         {tierOrder.map((tierKey, index) => (
-          <div key={tierKey} className="relative">
+          <div key={tierKey}>
             <SortableTier
               id={tierKey}
               tierKey={tierKey}
@@ -567,16 +567,9 @@ const TierEditor: React.FC<TierEditorProps> = ({
                 }))
               }
               backgroundColor={getTierColor(index)}
+              canRemove={tierOrder.length > 2}
+              onRemove={() => handleRemoveTier(tierKey)}
             />
-            {tierOrder.length > 2 && (
-              <button
-                onClick={() => handleRemoveTier(tierKey)}
-                className="absolute -right-8 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300 transition-colors"
-                title="Tierを削除"
-              >
-                <XCircleIcon size={20} />
-              </button>
-            )}
           </div>
         ))}
       </SortableContext>
